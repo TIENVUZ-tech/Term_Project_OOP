@@ -1,154 +1,90 @@
 package com.DevChickens.Arkanoid.core;
 
-import com.DevChickens.Arkanoid.graphics.Renderer;
+import com.DevChickens.Arkanoid.entities.Paddle;
+import com.DevChickens.Arkanoid.entities.Ball;
+import com.DevChickens.Arkanoid.entities.bricks.Brick;
+import com.DevChickens.Arkanoid.entities.bricks.NormalBrick;
+import com.DevChickens.Arkanoid.entities.powerups.PowerUp;
+import com.DevChickens.Arkanoid.enums.GameState;
 
-/**
- * Quản lý trạng thái và tiến trình chính của trò chơi Arkanoid.
- * <p>
- * GameManager giữ các thông tin như điểm số, số mạng, màn chơi hiện tại và trạng thái trò chơi.
- * Nó cung cấp các phương thức để bắt đầu, cập nhật, tạm dừng, tiếp tục và reset game.
- * </p>
- *
- * Luồng trạng thái chính:
- * <pre>
- * START  -> RUNNING <-> PAUSED -> GAME_OVER
- * </pre>
- *
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameManager {
 
-    /** Điểm số hiện tại của người chơi. */
+    private Paddle paddle;
+    private Ball ball;
+    private List<Brick> bricks;
+    private List<PowerUp> powerUps;
+
     private int score;
-
-    /** Số mạng còn lại của người chơi. */
     private int lives;
+    private int level;   // ✅ thêm biến level
+    private GameState gameState;
 
-    /** Màn chơi hiện tại. */
-    private int level;
-
-    /** Trạng thái hiện tại của trò chơi. */
-    private GameState state;
-
-    /**
-     * Khởi tạo GameManager với giá trị mặc định:
-     * <ul>
-     *   <li>score = 0</li>
-     *   <li>lives = 3</li>
-     *   <li>level = 1</li>
-     *   <li>state = START</li>
-     * </ul>
-     */
     public GameManager() {
+        this.bricks = new ArrayList<>();
+        this.powerUps = new ArrayList<>();
         this.score = 0;
         this.lives = 3;
-        this.level = 1;
-        this.state = GameState.START;
+        this.level = 1;  // ✅ mặc định bắt đầu từ level 1
+        this.gameState = GameState.STARTING;
     }
 
     /**
-     * Bắt đầu trò chơi từ trạng thái START.
-     * Trạng thái sẽ chuyển sang RUNNING.
+     * Khởi động lại game mới
      */
     public void startGame() {
-        this.state = GameState.RUNNING;
-    }
+        System.out.println("Game started! Level " + level);
 
-    /**
-     * Cập nhật logic chính của game.
-     * <p>
-     * Trong phiên bản demo: mỗi lần update giảm 1 mạng.
-     * Nếu mạng = 0 thì game chuyển sang GAME_OVER.
-     * </p>
-     */
-    public void update() {
-        if (state == GameState.RUNNING) {
-            lives--;
-            if (lives <= 0) {
-                state = GameState.GAME_OVER;
-            }
+        // Paddle ở giữa màn hình
+        this.paddle = new Paddle(350, 550);
+        this.ball = new Ball(390, 530);
+
+
+        // Thêm vài viên gạch mẫu (số lượng có thể phụ thuộc level)
+        bricks.clear();
+        for (int i = 0; i < 5 + (level - 1) * 2; i++) { // mỗi level cao hơn thì nhiều gạch hơn
+            bricks.add(new NormalBrick(100 + (i % 5) * 120, 100 + (i / 5) * 50, 100, 30));
         }
+
+        this.gameState = GameState.RUNNING;
     }
 
-    /**
-     * Tạm dừng trò chơi nếu đang ở trạng thái RUNNING.
-     */
-    public void pauseGame() {
-        if (state == GameState.RUNNING) {
-            state = GameState.PAUSED;
-        }
+    public void nextLevel() {
+        level++;
+        startGame();
     }
 
-    /**
-     * Tiếp tục trò chơi nếu đang ở trạng thái PAUSED.
-     */
-    public void resumeGame() {
-        if (state == GameState.PAUSED) {
-            state = GameState.RUNNING;
-        }
+    public void updateGame() {
+        if (gameState != GameState.RUNNING) return;
+
+        // TODO: cập nhật vị trí ball, paddle
+        System.out.println("Game updating...");
     }
 
-    /**
-     * Reset lại trò chơi về trạng thái ban đầu.
-     */
-    public void reset() {
-        this.score = 0;
-        this.lives = 3;
-        this.level = 1;
-        this.state = GameState.START;
+    public void handleInput(String input) {
+        // TODO: paddle.moveLeft(), moveRight()
+        System.out.println("Handling input: " + input);
     }
 
-    /**
-     * @return điểm số hiện tại.
-     */
-    public int getScore() {
-        return score;
+    public void checkCollisions() {
+        // TODO: xử lý ball đập vào paddle/brick
+        System.out.println("Checking collisions...");
     }
 
-    /**
-     * Tăng điểm số hiện tại.
-     *
-     * @param points số điểm được cộng thêm.
-     */
-    public void addScore(int points) {
-        this.score += points;
+    public void gameOver() {
+        this.gameState = GameState.GAME_OVER;
+        System.out.println("Game Over! Final score = " + score);
     }
 
-    /**
-     * @return số mạng hiện tại.
-     */
-    public int getLives() {
-        return lives;
-    }
-
-    /**
-     * @return màn chơi hiện tại.
-     */
-    public int getLevel() {
-        return level;
-    }
-
-    /**
-     * @return trạng thái hiện tại của trò chơi.
-     */
-    public GameState getState() {
-        return state;
-    }
-
-    /**
-     * Thiết lập trạng thái game thủ công (nếu cần).
-     *
-     * @param state trạng thái mới.
-     */
-    public void setState(GameState state) {
-        this.state = state;
-    }
-
-    /**
-     * @return chuỗi mô tả trạng thái game để debug hoặc hiển thị.
-     */
-    @Override
-    public String toString() {
-        return String.format("GameManager{score=%d, lives=%d, level=%d, state=%s}",
-                score, lives, level, state);
-    }
+    // Getter
+    public Paddle getPaddle() { return paddle; }
+    public Ball getBall() { return ball; }
+    public List<Brick> getBricks() { return bricks; }
+    public List<PowerUp> getPowerUps() { return powerUps; }
+    public GameState getState() { return gameState; }
+    public int getScore() { return score; }
+    public int getLives() { return lives; }
+    public int getLevel() { return level; }   // ✅ thêm getter cho level
 }
