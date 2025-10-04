@@ -42,4 +42,7 @@ public class ExpandPaddlePowerUp extends PowerUp {
     public void removeEffect(Paddle paddle, Ball ball) {
         paddle.setWidth(this.originalPaddleWidth);
     }
+
+    @Override
+    public void render() {}
 }

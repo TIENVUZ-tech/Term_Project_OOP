@@ -77,9 +77,4 @@ public abstract class PowerUp extends GameObject {
     public void render(Graphics g) {
         // Có thể vẽ biểu tượng power-up ở đây
     }
-
-    @Override
-    public String getTerminalString() {
-        return "[ P ]";
-    }
 }
