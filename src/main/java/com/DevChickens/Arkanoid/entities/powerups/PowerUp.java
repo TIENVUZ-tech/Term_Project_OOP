@@ -55,7 +55,7 @@ public abstract class PowerUp extends GameObject {
     public void render(Graphics g) {
     }
 
-    z@Override
+    @Override
     public String getTerminalString() {
         return "[ P ]";
     }

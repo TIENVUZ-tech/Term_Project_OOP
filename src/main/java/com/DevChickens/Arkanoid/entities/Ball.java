@@ -138,4 +138,13 @@ public class Ball extends MovableObject {
         this.setDx(this.getDx() * factor);
         this.setDy(this.getDy() * factor);
     }
+
+    /**
+     * ký tự đại diện cho quả bóng trên giao diện Terminal.
+     * @return Chuỗi ký tự "[O]".
+     */
+    @Override
+    public String getTerminalString() {
+        return "[O]";
+    }
 }
