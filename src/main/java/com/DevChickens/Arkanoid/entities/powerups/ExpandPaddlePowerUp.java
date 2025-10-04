@@ -42,13 +42,4 @@ public class ExpandPaddlePowerUp extends PowerUp {
     public void removeEffect(Paddle paddle, Ball ball) {
         paddle.setWidth(this.originalPaddleWidth);
     }
-
-    /**
-     * ký tự đại diện cho phiên bản Terminal.
-     * @return "[ E ]" (Expand).
-     */
-    @Override
-    public String getTerminalString() {
-        return "[ E ]";
-    }
 }
