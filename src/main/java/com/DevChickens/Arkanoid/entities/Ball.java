@@ -128,4 +128,13 @@ public class Ball extends MovableObject {
             directionY = -directionY;
         }
     }
+
+    /**
+     * phương thức thay đổi tốc độ của quả bóng.
+     * @param factor hệ số thay đổi tốc độ.
+     */
+    public void multiplySpeed(double factor) {
+        this.setDx(this.getDx() * factor);
+        this.setDy(this.getDy() * factor);
+    }
 }
