@@ -5,6 +5,8 @@ package com.DevChickens.Arkanoid.enums;
  */
 public enum BrickType {
     NORMAL,
-    STRONG
+    STRONG,
+    QUITE,
+    EXPLOSIVEBRICK,
     // Có thể bổ sung thêm: UNBREAKABLE, DOUBLE_HIT ...
 }

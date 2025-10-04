@@ -1,54 +1,28 @@
 package com.DevChickens.Arkanoid;
 
+import javax.swing.*;
 import com.DevChickens.Arkanoid.core.GameManager;
-import com.DevChickens.Arkanoid.enums.GameState;
-import com.DevChickens.Arkanoid.graphics.Renderer;
+import com.DevChickens.Arkanoid.graphics.GamePanel;
 
 /**
  * Điểm khởi chạy chính của trò chơi Arkanoid.
- * <p>
- * Trong phiên bản demo, luồng chạy đơn giản:
- * START -> RUNNING -> PAUSED -> RUNNING -> GAME_OVER.
- * </p>
- *
  */
 public class Main {
-
     public static void main(String[] args) {
-        GameManager gm = new GameManager();
-        Renderer renderer = new Renderer();
+        SwingUtilities.invokeLater(() -> {
+            // Tạo cửa sổ chính
+            JFrame frame = new JFrame("Arkanoid - DevChickens");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setResizable(false);
 
-        // Hiển thị trạng thái ban đầu (START)
-        renderer.render(gm);
+            // Tạo GameManager và gắn vào GamePanel
+            GameManager manager = new GameManager();
+            GamePanel panel = new GamePanel(manager);
 
-        // Bắt đầu game
-        gm.startGame();
-        renderer.showMessage("Game started!");
-        renderer.render(gm);
-
-        // Giả lập update vài lần
-        for (int i = 0; i < 2; i++) {
-            gm.update();
-            renderer.render(gm);
-        }
-
-        // Tạm dừng game
-        gm.pauseGame();
-        renderer.showMessage("Game paused!");
-        renderer.render(gm);
-
-        // Tiếp tục game
-        gm.resumeGame();
-        renderer.showMessage("Game resumed!");
-        renderer.render(gm);
-
-        // Giả lập update cho tới khi GAME_OVER
-        while (gm.getState() != GameState.GAME_OVER) {
-            gm.update();
-            renderer.render(gm);
-        }
-
-        // Hiện Game Over
-        renderer.showGameOver();
+            frame.add(panel);
+            frame.pack();
+            frame.setLocationRelativeTo(null); // căn giữa màn hình
+            frame.setVisible(true);
+        });
     }
 }
