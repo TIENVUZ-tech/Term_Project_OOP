@@ -28,32 +28,58 @@ public abstract class PowerUp extends GameObject {
         this.duration = duration;
     }
 
+    /** Getter cho type. */
+    public String getType() {
+        return type;
+    }
+
+    /** Getter cho duration (nếu cần dùng ngoài). */
+    public int getDuration() {
+        return duration;
+    }
+
+    /**
+     *
+     * Dùng AABB collision giống Ball.
+     */
+    public boolean checkCollision(GameObject other) {
+        boolean conditionOne   = this.getX() < other.getX() + other.getWidth();
+        boolean conditionTwo   = this.getX() + this.getWidth() > other.getX();
+        boolean conditionThree = this.getY() < other.getY() + other.getHeight();
+        boolean conditionFour  = this.getY() + this.getHeight() > other.getY();
+        return conditionOne && conditionTwo && conditionThree && conditionFour;
+    }
+
     /**
      * Cập nhật trạng thái của Power-up (ví dụ: di chuyển rơi xuống).
      */
     @Override
     public void update() {
-
+        this.setY(this.getY() + 2);
     }
 
+
     /**
-     * Áp dụng Powerup.
+     * Áp dụng Power-up.
      * @param paddle Thanh trượt có thể bị ảnh hưởng.
      * @param ball Quả bóng có thể bị ảnh hưởng.
      */
     public abstract void applyEffect(Paddle paddle, Ball ball);
 
     /**
-     * Gỡ bỏ Powerup khi hết hạn.
+     * Gỡ bỏ Power-up khi hết hạn.
      * @param paddle Thanh trượt có thể bị ảnh hưởng.
      * @param ball Quả bóng có thể bị ảnh hưởng.
      */
     public abstract void removeEffect(Paddle paddle, Ball ball);
 
     @Override
-    public void render() {}
-    
-    @Override
     public void render(Graphics g) {
+        // Có thể vẽ biểu tượng power-up ở đây
+    }
+
+    @Override
+    public String getTerminalString() {
+        return "[ P ]";
     }
 }
