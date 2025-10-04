@@ -1,21 +1,22 @@
 package com.DevChickens.Arkanoid.entities.bricks;
 
 import com.DevChickens.Arkanoid.entities.GameObject;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 /**
- * Lớp trừu tượng cơ sở (Model) cho tất cả các loại gạch trong game.
- * Chứa dữ liệu và logic chung như máu, điểm, và trạng thái.
+ * Lớp trừu tượng cơ sở cho tất cả các khối gạch cần phá hủy.
+ * Kế thừa từ GameObject và định nghĩa các thuộc tính, phương thức chung cho gạch.
  */
 public abstract class Brick extends GameObject {
 
-    /** Máu của viên gạch. Khi về 0, gạch sẽ bị phá hủy. */
-    protected int health;
-    /** Điểm số người chơi nhận được khi phá hủy gạch. */
-    protected int score;
+    /** Số lần va chạm cần thiết để phá hủy viên gạch. */
+    protected int hitPoints;
+    /** Loại của viên gạch, lưu dưới dạng một chuỗi ký tự. */
+    protected String type;
     /** Cờ đánh dấu viên gạch đã bị phá hủy hay chưa. */
-    protected boolean isDestroyed;
-    /** Cờ xác định xem gạch có khả năng sinh ra Power-up hay không. */
+    protected boolean destroyed;
+    /** Cờ xác định xem gạch có khả năng sinh ra Power-up khi bị phá hủy hay không. */
     protected boolean canSpawnPowerUp;
 
     /**
@@ -24,42 +25,38 @@ public abstract class Brick extends GameObject {
      * @param y Tọa độ Y.
      * @param width Chiều rộng.
      * @param height Chiều cao.
-     * @param health Lượng máu ban đầu.
-     * @param score Điểm số khi bị phá hủy.
+     * @param hitPoints Số lần va chạm ban đầu.
+     * @param type Chuỗi ký tự định danh loại gạch.
      */
-    public Brick(double x, double y, double width, double height, int health, int score) {
+    public Brick(double x, double y, double width, double height, int hitPoints, String type) {
         super(x, y, width, height);
-        this.health = health;
-        this.score = score;
-        this.isDestroyed = false;
+        this.hitPoints = hitPoints;
+        this.type = type;
+        this.destroyed = false;
 
-        /** random khả nang sinh powerup của viên gạch */
-        if (Math.random() < 0.2) {
+        if (hitPoints > 0 && Math.random() < 0.2) {
             this.canSpawnPowerUp = true;
-        } else {
-            this.canSpawnPowerUp = false;
         }
     }
 
     /**
-     * Xử lý logic khi bóng va chạm vào gạch.
-     * Giảm máu và kiểm tra xem gạch có bị phá hủy không.
+     * Xử lý logic khi viên gạch nhận một va chạm từ bóng.
      */
-    public void hit() {
-        if (this.health > 0) {
-            this.health--;
+    public void takeHit() {
+        if (this.hitPoints > 0) {
+            this.hitPoints--;
         }
-        if (this.health == 0) {
-            this.isDestroyed = true;
+        if (this.hitPoints == 0) {
+            this.destroyed = true;
         }
     }
 
     /**
-     * Kiểm tra xem gạch đã bị phá hủy chưa.
+     * Kiểm tra xem viên gạch đã bị phá hủy hoàn toàn hay chưa.
      * @return true nếu gạch đã bị phá hủy, ngược lại false.
      */
     public boolean isDestroyed() {
-        return this.isDestroyed;
+        return this.destroyed;
     }
 
     /**
@@ -71,30 +68,28 @@ public abstract class Brick extends GameObject {
     }
 
     /**
-     * Lấy điểm số của viên gạch.
-     * @return giá trị điểm số.
+     * Lấy loại của viên gạch.
+     * @return Chuỗi ký tự định danh loại gạch.
      */
-    public int getScore() {
-        return this.score;
+    public String getType() {
+        return this.type;
     }
 
     /**
-     * Lấy lượng máu hiện tại của viên gạch.
-     * @return số máu còn lại.
+     * Cài đặt phương thức update() được kế thừa từ GameObject.
+     * Vì gạch là vật thể tĩnh, phương thức này để trống.
      */
-    public int getHealth() {
-        return this.health;
-    }
-
-    /**
-     * Phương thức trừu tượng buộc các lớp con phải cung cấp một hình ảnh
-     * phù hợp với trạng thái hiện tại của chúng.
-     * @return Đối tượng BufferedImage để cho Renderer vẽ.
-     */
-    public abstract BufferedImage getImage();
-
     @Override
     public void update() {
-        // Gạch tĩnh không cần update.
+        // Gạch tĩnh không cần cập nhật logic.
     }
+
+    /**
+     * Khai báo lại phương thức render() là abstract.
+     * Điều này buộc các lớp con như NormalBrick, QuiteBrick... phải tự định nghĩa
+     * cách vẽ của riêng chúng.
+     * @param g Đối tượng Graphics dùng để vẽ.
+     */
+    @Override
+    public abstract void render(Graphics g);
 }

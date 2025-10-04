@@ -68,14 +68,12 @@ public abstract class  GameObject {
      * Cập nhật trạng thái logic của vật thể mỗi khung hình (frame) của game.
      *  Ví dụ: di chuyển, thay đổi kích thước...
      * Được định nghĩa chi tiết ở lớp con.
-     * @param none (không có gì)
      */
     public abstract void update();
 
     /**
      * Được gọi sau update() để hiển thị hình ảnh mới nhất.
      * Dùng đối tượng đồ hoạ (Graphics) để vẽ hình chữ nhật, ảnh sprite… tại vị trí đã cập nhật.
-     * @param none 
      */
     public abstract void render();
 }

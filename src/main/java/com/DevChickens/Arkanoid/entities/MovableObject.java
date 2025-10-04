@@ -48,7 +48,6 @@ public abstract class MovableObject extends GameObject {
      * Phương thức move(). Di chuyển đối tượng dựa trên tốc độ di chuyển dx, dy.
      * Phương thức move được để là abstract.
      * Nghĩa là mọi lớp con kế thừa từ MovableObject bắt buộc phải cung cấp cách di chuyển riêng.
-     * @param none
      */
     public abstract void move();
 }

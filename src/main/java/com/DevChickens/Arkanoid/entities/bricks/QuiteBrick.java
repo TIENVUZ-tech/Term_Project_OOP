@@ -1,45 +1,41 @@
 package com.DevChickens.Arkanoid.entities.bricks;
 
 import com.DevChickens.Arkanoid.graphics.AssetLoader;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 /**
- * Viên gạch cần 2 lần va chạm mới bị phá hủy
+ * Đại diện cho một viên gạch cứng, cần hai lần va chạm để phá hủy.
  * Viên gạch sẽ thay đổi hình dạng (bị nứt) sau lần va chạm đầu tiên.
  */
 public class QuiteBrick extends Brick {
-    /** Lượng máu của gạch, cần 2 lần va chạm. */
-    private static final int HEALTH = 2;
-    /** Điểm số người chơi nhận được. */
-    private static final int SCORE = 250;
-
-    /** Hình ảnh khi gạch còn nguyên vẹn. */
-    private BufferedImage imageNormal;
-    /** Hình ảnh khi gạch đã bị nứt sau 1 lần va chạm. */
-    private BufferedImage imageCracked;
+    private static final int HIT_POINTS = 2;
+    private final BufferedImage imageNormal;
+    private final BufferedImage imageCracked;
 
     /**
-     * Phương thức khởi tạo một viên gạch "dai" tại một vị trí cụ thể.
-     * @param x Tọa độ X của viên gạch.
-     * @param y Tọa độ Y của viên gạch.
+     * Khởi tạo một viên gạch cứng tại một vị trí cụ thể.
+     * @param x Tọa độ X.
+     * @param y Tọa độ Y.
      */
     public QuiteBrick(double x, double y) {
-        super(x, y, 64, 20, HEALTH, SCORE);
+        super(x, y, 64, 20, HIT_POINTS, "QUITE");
         this.imageNormal = AssetLoader.loadImage("/images/QuiteBrick.png");
         this.imageCracked = AssetLoader.loadImage("/images/QuiteBrick_cracked.png");
     }
 
     /**
-     * viên gạch có 2 trạng thái, mỗi hình ảnh tương ứng với 1 trạng thái.
-     * @return Hình ảnh bị nứt nếu còn 1 máu, ngược lại trả về hình ảnh bình thường.
+     * Vẽ viên gạch lên màn hình tùy theo trạng thái hitPoints.
+     * @param g Đối tượng Graphics dùng để vẽ.
      */
     @Override
-    public BufferedImage getImage() {
-        if (this.getHealth() == 1) {
-            return this.imageCracked;
-        } else {
-            return this.imageNormal;
+    public void render(Graphics g) {
+        if (!isDestroyed()) {
+            if (this.hitPoints == 1) {
+                g.drawImage(this.imageCracked, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
+            } else {
+                g.drawImage(this.imageNormal, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
+            }
         }
     }
-
 }

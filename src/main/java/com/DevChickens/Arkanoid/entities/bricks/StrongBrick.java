@@ -1,47 +1,40 @@
 package com.DevChickens.Arkanoid.entities.bricks;
 
 import com.DevChickens.Arkanoid.graphics.AssetLoader;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 /**
- * Viên gạch không thể bị phá hủy
- * Thường được dùng làm chướng ngại vật cố định trên màn chơi.
+ * Đại diện cho một viên gạch bất tử, không thể bị phá hủy.
  */
 public class StrongBrick extends Brick {
-    /** Điểm số là 0 vì không thể phá hủy. */
-    private static final int SCORE = 0;
-    /** Gán health là -1 để biểu thị trạng thái không thể phá hủy. */
-    private static final int HEALTH = -1;
-
-    /** Biến lưu trữ hình ảnh của viên gạch. */
-    private BufferedImage image;
+    private static final int HIT_POINTS = -1; // -1 biểu thị trạng thái bất tử
+    private final BufferedImage image;
 
     /**
-     * Phương thức khởi tạo một viên gạch bất tử tại một vị trí cụ thể.
-     * @param x Tọa độ X của viên gạch.
-     * @param y Tọa độ Y của viên gạch.
+     * Khởi tạo một viên gạch bất tử tại một vị trí cụ thể.
+     * @param x Tọa độ X.
+     * @param y Tọa độ Y.
      */
     public StrongBrick(double x, double y) {
-        super(x, y, 64, 20, HEALTH, SCORE);
+        super(x, y, 64, 20, HIT_POINTS, "STRONG");
         this.image = AssetLoader.loadImage("/images/StrongBrick.png");
     }
 
     /**
-     * Ghi đè phương thức hit() của lớp cha.
-     * không có bất kỳ hành động nào xảy ra, khiến viên gạch trở nên bất tử.
+     * Ghi đè phương thức takeHit() để không làm gì cả, khiến gạch trở nên bất tử.
      */
     @Override
-    public void hit() {
-
+    public void takeHit() {
+        // Gạch này không nhận sát thương.
     }
 
     /**
-     * Cung cấp hình ảnh trực quan của viên gạch.
-     * @return Đối tượng BufferedImage chứa hình ảnh của gạch.
+     * Vẽ viên gạch lên màn hình.
+     * @param g Đối tượng Graphics dùng để vẽ.
      */
     @Override
-    public BufferedImage getImage() {
-        return this.image;
+    public void render(Graphics g) {
+        g.drawImage(this.image, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
     }
-
 }
