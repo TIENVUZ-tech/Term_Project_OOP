@@ -18,8 +18,8 @@ public class NormalBrick extends Brick {
 
     /**
      * Phương thức khởi tạo một viên gạch bình thường tại một vị trí cụ thể.
-     * @param x Tọa độ X (hoành độ) của viên gạch.
-     * @param y Tọa độ Y (tung độ) của viên gạch.
+     * @param x Tọa độ X của viên gạch.
+     * @param y Tọa độ Y của viên gạch.
      */
     public NormalBrick(double x, double y) {
         super(x, y, 64, 20, HEALTH, SCORE);

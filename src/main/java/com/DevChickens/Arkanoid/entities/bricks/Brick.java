@@ -33,7 +33,7 @@ public abstract class Brick extends GameObject {
         this.score = score;
         this.isDestroyed = false;
 
-        // Quyết định ngẫu nhiên khả năng sinh Power-up
+        /** random khả nang sinh powerup của viên gạch */
         if (Math.random() < 0.2) {
             this.canSpawnPowerUp = true;
         } else {
@@ -47,7 +47,7 @@ public abstract class Brick extends GameObject {
      */
     public void hit() {
         if (this.health > 0) {
-            this.health--; // SỬA LỖI: health
+            this.health--;
         }
         if (this.health == 0) {
             this.isDestroyed = true;
@@ -66,7 +66,7 @@ public abstract class Brick extends GameObject {
      * Kiểm tra xem gạch có nên sinh ra một Power-up hay không.
      * @return true nếu gạch đã bị phá hủy và có khả năng sinh Power-up.
      */
-    public boolean shouldSpawnPowerUp() { // SỬA LỖI: Thêm ()
+    public boolean shouldSpawnPowerUp() {
         return isDestroyed() && canSpawnPowerUp;
     }
 

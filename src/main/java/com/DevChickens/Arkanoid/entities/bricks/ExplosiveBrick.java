@@ -5,8 +5,8 @@ import java.awt.image.BufferedImage;
 
 /**
  * Đại diện cho một viên gạch nổ.
- * Bị phá hủy sau **một lần** va chạm và đóng vai trò là "ngòi nổ".
- * Lưu ý: Logic gây nổ lan truyền được xử lý ở lớp cấp cao hơn (GameManager).
+ * Bị phá hủy sau 1 va chạm và đóng vai trò là ngòi nổ.
+ * Logic gây nổ lan truyền được xử lý ở lớp GameManager.
  */
 public class ExplosiveBrick extends Brick {
     /** Lượng máu của gạch, chỉ cần 1 lần va chạm để kích nổ. */

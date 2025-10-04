@@ -30,7 +30,7 @@ public class QuiteBrick extends Brick {
     }
 
     /**
-     * Cung cấp hình ảnh phù hợp với trạng thái máu hiện tại của gạch.
+     * viên gạch có 2 trạng thái, mỗi hình ảnh tương ứng với 1 trạng thái.
      * @return Hình ảnh bị nứt nếu còn 1 máu, ngược lại trả về hình ảnh bình thường.
      */
     @Override

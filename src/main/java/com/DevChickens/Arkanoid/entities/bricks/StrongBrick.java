@@ -28,12 +28,11 @@ public class StrongBrick extends Brick {
 
     /**
      * Ghi đè phương thức hit() của lớp cha.
-     * Phương thức này được cố tình để trống. Khi bóng va vào,
-     * sẽ không có bất kỳ hành động nào xảy ra, khiến viên gạch trở nên bất tử.
+     * không có bất kỳ hành động nào xảy ra, khiến viên gạch trở nên bất tử.
      */
     @Override
     public void hit() {
-        // Không làm gì cả.
+
     }
 
     /**
