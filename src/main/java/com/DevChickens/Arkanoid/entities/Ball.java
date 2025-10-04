@@ -78,9 +78,10 @@ public class Ball extends MovableObject {
     }
 
     @Override
-    public void render(Graphics g) {}
+    public void render() {}
 
-    
+    @Override
+    public void render(Graphics g) {}
 
     /**
      * Phương thức checkCollistion().
@@ -137,14 +138,5 @@ public class Ball extends MovableObject {
     public void multiplySpeed(double factor) {
         this.setDx(this.getDx() * factor);
         this.setDy(this.getDy() * factor);
-    }
-
-    /**
-     * ký tự đại diện cho quả bóng trên giao diện Terminal.
-     * @return Chuỗi ký tự "[O]".
-     */
-    @Override
-    public String getTerminalString() {
-        return "[O]";
     }
 }
