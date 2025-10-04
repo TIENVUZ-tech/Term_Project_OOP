@@ -77,4 +77,6 @@ public abstract class  GameObject {
      * Dùng đối tượng đồ hoạ (Graphics) để vẽ hình chữ nhật, ảnh sprite… tại vị trí đã cập nhật.
      */
     public abstract void render(Graphics g);
+
+    public abstract String getTerminalString();
 }

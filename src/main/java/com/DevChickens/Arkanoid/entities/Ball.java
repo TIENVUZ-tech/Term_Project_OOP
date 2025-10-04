@@ -1,4 +1,5 @@
 package com.DevChickens.Arkanoid.entities;
+import java.awt.Graphics;
 
 public class Ball extends MovableObject {
     /*Tốc độ của bóng. Đơn vị là pixel */
@@ -77,7 +78,7 @@ public class Ball extends MovableObject {
     }
 
     @Override
-    public void render() {}
+    public void render(Graphics g) {}
 
     
 
