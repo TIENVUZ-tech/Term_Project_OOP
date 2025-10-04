@@ -50,13 +50,10 @@ public abstract class PowerUp extends GameObject {
      */
     public abstract void removeEffect(Paddle paddle, Ball ball);
 
-
+    @Override
+    public void render() {}
+    
     @Override
     public void render(Graphics g) {
-    }
-
-    @Override
-    public String getTerminalString() {
-        return "[ P ]";
     }
 }
