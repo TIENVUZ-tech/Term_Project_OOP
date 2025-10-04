@@ -1,26 +1,34 @@
 package com.DevChickens.Arkanoid.graphics;
 
 import com.DevChickens.Arkanoid.core.GameManager;
+
 import javax.swing.*;
 
 /**
- * GameWindow tạo JFrame để chứa GamePanel.
+ * GameWindow tạo cửa sổ chính chứa GamePanel.
  */
-public class GameWindow {
+public class GameWindow extends JFrame {
+
+    public GameWindow(GameManager manager) {
+        setTitle("Arkanoid - OOP Project");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+
+        GamePanel panel = new GamePanel(manager);
+        add(panel);
+
+        pack(); // auto chỉnh kích thước theo panel
+        setLocationRelativeTo(null); // đặt giữa màn hình
+        setVisible(true);
+    }
+
+    /**
+     * Hàm main để chạy game
+     */
     public static void main(String[] args) {
-        GameManager manager = new GameManager();
-        manager.startGame(); // khởi động game
-
-        JFrame window = new JFrame("Arkanoid - DevChickens");
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        GamePanel gamePanel = new GamePanel(manager);
-        window.add(gamePanel);
-        window.pack();
-
-        window.setLocationRelativeTo(null);
-        window.setVisible(true);
-
-        gamePanel.startGameLoop(); // chạy vòng lặp game
+        SwingUtilities.invokeLater(() -> {
+            GameManager manager = new GameManager();
+            new GameWindow(manager);
+        });
     }
 }

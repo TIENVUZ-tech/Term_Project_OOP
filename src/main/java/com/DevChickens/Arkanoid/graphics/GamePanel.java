@@ -1,61 +1,61 @@
 package com.DevChickens.Arkanoid.graphics;
 
-import com.DevChickens.Arkanoid.entities.Paddle;
-import com.DevChickens.Arkanoid.entities.Ball;
-import com.DevChickens.Arkanoid.entities.bricks.Brick;
-import com.DevChickens.Arkanoid.entities.powerups.PowerUp;
 import com.DevChickens.Arkanoid.core.GameManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 /**
- * GamePanel là JPanel nơi mọi thứ được vẽ lên.
- * Renderer được gọi trong phương thức paintComponent().
+ * GamePanel là nơi hiển thị game và chứa vòng lặp game (game loop).
+ *  - Gọi GameManager.update() để cập nhật logic
+ *  - repaint() để vẽ lại game
+ *  - Lắng nghe sự kiện bàn phím và chuyển cho GameManager xử lý
  */
-public class GamePanel extends JPanel implements Runnable {
+public class GamePanel extends JPanel implements Runnable, KeyListener {
 
-    private GameManager gameManager;
-    private Renderer renderer;
-
+    private GameManager manager;
     private Thread gameThread;
-    private final int FPS = 60;
+    private boolean running;
 
-    public GamePanel(GameManager gameManager) {
-        this.gameManager = gameManager;
-        this.renderer = new Renderer();
-        setPreferredSize(new Dimension(800, 600));
+    public GamePanel(GameManager manager) {
+        this.manager = manager;
+
+        setPreferredSize(new Dimension(GameManager.GAME_WIDTH, GameManager.GAME_HEIGHT));
         setBackground(Color.BLACK);
+
         setFocusable(true);
+        requestFocus();
+        addKeyListener(this);
+
+        startGameLoop();
     }
 
-    public void startGameLoop() {
+    private void startGameLoop() {
+        running = true;
         gameThread = new Thread(this);
         gameThread.start();
     }
 
     @Override
     public void run() {
-        double drawInterval = 1000000000.0 / FPS; // nanoseconds per frame
-        double nextDrawTime = System.nanoTime() + drawInterval;
+        // Game loop với ~60 FPS
+        final int FPS = 60;
+        final long frameTime = 1000 / FPS;
 
-        while (gameThread != null) {
-            // 1. Cập nhật game
-            gameManager.updateGame();
+        while (running) {
+            long start = System.currentTimeMillis();
 
-            // 2. Vẽ lại màn hình
+            manager.update();
             repaint();
 
-            // 3. Đợi đến khung hình tiếp theo
+            long elapsed = System.currentTimeMillis() - start;
+            long sleepTime = frameTime - elapsed;
+            if (sleepTime < 0) sleepTime = 2;
+
             try {
-                double remaining = nextDrawTime - System.nanoTime();
-                remaining = remaining / 1000000; // chuyển sang ms
-
-                if (remaining < 0) remaining = 0;
-                Thread.sleep((long) remaining);
-
-                nextDrawTime += drawInterval;
+                Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -65,14 +65,21 @@ public class GamePanel extends JPanel implements Runnable {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        manager.draw(g);
+    }
 
-        Graphics2D g2 = (Graphics2D) g;
+    @Override
+    public void keyPressed(KeyEvent e) {
+        manager.handleInput(e.getKeyCode());
+    }
 
-        Paddle paddle = gameManager.getPaddle();
-        Ball ball = gameManager.getBall();
-        List<Brick> bricks = gameManager.getBricks();
-        List<PowerUp> powerUps = gameManager.getPowerUps();
+    @Override
+    public void keyReleased(KeyEvent e) {
+        // không cần
+    }
 
-        renderer.renderAll(g2, paddle, ball, bricks, powerUps);
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // không cần
     }
 }
