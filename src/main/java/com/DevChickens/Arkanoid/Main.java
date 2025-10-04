@@ -1,7 +1,7 @@
 package com.DevChickens.Arkanoid;
 
 import com.DevChickens.Arkanoid.core.GameManager;
-import com.DevChickens.Arkanoid.core.GameState;
+import com.DevChickens.Arkanoid.enums.GameState;
 import com.DevChickens.Arkanoid.graphics.Renderer;
 
 /**
