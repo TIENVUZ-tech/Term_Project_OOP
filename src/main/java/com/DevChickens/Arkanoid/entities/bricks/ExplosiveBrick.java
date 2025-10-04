@@ -35,4 +35,5 @@ public class ExplosiveBrick extends Brick {
     public BufferedImage getImage() {
         return this.image;
     }
+
 }

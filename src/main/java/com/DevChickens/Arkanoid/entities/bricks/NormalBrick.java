@@ -35,4 +35,5 @@ public class NormalBrick extends Brick {
     public BufferedImage getImage() {
         return this.image;
     }
+
 }

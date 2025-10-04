@@ -41,4 +41,5 @@ public class QuiteBrick extends Brick {
             return this.imageNormal;
         }
     }
+
 }

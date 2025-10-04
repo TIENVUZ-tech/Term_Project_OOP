@@ -43,4 +43,5 @@ public class StrongBrick extends Brick {
     public BufferedImage getImage() {
         return this.image;
     }
+
 }
