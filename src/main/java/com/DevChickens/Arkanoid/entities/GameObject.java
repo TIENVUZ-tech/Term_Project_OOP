@@ -4,7 +4,7 @@ package com.DevChickens.Arkanoid.entities;
  * Paddle, Ball, Brick, PowerUp… đều kế thừa từ GameObject.
  * Lớp này gom những thuộc tính vị trí – kích thước – hành vi chung mà mọi đối tượng đều cần.
  */
-public abstract class GameObject {
+public abstract class  GameObject {
     /*Tọa độ trục hoành (trục X). Dùng để quy định vị trí của vật theo phương ngang.*/
     private double x;
     /*Tọa độ trục tung (trục Y). Dùng để quy định vị trí của vật theo phương thẳng đứng.*/
