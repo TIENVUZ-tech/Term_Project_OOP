@@ -5,6 +5,8 @@ package com.DevChickens.Arkanoid.entities;
  * Phương thức: moveLeft(), moveRight(), applyPowerUp(). 
  */
 
+import java.awt.Graphics;
+
 import com.DevChickens.Arkanoid.entities.powerups.PowerUp;
 
 public class Paddle extends MovableObject {
@@ -63,7 +65,11 @@ public class Paddle extends MovableObject {
 
     @Override
     public void move() {}
-    
+
+    @Override
+    public void render(Graphics g) {
+
+    }
     /**
      * Phương thức moveLeft() (di chuyển sang trái speed đơn vị).
      * @param none
