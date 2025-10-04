@@ -38,13 +38,4 @@ public class FastBallPowerUp extends PowerUp {
     public void removeEffect(Paddle paddle, Ball ball) {
         ball.multiplySpeed(1 / speedFactor);
     }
-
-    /**
-     * Ký tự đại diện cho phiên bản Terminal.
-     * @return "[ F ]" (Fast).
-     */
-    @Override
-    public String getTerminalString() {
-        return "[ F ]";
-    }
 }
