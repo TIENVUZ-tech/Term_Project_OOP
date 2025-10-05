@@ -9,19 +9,18 @@ import java.awt.image.BufferedImage;
  * Viên gạch sẽ thay đổi hình dạng (bị nứt) sau lần va chạm đầu tiên.
  */
 public class QuiteBrick extends Brick {
-    private static final int HIT_POINTS = 2;
-    private final BufferedImage imageNormal;
-    private final BufferedImage imageCracked;
+    // private final BufferedImage imageNormal;
+    // private final BufferedImage imageCracked;
 
     /**
      * Khởi tạo một viên gạch cứng tại một vị trí cụ thể.
      * @param x Tọa độ X.
      * @param y Tọa độ Y.
      */
-    public QuiteBrick(double x, double y) {
-        super(x, y, 64, 20, HIT_POINTS, "QUITE");
-        this.imageNormal = AssetLoader.loadImage("/images/QuiteBrick.png");
-        this.imageCracked = AssetLoader.loadImage("/images/QuiteBrick_cracked.png");
+    public QuiteBrick(double x, double y, double width, double height, int hitPoints, String type) {
+        super(x, y, width, height, hitPoints, type);
+    //     this.imageNormal = AssetLoader.loadImage("/images/QuiteBrick.png");
+    //     this.imageCracked = AssetLoader.loadImage("/images/QuiteBrick_cracked.png");
     }
 
     /**
@@ -30,12 +29,12 @@ public class QuiteBrick extends Brick {
      */
     @Override
     public void render(Graphics g) {
-        if (!isDestroyed()) {
-            if (this.hitPoints == 1) {
-                g.drawImage(this.imageCracked, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
-            } else {
-                g.drawImage(this.imageNormal, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
-            }
-        }
+        // if (!isDestroyed()) {
+        //     if (this.hitPoints == 1) {
+        //         g.drawImage(this.imageCracked, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
+        //     } else {
+        //         g.drawImage(this.imageNormal, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
+        //     }
+        // }
     }
 }

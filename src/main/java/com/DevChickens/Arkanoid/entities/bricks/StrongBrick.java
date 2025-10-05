@@ -1,5 +1,6 @@
 package com.DevChickens.Arkanoid.entities.bricks;
 
+import com.DevChickens.Arkanoid.entities.GameObject;
 import com.DevChickens.Arkanoid.graphics.AssetLoader;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -8,17 +9,16 @@ import java.awt.image.BufferedImage;
  * Đại diện cho một viên gạch bất tử, không thể bị phá hủy.
  */
 public class StrongBrick extends Brick {
-    private static final int HIT_POINTS = -1; // -1 biểu thị trạng thái bất tử
-    private final BufferedImage image;
+    // private final BufferedImage image;
 
     /**
      * Khởi tạo một viên gạch bất tử tại một vị trí cụ thể.
      * @param x Tọa độ X.
      * @param y Tọa độ Y.
      */
-    public StrongBrick(double x, double y) {
-        super(x, y, 64, 20, HIT_POINTS, "STRONG");
-        this.image = AssetLoader.loadImage("/images/StrongBrick.png");
+    public StrongBrick(double x, double y, double width, double height, int hitPoints, String type) {
+        super(x, y, width, height, hitPoints, type);
+        // this.image = AssetLoader.loadImage("/images/StrongBrick.png");
     }
 
     /**
@@ -35,6 +35,6 @@ public class StrongBrick extends Brick {
      */
     @Override
     public void render(Graphics g) {
-        g.drawImage(this.image, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
+        // g.drawImage(this.image, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
     }
 }
