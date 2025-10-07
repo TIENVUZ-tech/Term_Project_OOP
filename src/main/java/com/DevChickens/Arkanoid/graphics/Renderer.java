@@ -92,6 +92,21 @@ public class Renderer {
         g.drawString("Press P to Resume", w / 2 - 100, h / 2 + 40);
     }
 
+    public void drawNextRound(Graphics g, int width, int height, int round) {
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, width, height);
+
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 48));
+        String text = "ROUND " + round;
+        int textWidth = g.getFontMetrics().stringWidth(text);
+        g.drawString(text, (width - textWidth) / 2, height / 2);
+
+        g.setFont(new Font("Arial", Font.PLAIN, 20));
+        g.drawString("Get Ready...", (width / 2) - 50, (height / 2) + 40);
+    }
+
+
     public void drawGameOver(Graphics g, int w, int h, int score) {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, w, h);
