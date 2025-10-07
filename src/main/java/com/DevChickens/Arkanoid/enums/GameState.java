@@ -5,10 +5,12 @@ package com.DevChickens.Arkanoid.enums;
  * Được sử dụng trong GameManager để điều khiển luồng xử lý.
  */
 public enum GameState {
-    MENU,       // Màn hình menu chính
-    PLAYING,    // Đang chơi game
-    PAUSED,     // Game bị tạm dừng
-    GAME_OVER,  // Thua hết mạng
-    VICTORY     // Hoàn thành màn chơi (thắng)
+    MENU,
+    PLAYING,
+    PAUSED,
+    GAME_OVER,
+    VICTORY,
+    NEXT_ROUND
 }
+
 

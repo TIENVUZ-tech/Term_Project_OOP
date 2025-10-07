@@ -7,6 +7,6 @@ public enum BrickType {
     NORMAL,
     STRONG,
     QUITE,
-    EXPLOSIVEBRICK,
+    EXPLOSIVE,
     // Có thể bổ sung thêm: UNBREAKABLE, DOUBLE_HIT ...
 }

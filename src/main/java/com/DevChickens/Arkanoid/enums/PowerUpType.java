@@ -5,6 +5,6 @@ package com.DevChickens.Arkanoid.enums;
  */
 public enum PowerUpType {
     EXPAND_PADDLE,
-    FAST_BALL
+    FAST_BALL,
     // Có thể bổ sung thêm: MULTI_BALL, EXTRA_LIFE ...
 }
