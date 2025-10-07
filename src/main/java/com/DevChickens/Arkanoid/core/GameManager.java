@@ -9,6 +9,7 @@ import com.DevChickens.Arkanoid.graphics.Renderer;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class GameManager {
     private Paddle paddle;
@@ -19,6 +20,10 @@ public class GameManager {
     private int score;
     private int lives;
     private GameState gameState;
+    private int currentRound;
+    private final int maxRounds = 5;
+    private long nextRoundStartTime; // Thời điểm bắt đầu hiển thị "ROUND X"
+    private final long ROUND_DISPLAY_DURATION = 2000; // 2 giây
 
     private Renderer renderer;
 
@@ -37,46 +42,49 @@ public class GameManager {
     public void initGame() {
         score = 0;
         lives = 3;
+        currentRound = 1; // Bắt đầu từ round 1
         gameState = GameState.MENU;
+        initRound(currentRound); // Khởi tạo round đầu tiên
+    }
 
-        // Paddle: (x, y, width, height, dx, dy, speed, currentPowerUp)
-        paddle = new Paddle(
-                GAME_WIDTH / 2.0 - 50,
-                GAME_HEIGHT - 50,
-                100,
-                15,
-                0,
-                0,
-                20,
-                null
-        );
-
-        // Ball: (x, y, width, height, dx, dy, speed, directionX, directionY)
-        ball = new Ball(
-                GAME_WIDTH / 2.0,
-                GAME_HEIGHT - 70,
-                15,
-                15,
-                3,
-                -3,
-                5,
-                1,
-                -1
-        );
+    private void initRound(int round) {
+        paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 100, 15, 0, 0, 20, null);
+        ball = new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 15, 15, 3, -3, 5 + round, 1, -1);
 
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
+        Random random = new Random();
 
-        // Tạo lưới gạch bằng BrickFactory
-        for (int row = 0; row < 5; row++) {
-            for (int col = 0; col < 10; col++) {
-                int hitPoints = (row < 2) ? 1 : 2;
-                String type = (hitPoints == 1) ? "normal" : "strong";
+        // Số hàng và cột tăng dần theo round
+        int rows = 3 + round;       // round 1: 4 hàng, round 5: 8 hàng
+        int cols = 8 + (round / 2); // tăng dần
+
+        // Độ khó: càng cao càng có nhiều gạch “khó”
+        double strongChance = 0.1 * round;
+        double explosiveChance = 0.05 * round;
+        double quiteChance = 0.15 * round;
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                String type;
+                double r = random.nextDouble();
+                if (r < explosiveChance) type = "explosive";
+                else if (r < explosiveChance + strongChance) type = "strong";
+                else if (r < explosiveChance + strongChance + quiteChance) type = "quite";
+                else type = "normal";
+
+                int hitPoints = switch (type) {
+                    case "strong" -> 3;
+                    case "explosive" -> 1;
+                    case "quite" -> 2;
+                    default -> 1;
+                };
 
                 bricks.add(BrickFactory.createBrick(
                         60 + col * 70,
                         50 + row * 30,
-                        64, 20, hitPoints,
+                        64, 20,
+                        hitPoints,
                         type
                 ));
             }
@@ -87,6 +95,18 @@ public class GameManager {
      * Cập nhật logic game
      */
     public void update() {
+        // Nếu chưa chơi thì không update
+        if (gameState == GameState.MENU || gameState == GameState.GAME_OVER || gameState == GameState.VICTORY) return;
+
+        // Hiển thị "ROUND X" vài giây trước khi bắt đầu chơi
+        if (gameState == GameState.NEXT_ROUND) {
+            long now = System.currentTimeMillis();
+            if (now - nextRoundStartTime >= ROUND_DISPLAY_DURATION) {
+                gameState = GameState.PLAYING;
+            }
+            return; // Dừng update logic game trong lúc hiển thị round
+        }
+
         if (gameState != GameState.PLAYING) return;
 
         ball.move();
@@ -113,17 +133,32 @@ public class GameManager {
             }
         }
 
-        // Kiểm tra thắng (mọi brick bị phá)
-        boolean allDestroyed = true;
+        // Kiểm tra thắng
+        boolean allBreakableDestroyed = true;
         for (Brick b : bricks) {
+            // Bỏ qua gạch không thể phá (StrongBrick)
+            if (b instanceof StrongBrick) {
+                continue;
+            }
+
+            // Nếu còn gạch bình thường chưa vỡ → chưa thắng
             if (!b.isDestroyed()) {
-                allDestroyed = false;
+                allBreakableDestroyed = false;
                 break;
             }
         }
-        if (allDestroyed) {
-            gameState = GameState.VICTORY;
+
+        if (allBreakableDestroyed) {
+            if (currentRound < maxRounds) {
+                currentRound++;
+                initRound(currentRound);
+                gameState = GameState.NEXT_ROUND;
+                nextRoundStartTime = System.currentTimeMillis();
+            } else {
+                gameState = GameState.VICTORY;
+            }
         }
+
     }
 
     /**
@@ -188,15 +223,25 @@ public class GameManager {
                 ball.setY(ball.getY() - ball.getSpeed() * ball.getDirectionY());
 
                 // Va chạm và Bật ngược (sử dụng logic bounceOff trong Ball.java)
-                ball.bounceOff(b); 
-                
-                b.takeHit();
-                score += 100;
+                ball.bounceOff(b);
 
-                // Nếu Brick vỡ thì có thể rơi PowerUp
-                if (b.isDestroyed() && Math.random() < 0.2) {
-                    powerUps.add(new ExpandPaddlePowerUp(b.getX(), b.getY()));
+                b.takeHit();
+
+                if (b.isDestroyed()) {
+                    int points = switch (b.getType().toLowerCase()) {
+                        case "strong" -> 300;
+                        case "explosive" -> 200;
+                        case "quite" -> 150;
+                        default -> 100;
+                    };
+                    score += points;
+
+                    // Có thể rơi PowerUp ngẫu nhiên
+                    if (Math.random() < 0.2) {
+                        powerUps.add(new ExpandPaddlePowerUp(b.getX(), b.getY()));
+                    }
                 }
+
             }
         }
 
@@ -228,7 +273,7 @@ public class GameManager {
                 GAME_HEIGHT - 50,
                 100,
                 15,
-                0, 0, 5, null
+                0, 0, 10, null
         );
 
         // Thiết lập lại vị trí và hướng/tốc độ ban đầu cho bóng
@@ -299,11 +344,16 @@ public class GameManager {
                 g.setColor(Color.WHITE);
                 g.drawString("Score: " + score, 10, 20);
                 g.drawString("Lives: " + lives, 10, 40);
-                
+                g.drawString("Round: " + currentRound + "/" + maxRounds, 10, 60);
+
+
                 // VẼ MÀN HÌNH PAUSED
                 if (gameState == GameState.PAUSED) {
                     renderer.drawPause(g, GAME_WIDTH, GAME_HEIGHT);
                 }
+                break;
+            case NEXT_ROUND:
+                renderer.drawNextRound(g, GAME_WIDTH, GAME_HEIGHT, currentRound);
                 break;
             case GAME_OVER:
                 renderer.drawGameOver(g, GAME_WIDTH, GAME_HEIGHT, score);
@@ -311,6 +361,7 @@ public class GameManager {
             case VICTORY:
                 renderer.drawVictory(g, GAME_WIDTH, GAME_HEIGHT, score);
                 break;
+
         }
     }
 }
