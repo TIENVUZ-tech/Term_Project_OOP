@@ -17,6 +17,7 @@ public class Ball extends MovableObject {
     private int directionY;
     /* biên chứa anhr của bong. */
     private BufferedImage image;
+
     /**
      * Phương thức khởi tạo Ball, giữ nguyên 9 tham số đầu vào.
      * @param x (tọa độ x)
@@ -43,8 +44,6 @@ public class Ball extends MovableObject {
             this.setHeight(TARGET_SIZE);
         }
     }
-    
-    // --- Setter và Getter ---
 
     /**Phương thức setter và getter của speed. */
     public void setSpeed(double speed) {

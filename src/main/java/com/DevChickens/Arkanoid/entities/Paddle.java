@@ -96,7 +96,6 @@ public class Paddle extends MovableObject {
     }
     /**
      * Phương thức moveLeft() (di chuyển sang trái speed đơn vị).
-     * @param none
      */
     public void moveLeft() {
         setX(getX() - speed); // cập nhật lại toạ độ trục x của paddle.
@@ -104,7 +103,6 @@ public class Paddle extends MovableObject {
 
     /**
      * Phương thức moveRight() (di chuyển sang phải speed đơn vị).
-     * @param none
      */
     public void moveRight() {
         setX(getX() + speed); // cập nhật lại toạn độ trục x của paddle.
