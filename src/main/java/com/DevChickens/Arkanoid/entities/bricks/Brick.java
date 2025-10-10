@@ -18,7 +18,8 @@ public abstract class Brick extends GameObject {
     protected boolean destroyed;
     /** Cờ xác định xem gạch có khả năng sinh ra Power-up khi bị phá hủy hay không. */
     protected boolean canSpawnPowerUp;
-
+    /** biến lu trữ hình ảnh. */
+    protected BufferedImage image;
     /**
      * Phương thức khởi tạo chung cho mọi viên gạch.
      * @param x Tọa độ X.
@@ -94,4 +95,12 @@ public abstract class Brick extends GameObject {
      */
     @Override
     public abstract void render(Graphics g);
+
+    /**
+     * lay anh
+     * @return anh.
+     */
+    public BufferedImage getImage() {
+        return this.image;
+    }
 }

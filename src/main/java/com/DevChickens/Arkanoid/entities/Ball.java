@@ -1,7 +1,8 @@
 package com.DevChickens.Arkanoid.entities;
 
 import java.awt.Graphics;
-
+import com.DevChickens.Arkanoid.graphics.AssetLoader;
+import java.awt.image.BufferedImage;
 /**
  * Lớp Ball, giữ nguyên chữ ký hàm khởi tạo 9 tham số theo yêu cầu.
  * Logic di chuyển chỉ sử dụng 'speed', 'directionX', 'directionY'.
@@ -14,28 +15,33 @@ public class Ball extends MovableObject {
     private int directionX;
     /* Hướng di chuyển của bóng theo phương dọc (1 hoặc -1). */
     private int directionY;
-
+    /* biên chứa anhr của bong. */
+    private BufferedImage image;
     /**
      * Phương thức khởi tạo Ball, giữ nguyên 9 tham số đầu vào.
      * @param x (tọa độ x)
      * @param y (toạ độ y)
-     * @param width (độ rộng)
-     * @param height (độ cao)
      * @param dx (tốc độ di chuyển theo trục x - được truyền lên lớp cha)
      * @param dy (tốc độ di chuyển theo chiều y - được truyền lên lớp cha)
      * @param speed (tốc độ di chuyển tổng - được dùng trong move())
      * @param directionX (hướng di chuyển theo phương ngang)
      * @param directionY (hướng di chuyển theo phương dọc)
      */
-    public Ball(double x, double y, double width, double height, double dx, double dy,
+    public Ball(double x, double y, double dx, double dy,
                 double speed, int directionX, int directionY) {
         // Gọi hàm khởi tạo của MovableObject, sử dụng dx và dy đầu vào
-        super(x, y, width, height, dx, dy); 
+        super(x, y, 0, 0, dx, dy);
         
         this.speed = speed;
         // Đảm bảo hướng di chuyển luôn là 1 hoặc -1
         this.directionX = directionX == 0 ? 1 : directionX; 
         this.directionY = directionY == 0 ? 1 : directionY;
+        this.image = AssetLoader.loadImage("/images/ball.png");
+        if (this.image != null) {
+            final double TARGET_SIZE = 30;
+            this.setWidth(TARGET_SIZE);
+            this.setHeight(TARGET_SIZE);
+        }
     }
     
     // --- Setter và Getter ---
@@ -150,5 +156,10 @@ public class Ball extends MovableObject {
      */
     public void multiplySpeed(double factor) {
         this.speed *= factor;
+    }
+
+    /** << THÊM DÒNG NÀY: Getter để lấy ảnh của quả bóng */
+    public BufferedImage getImage() {
+        return image;
     }
 }

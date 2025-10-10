@@ -28,8 +28,8 @@ public class GameManager {
     private Renderer renderer;
 
     // Kích thước khu vực chơi (Tường)
-    public static final int GAME_WIDTH = 800;
-    public static final int GAME_HEIGHT = 600;
+    public static final int GAME_WIDTH = 920;
+    public static final int GAME_HEIGHT = 690;
 
     public GameManager() {
         renderer = new Renderer();
@@ -48,9 +48,8 @@ public class GameManager {
     }
 
     private void initRound(int round) {
-        paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 100, 15, 0, 0, 20, null);
-        ball = new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 15, 15, 3, -3, 5 + round, 1, -1);
-
+        paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 0, 0, 20, null);
+        ball = new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 5 + round, 1, -1);
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         Random random = new Random();
@@ -58,6 +57,21 @@ public class GameManager {
         // Số hàng và cột tăng dần theo round
         int rows = 3 + round;       // round 1: 4 hàng, round 5: 8 hàng
         int cols = 8 + (round / 2); // tăng dần
+
+        // chiều rộng cố định mong muốn cho viên gạch
+        final double BRICK_WIDTH = 85;
+        final double PADDING = 2; // Khoảng cách cho hàng và cột
+        final double TOP_OFFSET = 70; // khoảng cách từ lề trên xuống
+
+        // Chiều cao tạm thời, giá trị thật sẽ được tính trong mỗi class gạch
+        final double BRICK_HEIGHT = BRICK_WIDTH * (85.0 / 256.0);
+
+        // Tính toán tổng chiều rộng của toàn bộ lưới gạch
+        // Tổng chiều rộng = (số cột * chiều rộng gạch) + (số khoảng trống ở giữa * padding)
+        double totalGridWidth = (cols * BRICK_WIDTH) + ((cols - 1) * PADDING);
+
+        // Căn giữa toàn bộ lưới gạch bằng cách tính vị trí X bắt đầu
+        double startX = (GAME_WIDTH - totalGridWidth) / 2;
 
         // Độ khó: càng cao càng có nhiều gạch “khó”
         double strongChance = 0.1 * round;
@@ -79,11 +93,15 @@ public class GameManager {
                     case "quite" -> 2;
                     default -> 1;
                 };
+                // Sử dụng các biến PADDING đã tính toán ở trên để đặt vị trí
+                double brickX = startX + col * (BRICK_WIDTH + PADDING);
+                double brickY = TOP_OFFSET + row * (BRICK_HEIGHT + PADDING);
 
                 bricks.add(BrickFactory.createBrick(
-                        60 + col * 70,
-                        50 + row * 30,
-                        64, 20,
+                        brickX,
+                        brickY,
+                        BRICK_WIDTH,  // Truyền chiều rộng mới
+                        BRICK_HEIGHT, // Truyền chiều cao mới
                         hitPoints,
                         type
                 ));
@@ -269,10 +287,8 @@ public class GameManager {
      */
     private void resetBallAndPaddle() {
         paddle = new Paddle(
-                GAME_WIDTH / 2.0 - 50,
+                GAME_WIDTH / 2.0,
                 GAME_HEIGHT - 50,
-                100,
-                15,
                 0, 0, 10, null
         );
 
@@ -280,8 +296,6 @@ public class GameManager {
         ball = new Ball(
                 GAME_WIDTH / 2.0,
                 GAME_HEIGHT - 70,
-                15,
-                15,
                 3,
                 -3,
                 5,
@@ -333,6 +347,9 @@ public class GameManager {
                 break;
             case PLAYING:
             case PAUSED:
+                g.setColor(Color.BLACK);
+                g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
                 // VẼ GAME OBJECTS
                 renderer.drawPaddle(g, paddle);
                 renderer.drawBall(g, ball);
@@ -361,7 +378,6 @@ public class GameManager {
             case VICTORY:
                 renderer.drawVictory(g, GAME_WIDTH, GAME_HEIGHT, score);
                 break;
-
         }
     }
 }

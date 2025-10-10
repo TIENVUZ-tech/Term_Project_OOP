@@ -9,8 +9,6 @@ import java.awt.image.BufferedImage;
  * Lưu ý: Logic gây nổ lan truyền được xử lý ở lớp cấp cao hơn (GameManager).
  */
 public class ExplosiveBrick extends Brick {
-    // private final BufferedImage image;
-
     /**
      * Khởi tạo một viên gạch nổ tại một vị trí cụ thể.
      * @param x Tọa độ X.
@@ -18,7 +16,15 @@ public class ExplosiveBrick extends Brick {
      */
     public ExplosiveBrick(double x, double y, double width, double height, int hitPoints, String type) {
         super(x, y, width, height, hitPoints, type);
-        // this.image = AssetLoader.loadImage("/images/ExplosiveBrick.png");
+        this.image = AssetLoader.loadImage("/images/ExplosiveBrick.png");
+        if (this.image != null) {
+            double originalWidth = this.image.getWidth();
+            double originalHeight = this.image.getHeight();
+            double aspectRatio = originalHeight / originalWidth;
+
+            this.setWidth(width);
+            this.setHeight(width * aspectRatio);
+        }
     }
 
     /**
@@ -27,8 +33,8 @@ public class ExplosiveBrick extends Brick {
      */
     @Override
     public void render(Graphics g) {
-        // if (!isDestroyed()) {
-        //     g.drawImage(this.image, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
-        // }
+        if (!isDestroyed()) {
+            g.drawImage(this.image, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
+        }
     }
 }

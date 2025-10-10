@@ -24,7 +24,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
         setPreferredSize(new Dimension(GameManager.GAME_WIDTH, GameManager.GAME_HEIGHT));
         setBackground(Color.BLACK);
-
+        setOpaque(false);
         setFocusable(true);
         requestFocus();
         addKeyListener(this);

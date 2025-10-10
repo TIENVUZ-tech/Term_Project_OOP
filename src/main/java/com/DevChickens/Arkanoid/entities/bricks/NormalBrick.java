@@ -8,9 +8,6 @@ import java.awt.image.BufferedImage;
  * Đại diện cho một viên gạch bình thường, bị phá hủy sau một lần va chạm.
  */
 public class NormalBrick extends Brick {
-
-    // private final BufferedImage image;
-
     /**
      * Khởi tạo một viên gạch bình thường tại một vị trí cụ thể.
      * @param x Tọa độ X.
@@ -18,7 +15,15 @@ public class NormalBrick extends Brick {
      */
     public NormalBrick(double x, double y, double width, double height, int hitPoints, String type) {
         super(x, y, width, height, hitPoints, type);
-        // this.image = AssetLoader.loadImage("/images/NormalBrick.png");
+        this.image = AssetLoader.loadImage("/images/NormalBrick.png");
+        if (this.image != null) {
+            double originalWidth = this.image.getWidth();
+            double originalHeight = this.image.getHeight();
+            double aspectRatio = originalHeight / originalWidth; // Tính tỷ lệ
+            // Đặt lại kích thước cho đối tượng
+            this.setWidth(width);
+            this.setHeight(width * aspectRatio);
+        }
     }
 
     /**
@@ -27,8 +32,8 @@ public class NormalBrick extends Brick {
      */
     @Override
     public void render(Graphics g) {
-        // if (!isDestroyed()) {
-        //     g.drawImage(this.image, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
-        // }
+        if (!isDestroyed()) {
+            g.drawImage(this.image, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
+        }
     }
 }

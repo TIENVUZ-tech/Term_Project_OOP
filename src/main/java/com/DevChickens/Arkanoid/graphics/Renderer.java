@@ -15,47 +15,36 @@ public class Renderer {
     // Vẽ đối tượng gameplay
     // =========================
     public void drawPaddle(Graphics g, Paddle paddle) {
-        g.setColor(Color.CYAN);
-        g.fillRect((int) paddle.getX(), (int) paddle.getY(),
-                (int) paddle.getWidth(), (int) paddle.getHeight());
+        Graphics2D g2d = (Graphics2D) g;
+        if (paddle.getImage() != null) {
+            // SỬA LẠI THÀNH ĐÚNG
+            g2d.drawImage(paddle.getImage(),
+                    (int) paddle.getX(),
+                    (int) paddle.getY(),
+                    (int) paddle.getWidth(),
+                    (int) paddle.getHeight(), null);
+        }
     }
 
     public void drawBall(Graphics g, Ball ball) {
-        g.setColor(Color.YELLOW);
-        g.fillOval((int) ball.getX(), (int) ball.getY(),
-                (int) ball.getWidth(), (int) ball.getHeight());
+        // Ép kiểu g sang Graphics2D
+        Graphics2D g2d = (Graphics2D) g;
+        if (ball.getImage() != null) {
+            // Dùng g2d để vẽ
+            g2d.drawImage(ball.getImage(), (int) ball.getX(), (int) ball.getY(),
+                    (int) ball.getWidth(), (int) ball.getHeight(), null);
+        }
     }
 
     public void drawBrick(Graphics g, Brick brick) {
-        if (brick.isDestroyed()) return;
-
-        // Màu sắc dựa trên loại hoặc hitPoints
-        switch (brick.getType().toLowerCase()) {
-            case "normal":
-                g.setColor(Color.LIGHT_GRAY);
-                break;
-            case "strong":
-                g.setColor(Color.RED);
-                break;
-            case "explosive":
-                g.setColor(Color.ORANGE);
-                break;
-            case "quite":
-                g.setColor(Color.MAGENTA);
-                break;
-            default:
-                g.setColor(Color.WHITE);
+        if (brick.isDestroyed() || brick.getImage() == null) {
+            return;
         }
-
-        // Tô màu chính
-        g.fillRect((int) brick.getX(), (int) brick.getY(),
-                (int) brick.getWidth(), (int) brick.getHeight());
-
-        // Viền
-        g.setColor(Color.BLACK);
-        g.drawRect((int) brick.getX(), (int) brick.getY(),
-                (int) brick.getWidth(), (int) brick.getHeight());
-
+        // Ép kiểu g sang Graphics2D
+        Graphics2D g2d = (Graphics2D) g;
+        // Dùng g2d để vẽ
+        g2d.drawImage(brick.getImage(), (int) brick.getX(), (int) brick.getY(),
+                (int) brick.getWidth(), (int) brick.getHeight(), null);
     }
 
     public void drawPowerUp(Graphics g, PowerUp p) {
