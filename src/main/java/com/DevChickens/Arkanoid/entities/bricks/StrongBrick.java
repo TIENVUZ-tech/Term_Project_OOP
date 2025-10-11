@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
  * Đại diện cho một viên gạch bất tử, không thể bị phá hủy.
  */
 public class StrongBrick extends Brick {
-    // private final BufferedImage image;
 
     /**
      * Khởi tạo một viên gạch bất tử tại một vị trí cụ thể.
@@ -18,7 +17,7 @@ public class StrongBrick extends Brick {
      */
     public StrongBrick(double x, double y, double width, double height, int hitPoints, String type) {
         super(x, y, width, height, hitPoints, type);
-        // this.image = AssetLoader.loadImage("/images/StrongBrick.png");
+        this.image = AssetLoader.loadImage("/images/StrongBrick.png");
     }
 
     /**
@@ -35,6 +34,6 @@ public class StrongBrick extends Brick {
      */
     @Override
     public void render(Graphics g) {
-        // g.drawImage(this.image, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
+        g.drawImage(this.image, (int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), null);
     }
 }
