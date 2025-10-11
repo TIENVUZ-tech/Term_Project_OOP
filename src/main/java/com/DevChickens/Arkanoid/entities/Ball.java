@@ -37,7 +37,7 @@ public class Ball extends MovableObject {
         // Đảm bảo hướng di chuyển luôn là 1 hoặc -1
         this.directionX = directionX == 0 ? 1 : directionX; 
         this.directionY = directionY == 0 ? 1 : directionY;
-        this.image = AssetLoader.loadImage("/images/ball.png");
+        this.image = AssetLoader.loadImage("/images/Ball.png");
         if (this.image != null) {
             final double TARGET_SIZE = 30;
             this.setWidth(TARGET_SIZE);
