@@ -76,7 +76,5 @@ public abstract class  GameObject {
      * Được gọi sau update() để hiển thị hình ảnh mới nhất.
      * Dùng đối tượng đồ hoạ (Graphics) để vẽ hình chữ nhật, ảnh sprite… tại vị trí đã cập nhật.
      */
-    public abstract void render();
-
     public abstract void render(Graphics g);
 }
