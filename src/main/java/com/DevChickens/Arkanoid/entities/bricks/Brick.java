@@ -85,8 +85,6 @@ public abstract class Brick extends GameObject {
         // Gạch tĩnh không cần cập nhật logic.
     }
 
-    @Override
-    public void render() {}
     /**
      * Khai báo lại phương thức render() là abstract.
      * Điều này buộc các lớp con như NormalBrick, QuiteBrick... phải tự định nghĩa
