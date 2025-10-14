@@ -85,9 +85,6 @@ public class Paddle extends MovableObject {
     public void update() {}
 
     @Override
-    public void render() {}
-
-    @Override
     public void move() {}
 
     @Override
@@ -98,14 +95,18 @@ public class Paddle extends MovableObject {
      * Phương thức moveLeft() (di chuyển sang trái speed đơn vị).
      */
     public void moveLeft() {
-        setX(getX() - speed); // cập nhật lại toạ độ trục x của paddle.
+        if (this.getX() > 0) {
+            setX(getX() - speed); // cập nhật lại toạ độ trục x của paddle.
+        }
     }
 
     /**
      * Phương thức moveRight() (di chuyển sang phải speed đơn vị).
      */
     public void moveRight() {
-        setX(getX() + speed); // cập nhật lại toạn độ trục x của paddle.
+        if(this.getX() + this.getWidth() < 920) {
+            setX(getX() + speed); // cập nhật lại toạn độ trục x của paddle.
+        }
     }
     /**
      * Phương thức applyPowerUp. Cập nhật trạng thái PowerUp hiện tại.
