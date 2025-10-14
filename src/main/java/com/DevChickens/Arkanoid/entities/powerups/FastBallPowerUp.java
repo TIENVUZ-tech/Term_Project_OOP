@@ -1,6 +1,9 @@
 package com.DevChickens.Arkanoid.entities.powerups;
 
 import com.DevChickens.Arkanoid.entities.Paddle;
+
+import java.awt.Graphics;
+
 import com.DevChickens.Arkanoid.entities.Ball;
 
 /**
@@ -15,8 +18,8 @@ public class FastBallPowerUp extends PowerUp {
      * @param x Tọa độ X ban đầu.
      * @param y Tọa độ Y ban đầu.
      */
-    public FastBallPowerUp(double x, double y) {
-        super(x, y, "FAST_BALL", 500);
+    public FastBallPowerUp(double x, double y, String type, int duration) {
+        super(x, y, type, duration);
     }
 
     /**
@@ -40,5 +43,5 @@ public class FastBallPowerUp extends PowerUp {
     }
 
     @Override
-    public void render() {}
+    public void render(Graphics g) {}
 }
