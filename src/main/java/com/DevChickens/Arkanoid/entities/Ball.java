@@ -15,8 +15,16 @@ public class Ball extends MovableObject {
     private int directionX;
     /* Hướng di chuyển của bóng theo phương dọc (1 hoặc -1). */
     private int directionY;
-    /* biên chứa anhr của bong. */
+    /* biến chứa ảnh của bóng. */
+    private BufferedImage normalImage;
+    /* biến chứa ảnh của siêu bóng. */
+    private BufferedImage superImage;
+    /* biến chứa hình ảnh hiện tại của bóng. */
     private BufferedImage image;
+    /* biến thể hiện tình trạng bóng. */
+    private boolean isSuperBall = false;
+    /* biến thể hiện thời gian cho đến khi superBallPowerUp hết tác dụng. */
+    private long superBallEndTime = 0;
 
     /**
      * Phương thức khởi tạo Ball, giữ nguyên 9 tham số đầu vào.
@@ -37,12 +45,21 @@ public class Ball extends MovableObject {
         // Đảm bảo hướng di chuyển luôn là 1 hoặc -1
         this.directionX = directionX == 0 ? 1 : directionX; 
         this.directionY = directionY == 0 ? 1 : directionY;
-        this.image = AssetLoader.loadImage("/images/Ball.png");
-        if (this.image != null) {
+        // Đọc ảnh từ thư mục images.
+        this.normalImage = AssetLoader.loadImage("/images/Ball.png");
+        if (this.normalImage != null) {
             final double TARGET_SIZE = 30;
             this.setWidth(TARGET_SIZE);
             this.setHeight(TARGET_SIZE);
         }
+        // Đọc ảnh superBall từ thư mục images.
+        this.superImage = AssetLoader.loadImage("/images/SuperBall.png");
+        if (this.superImage != null) {
+            final double TARGET_SIZE = 30;
+            this.setWidth(TARGET_SIZE);
+            this.setHeight(TARGET_SIZE);
+        }
+        this.image = this.normalImage;
     }
 
     /**Phương thức setter và getter của speed. */
@@ -73,6 +90,8 @@ public class Ball extends MovableObject {
     public int getDirectionY() {
         return this.directionY;
     }
+
+    /* Phương thức  */
     
     // --- Logic Game ---
 
@@ -86,15 +105,18 @@ public class Ball extends MovableObject {
 
     @Override
     public void update() {
-        /* Đảm bảo bóng tự chạy. */
+        // gọi phương thức di chuyển.
         move();
+        // kiểm tra và kết thúc SuperBallPowerUp
+        if (isSuperBall && System.currentTimeMillis() > superBallEndTime) {
+            deactivateSuperBall();
+        }
     }
-    
-    @Override
-    public void render() {}
 
     @Override
-    public void render(Graphics g) {}
+    public void render(Graphics g) {
+        
+    }
 
     /**
      * Phương thức checkCollistion().
@@ -103,10 +125,11 @@ public class Ball extends MovableObject {
      * @return true (nếu bóng va chạm với vật thể).
      */
     public boolean checkCollision(GameObject other) {
-        return this.getX() < other.getX() + other.getWidth() &&
-               this.getX() + this.getWidth() > other.getX() &&
-               this.getY() < other.getY() + other.getHeight() &&
-               this.getY() + this.getHeight() > other.getY();
+        boolean conditionOne   = this.getX() < other.getX() + other.getWidth();
+        boolean conditionTwo   = this.getX() + this.getWidth() > other.getX();
+        boolean conditionThree = this.getY() < other.getY() + other.getHeight();
+        boolean conditionFour  = this.getY() + this.getHeight() > other.getY();
+        return conditionOne && conditionTwo && conditionThree && conditionFour;
     }
 
     /**
@@ -157,8 +180,28 @@ public class Ball extends MovableObject {
         this.speed *= factor;
     }
 
-    /** << THÊM DÒNG NÀY: Getter để lấy ảnh của quả bóng */
+    /**
+     * Phương thức activateSuperBall() để thay đổi trạng thái của isSuperBall.
+     */
+    public void activateSuperBall(long duration) {
+        this.isSuperBall = true;
+        this.image = this.superImage;
+        // thời gian kết thúc = thời gian hiện tại + thời gian tồn tại.
+        this.superBallEndTime = System.currentTimeMillis() + duration;
+    }
+
+    /**
+     * Phương thức deactivateSuperBall() để thay đổi trạng thái của isSuperBall.
+     */
+    public void deactivateSuperBall() {
+        this.isSuperBall = false;
+        this.image = this.normalImage;
+    }
+
+    /**
+     * Phương thức trả về biến hình ảnh dùng để vẽ vật thể trong Renderer.
+     */
     public BufferedImage getImage() {
-        return image;
+        return this.image;
     }
 }
