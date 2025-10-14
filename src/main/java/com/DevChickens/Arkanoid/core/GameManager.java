@@ -48,7 +48,7 @@ public class GameManager {
     }
 
     private void initRound(int round) {
-        paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 0, 0, 20, null);
+        paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 0, 0, 35, null);
         ball = new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 5 + round, 1, -1);
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
@@ -256,7 +256,9 @@ public class GameManager {
 
                     // Có thể rơi PowerUp ngẫu nhiên
                     if (Math.random() < 0.2) {
-                        powerUps.add(new ExpandPaddlePowerUp(b.getX(), b.getY()));
+                        powerUps.add(new ExpandPaddlePowerUp(b.getX(), b.getY(), "EXPAND_PADDLE", 5000));
+                    } else  {
+                        powerUps.add(new SuperBallPowerUp(b.getX(), b.getY(), "SUPER_BALL", 5000));
                     }
                 }
 
@@ -274,7 +276,12 @@ public class GameManager {
             }
             
             if (p.checkCollision(paddle)) {
-                p.applyEffect(paddle, ball);
+
+                if (p instanceof SuperBallPowerUp) {
+                    p.applyEffect(paddle, ball);
+                } else if (p instanceof ExpandPaddlePowerUp) {
+                    p.applyEffect(paddle, ball);
+                }
                 powerUps.remove(i);
                 i--;
             }
@@ -289,7 +296,7 @@ public class GameManager {
         paddle = new Paddle(
                 GAME_WIDTH / 2.0,
                 GAME_HEIGHT - 50,
-                0, 0, 10, null
+                0, 0, 35, null
         );
 
         // Thiết lập lại vị trí và hướng/tốc độ ban đầu cho bóng
