@@ -1,6 +1,9 @@
 package com.DevChickens.Arkanoid.entities.powerups;
 
 import com.DevChickens.Arkanoid.entities.Paddle;
+
+import java.awt.Graphics;
+
 import com.DevChickens.Arkanoid.entities.Ball;
 
 /**
@@ -18,8 +21,8 @@ public class ExpandPaddlePowerUp extends PowerUp {
      * @param x Tọa độ X ban đầu.
      * @param y Tọa độ Y ban đầu.
      */
-    public ExpandPaddlePowerUp(double x, double y) {
-        super(x, y, "EXPAND_PADDLE", 500);
+    public ExpandPaddlePowerUp(double x, double y, String type, int duration) {
+        super(x, y, type, duration);
     }
 
     /**
@@ -44,5 +47,5 @@ public class ExpandPaddlePowerUp extends PowerUp {
     }
 
     @Override
-    public void render() {}
+    public void render(Graphics g) {}
 }
