@@ -15,7 +15,6 @@ public class GameManager {
     private Paddle paddle;
     private Ball ball;
     private List<Brick> bricks;
-    private List<PowerUp> powerUps;
 
     private int score;
     private int lives;
@@ -25,6 +24,8 @@ public class GameManager {
     private long nextRoundStartTime; // Thời điểm bắt đầu hiển thị "ROUND X"
     private final long ROUND_DISPLAY_DURATION = 2000; // 2 giây
 
+    private List<PowerUp> powerUps; // Power-up đang rơi
+    private List<PowerUp> activePowerUps; // Power-up đang có hiệu lực
     private Renderer renderer;
 
     // Kích thước khu vực chơi (Tường)
@@ -45,6 +46,7 @@ public class GameManager {
         currentRound = 1; // Bắt đầu từ round 1
         gameState = GameState.MENU;
         initRound(currentRound); // Khởi tạo round đầu tiên
+        activePowerUps = new ArrayList<>();
     }
 
     private void initRound(int round) {
@@ -52,6 +54,7 @@ public class GameManager {
         ball = new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 5 + round, 1, -1);
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
+        activePowerUps = new ArrayList<>();
         Random random = new Random();
 
         // Số hàng và cột tăng dần theo round
@@ -177,6 +180,16 @@ public class GameManager {
             }
         }
 
+        // Kiểm tra và gỡ bỏ Power-up hết hạn
+        java.util.Iterator<PowerUp> iterator = activePowerUps.iterator();
+        while (iterator.hasNext()) {
+            PowerUp p = iterator.next();
+            // Giả sử bạn có phương thức isExpired() trong PowerUp để kiểm tra
+            if (p.isExpired()) {
+                p.removeEffect(paddle, ball); // Gỡ bỏ hiệu ứng
+                iterator.remove(); // Xóa khỏi danh sách active
+            }
+        }
     }
 
     /**
@@ -274,15 +287,13 @@ public class GameManager {
                 i--;
                 continue;
             }
-            
-            if (p.checkCollision(paddle)) {
 
-                if (p instanceof SuperBallPowerUp) {
-                    p.applyEffect(paddle, ball);
-                } else if (p instanceof ExpandPaddlePowerUp) {
-                    p.applyEffect(paddle, ball);
-                }
-                powerUps.remove(i);
+            if (p.checkCollision(paddle)) {
+                p.applyEffect(paddle, ball);
+                p.activate(); // Giả sử bạn có phương thức này trong lớp PowerUp để bắt đầu đếm giờ
+
+                activePowerUps.add(p); // Chuyển nó sang danh sách active
+                powerUps.remove(i);    // Xóa khỏi danh sách đang rơi
                 i--;
             }
         }

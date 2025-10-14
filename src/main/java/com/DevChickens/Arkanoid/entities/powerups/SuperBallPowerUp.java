@@ -16,7 +16,7 @@ public class SuperBallPowerUp extends PowerUp {
      * @param type (kiểu powerUp)
      * @param duration (thời gian tồn tại).
      */
-    public SuperBallPowerUp(double x, double y, String type, int duration) {
+    public SuperBallPowerUp(double x, double y, String type, long duration) {
         super(x, y, type, duration);
     }
 

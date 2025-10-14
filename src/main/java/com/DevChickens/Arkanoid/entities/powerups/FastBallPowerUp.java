@@ -18,7 +18,7 @@ public class FastBallPowerUp extends PowerUp {
      * @param x Tọa độ X ban đầu.
      * @param y Tọa độ Y ban đầu.
      */
-    public FastBallPowerUp(double x, double y, String type, int duration) {
+    public FastBallPowerUp(double x, double y, String type, long duration) {
         super(x, y, type, duration);
     }
 

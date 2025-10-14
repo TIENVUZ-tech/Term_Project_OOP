@@ -13,7 +13,11 @@ public abstract class PowerUp extends GameObject {
     /** Loại của Power-up. */
     protected String type;
     /** Thời gian hiệu lực của Power-up (tính bằng số lần update hoặc mili giây). */
-    protected int duration;
+    protected long duration;
+    /** Thời điểm Power-up được kích hoạt. */
+    private long activationTime;
+    /** Trạng thái kích hoạt của Power-up. */
+    private boolean isActive = false;
 
     /**
      * Phương thức khởi tạo chung cho mọi Power-up.
@@ -22,10 +26,29 @@ public abstract class PowerUp extends GameObject {
      * @param type Chuỗi ký tự định danh loại Power-up.
      * @param duration Thời gian hiệu lực.
      */
-    public PowerUp(double x, double y, String type, int duration) {
+    public PowerUp(double x, double y, String type, long duration) {
         super(x, y, 30, 30); // Giả sử kích thước Power-up là 30x30
         this.type = type;
         this.duration = duration;
+    }
+
+    /**
+     * Kích hoạt Power-up và bắt đầu đếm ngược thời gian.
+     */
+    public void activate() {
+        this.isActive = true;
+        this.activationTime = System.currentTimeMillis();
+    }
+
+    /**
+     * Kiểm tra xem Power-up đã hết hạn hay chưa.
+     * @return true nếu đã hết hạn, ngược lại là false.
+     */
+    public boolean isExpired() {
+        if (!isActive) {
+            return false;
+        }
+        return System.currentTimeMillis() > activationTime + duration;
     }
 
     /** Getter cho type. */
@@ -34,7 +57,7 @@ public abstract class PowerUp extends GameObject {
     }
 
     /** Getter cho duration (nếu cần dùng ngoài). */
-    public int getDuration() {
+    public long getDuration() {
         return duration;
     }
 
@@ -51,13 +74,14 @@ public abstract class PowerUp extends GameObject {
     }
 
     /**
-     * Cập nhật trạng thái của Power-up (ví dụ: di chuyển rơi xuống).
+     * Cập nhật trạng thái của Power-up (chỉ rơi khi chưa kích hoạt).
      */
     @Override
     public void update() {
-        this.setY(this.getY() + 2);
+        if (!isActive) {
+            this.setY(this.getY() + 2);
+        }
     }
-
 
     /**
      * Áp dụng Power-up.
