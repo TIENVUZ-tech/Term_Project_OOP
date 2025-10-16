@@ -12,11 +12,6 @@ import com.DevChickens.Arkanoid.entities.Ball;
 public class ExpandPaddlePowerUp extends PowerUp {
 
     /**
-     * biến lưu kích thước gốc của baddle
-     */
-    private double originalPaddleWidth;
-
-    /**
      * Khởi tạo Power-up làm dài thanh trượt.
      * @param x Tọa độ X ban đầu.
      * @param y Tọa độ Y ban đầu.
@@ -26,24 +21,50 @@ public class ExpandPaddlePowerUp extends PowerUp {
     }
 
     /**
-     * Áp dụng hiệu ứng: Tăng chiều dài của Paddle.
-     * @param paddle Thanh trượt sẽ được làm dài ra.
-     * @param ball ko sử dụng.
+     * Áp dụng hiệu ứng: Lấy thông tin từ Paddle, tính toán và cập nhật lại Paddle.
      */
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
-        this.originalPaddleWidth = paddle.getWidth();
-        paddle.setWidth(this.originalPaddleWidth * 1.5);
+        // Tăng bộ đếm hiệu ứng trong paddle
+        int currentCount = paddle.getExpandEffectCount();
+        paddle.setExpandEffectCount(currentCount + 1);
+
+        // phuong thuc thực hiện toàn bộ logic tính toán
+        this.updatePaddle(paddle);
     }
 
     /**
-     * Gỡ bỏ hiệu ứng: Đưa Paddle về lại chiều dài ban đầu.
-     * @param paddle Thanh trượt sẽ được trả về kích thước cũ.
-     * @param ball không sử dụng.
+     * Gỡ bỏ hiệu ứng: Lấy thông tin từ Paddle, tính toán và cập nhật lại Paddle.
      */
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
-        paddle.setWidth(this.originalPaddleWidth);
+        // Giảm bộ đếm hiệu ứng trong paddle
+        int currentCount = paddle.getExpandEffectCount();
+        paddle.setExpandEffectCount(currentCount - 1);
+
+        // phuong thuc thực hiện toàn bộ logic tính toán
+        this.updatePaddle(paddle);
+    }
+
+    /**
+     * Phương thức riêng để tính toán và cập nhật paddle.
+     */
+    private void updatePaddle(Paddle paddle) {
+        double oldWidth = paddle.getWidth();
+
+        // Đọc dữ liệu từ paddle
+        double baseWidth = paddle.getBaseWidth();
+        int effectCount = paddle.getExpandEffectCount();
+
+        // Tính toán kích thước mới
+        double newWidth = baseWidth * (1 + (0.5 * effectCount));
+
+        // Ghi dữ liệu mới trở lại paddle
+        paddle.setWidth(newWidth);
+
+        // Tính toán và cập nhật lại vị trí để căn giữa
+        double widthChange = newWidth - oldWidth;
+        paddle.setX(paddle.getX() - widthChange / 2.0);
     }
 
     @Override

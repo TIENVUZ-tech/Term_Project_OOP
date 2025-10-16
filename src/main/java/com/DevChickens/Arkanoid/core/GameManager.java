@@ -290,7 +290,7 @@ public class GameManager {
 
             if (p.checkCollision(paddle)) {
                 p.applyEffect(paddle, ball);
-                p.activate(); // Giả sử bạn có phương thức này trong lớp PowerUp để bắt đầu đếm giờ
+                p.activate();
 
                 activePowerUps.add(p); // Chuyển nó sang danh sách active
                 powerUps.remove(i);    // Xóa khỏi danh sách đang rơi

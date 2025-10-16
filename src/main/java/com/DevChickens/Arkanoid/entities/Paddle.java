@@ -12,14 +12,19 @@ import com.DevChickens.Arkanoid.graphics.AssetLoader; // Thêm import
 import java.awt.image.BufferedImage;
 
 public class Paddle extends MovableObject {
-    /* Tốc độ di chuyển của Paddle theo phương ngang.
+    /** Tốc độ di chuyển của Paddle theo phương ngang.
      * với mỗi lần cập nhật thì vị trí của paddle thay đổi speed (pixel).
      */
     private double speed;
-    /* Tham chiếu đến PowerUp mà hiện tại paddle đang áp dụng. */
+    /** Tham chiếu đến PowerUp mà hiện tại paddle đang áp dụng. */
     private PowerUp currentPowerUp;
-    /*Biến lưu ảnh của Paddle. */
+    /** Biến lưu ảnh của Paddle. */
     private BufferedImage image;
+    /** Biến để lưu kích thước GỐC của paddle. */
+    private final double baseWidth;
+
+    /** Biến để đếm số lượng hiệu ứng "Expand" đang có hiệu lực. */
+    private int expandEffectCount;
 
     /**
      * Phương thức khởi tạo Paddle.
@@ -36,11 +41,12 @@ public class Paddle extends MovableObject {
         this.speed = speed;
         this.currentPowerUp = currentPowerUp;
         this.image = AssetLoader.loadImage("/images/Paddle.png");
+        double targetWidth = 0;
         if (this.image != null) {
             // Định nghĩa chiều rộng mong muốn tương đối so với chiều rộng màn hình
             // Ví dụ: 1/6 chiều rộng màn hình
             final double DESIRED_SCREEN_WIDTH_RATIO = 6.0;
-            double targetWidth = GameManager.GAME_WIDTH / DESIRED_SCREEN_WIDTH_RATIO; // Chiều rộng paddle mong muốn
+            targetWidth = GameManager.GAME_WIDTH / DESIRED_SCREEN_WIDTH_RATIO; // Chiều rộng paddle mong muốn
 
             // Tính toán chiều cao để giữ nguyên tỷ lệ ảnh gốc
             double aspectRatio = (double)this.image.getHeight() / this.image.getWidth();
@@ -58,7 +64,10 @@ public class Paddle extends MovableObject {
             this.setY(GameManager.GAME_HEIGHT - this.getHeight() - MARGIN_FROM_BOTTOM);
 
         }
+        this.baseWidth = targetWidth;         // MỚI: Lưu lại kích thước gốc
+        this.expandEffectCount = 0;
     }
+
     /** Phương thức getter và setter của speed (tốc độ).
      * @param speed
     */
@@ -79,6 +88,23 @@ public class Paddle extends MovableObject {
 
     public PowerUp getCurrentPowerUp() {
         return this.currentPowerUp;
+    }
+
+    /** Lấy kích thước gốc. */
+    public double getBaseWidth() {
+        return this.baseWidth;
+    }
+
+    /** Lấy số lượng hiệu ứng "Expand" đang có. */
+    public int getExpandEffectCount() {
+        return this.expandEffectCount;
+    }
+
+    /** Thiết lập số lượng hiệu ứng "Expand". */
+    public void setExpandEffectCount(int count) {
+        if (count >= 0) {
+            this.expandEffectCount = count;
+        }
     }
 
     @Override
@@ -108,6 +134,7 @@ public class Paddle extends MovableObject {
             setX(getX() + speed); // cập nhật lại toạn độ trục x của paddle.
         }
     }
+
     /**
      * Phương thức applyPowerUp. Cập nhật trạng thái PowerUp hiện tại.
      * @param p

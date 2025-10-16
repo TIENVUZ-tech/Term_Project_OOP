@@ -186,8 +186,11 @@ public class Ball extends MovableObject {
     public void activateSuperBall(long duration) {
         this.isSuperBall = true;
         this.image = this.superImage;
-        // thời gian kết thúc = thời gian hiện tại + thời gian tồn tại.
-        this.superBallEndTime = System.currentTimeMillis() + duration;
+        long now = System.currentTimeMillis();
+        // Tính thời gian còn lại của hiệu ứng cũ (nếu có)
+        long remainingTime = (this.superBallEndTime > now) ? (this.superBallEndTime - now) : 0;
+        // Thời gian kết thúc mới = Hiện tại + Thời gian còn lại + Thời gian mới
+        this.superBallEndTime = System.currentTimeMillis() + remainingTime + duration;
     }
 
     /**
