@@ -27,6 +27,7 @@ public class GameManager {
     private List<PowerUp> powerUps; // Power-up đang rơi
     private List<PowerUp> activePowerUps; // Power-up đang có hiệu lực
     private Renderer renderer;
+    private boolean isBallLaunched;
 
     // Kích thước khu vực chơi (Tường)
     public static final int GAME_WIDTH = 920;
@@ -37,13 +38,10 @@ public class GameManager {
         initGame();
     }
 
-    /**
-     * Khởi tạo game mới
-     */
     public void initGame() {
         score = 0;
         lives = 3;
-        currentRound = 1; // Bắt đầu từ round 1
+        currentRound = 1;
         gameState = GameState.MENU;
         initRound(currentRound); // Khởi tạo round đầu tiên
         activePowerUps = new ArrayList<>();
@@ -55,6 +53,7 @@ public class GameManager {
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         activePowerUps = new ArrayList<>();
+        isBallLaunched = false;
         Random random = new Random();
 
         // Số hàng và cột tăng dần theo round
@@ -76,7 +75,7 @@ public class GameManager {
         // Căn giữa toàn bộ lưới gạch bằng cách tính vị trí X bắt đầu
         double startX = (GAME_WIDTH - totalGridWidth) / 2;
 
-        // Độ khó: càng cao càng có nhiều gạch “khó”
+        // Độ khó: càng cao càng có nhiều gạch khó
         double strongChance = 0.1 * round;
         double explosiveChance = 0.05 * round;
         double quiteChance = 0.15 * round;
@@ -112,9 +111,6 @@ public class GameManager {
         }
     }
 
-    /**
-     * Cập nhật logic game
-     */
     public void update() {
         // Nếu chưa chơi thì không update
         if (gameState == GameState.MENU || gameState == GameState.GAME_OVER || gameState == GameState.VICTORY) return;
@@ -130,65 +126,66 @@ public class GameManager {
 
         if (gameState != GameState.PLAYING) return;
 
-        ball.move();
         paddle.update();
 
-        // PowerUps rơi xuống
-        for (PowerUp p : powerUps) {
-            p.update();
-        }
-
-        // Kiểm tra va chạm TƯỜNG
-        checkWallCollisions();
-
-        // Kiểm tra va chạm giữa các vật thể (Paddle, Bricks, PowerUps)
-        checkCollisions();
-
-        // Nếu bóng rơi ra ngoài
-        if (ball.getY() > GAME_HEIGHT) {
-            lives--;
-            if (lives <= 0) {
-                gameState = GameState.GAME_OVER;
-            } else {
-                resetBallAndPaddle();
-            }
-        }
-
-        // Kiểm tra thắng
-        boolean allBreakableDestroyed = true;
-        for (Brick b : bricks) {
-            // Bỏ qua gạch không thể phá (StrongBrick)
-            if (b instanceof StrongBrick) {
-                continue;
-            }
-
-            // Nếu còn gạch bình thường chưa vỡ → chưa thắng
-            if (!b.isDestroyed()) {
-                allBreakableDestroyed = false;
-                break;
-            }
-        }
-
-        if (allBreakableDestroyed) {
-            if (currentRound < maxRounds) {
-                currentRound++;
-                initRound(currentRound);
-                gameState = GameState.NEXT_ROUND;
-                nextRoundStartTime = System.currentTimeMillis();
-            } else {
-                gameState = GameState.VICTORY;
-            }
-        }
-
-        // Kiểm tra và gỡ bỏ Power-up hết hạn
         java.util.Iterator<PowerUp> iterator = activePowerUps.iterator();
         while (iterator.hasNext()) {
             PowerUp p = iterator.next();
-            // Giả sử bạn có phương thức isExpired() trong PowerUp để kiểm tra
             if (p.isExpired()) {
-                p.removeEffect(paddle, ball); // Gỡ bỏ hiệu ứng
-                iterator.remove(); // Xóa khỏi danh sách active
+                p.removeEffect(paddle, ball);
+                iterator.remove();
             }
+        }
+
+        if (isBallLaunched) {
+            ball.move();
+
+            for (PowerUp p : powerUps) {
+                p.update();
+            }
+
+            checkWallCollisions();
+
+            checkCollisions();
+
+            // Nếu bóng rơi ra ngoài
+            if (ball.getY() > GAME_HEIGHT) {
+                lives--;
+                if (lives <= 0) {
+                    gameState = GameState.GAME_OVER;
+                } else {
+                    resetBallAndPaddle();
+                }
+            }
+
+            // Kiểm tra thắng
+            boolean allBreakableDestroyed = true;
+            for (Brick b : bricks) {
+                // Bỏ qua gạch không thể phá (StrongBrick)
+                if (b instanceof StrongBrick) {
+                    continue;
+                }
+                if (!b.isDestroyed()) {
+                    allBreakableDestroyed = false;
+                    break;
+                }
+            }
+
+            if (allBreakableDestroyed) {
+                if (currentRound < maxRounds) {
+                    currentRound++;
+                    initRound(currentRound);
+                    gameState = GameState.NEXT_ROUND;
+                    nextRoundStartTime = System.currentTimeMillis();
+                } else {
+                    gameState = GameState.VICTORY;
+                }
+            }
+
+        } else {
+            // Giữ bóng dính vào giữa paddle
+            ball.setX(paddle.getX() + (paddle.getWidth() / 2.0) - (ball.getWidth() / 2.0));
+            ball.setY(paddle.getY() - ball.getHeight());
         }
     }
 
@@ -325,7 +322,7 @@ public class GameManager {
                 1,
                 -1
         );
-        gameState = GameState.PAUSED;
+        isBallLaunched = false;
     }
 
     /**
@@ -334,29 +331,39 @@ public class GameManager {
     public void handleInput(int keyCode) {
         switch (gameState) {
             case MENU:
-                if (keyCode == java.awt.event.KeyEvent.VK_ENTER)
+                if (keyCode == java.awt.event.KeyEvent.VK_ENTER) {
                     gameState = GameState.PLAYING;
+                }
                 break;
 
             case PLAYING:
-                if (keyCode == java.awt.event.KeyEvent.VK_LEFT)
+                if (keyCode == java.awt.event.KeyEvent.VK_LEFT) {
                     paddle.moveLeft();
-                if (keyCode == java.awt.event.KeyEvent.VK_RIGHT)
+                }
+                if (keyCode == java.awt.event.KeyEvent.VK_RIGHT) {
                     paddle.moveRight();
-                if (keyCode == java.awt.event.KeyEvent.VK_P)
+                }
+                if (keyCode == java.awt.event.KeyEvent.VK_P) {
                     gameState = GameState.PAUSED;
+                }
+                if (keyCode == java.awt.event.KeyEvent.VK_SPACE) {
+                    if (!isBallLaunched) {
+                        isBallLaunched = true;
+                    }
+                }
                 break;
 
             case PAUSED:
-                if (keyCode == java.awt.event.KeyEvent.VK_P)
+                if (keyCode == java.awt.event.KeyEvent.VK_P) {
                     gameState = GameState.PLAYING;
-                break;
-
+                    break;
+                }
             case GAME_OVER:
             case VICTORY:
-                if (keyCode == java.awt.event.KeyEvent.VK_ENTER)
+                if (keyCode == java.awt.event.KeyEvent.VK_ENTER) {
                     initGame();
-                break;
+                    break;
+                }
         }
     }
 
