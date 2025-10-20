@@ -23,8 +23,6 @@ public class Ball extends MovableObject {
     private BufferedImage image;
     /* biến thể hiện tình trạng bóng. */
     private boolean isSuperBall = false;
-    /* biến thể hiện thời gian cho đến khi superBallPowerUp hết tác dụng. */
-    private long superBallEndTime = 0;
 
     /**
      * Phương thức khởi tạo Ball, giữ nguyên 9 tham số đầu vào.
@@ -91,6 +89,11 @@ public class Ball extends MovableObject {
         return this.directionY;
     }
 
+    /*Phương thức getter của isSuperBall. */
+    public boolean getIsSuperBall() {
+        return this.isSuperBall;
+    }
+
     /* Phương thức  */
     
     // --- Logic Game ---
@@ -107,10 +110,6 @@ public class Ball extends MovableObject {
     public void update() {
         // gọi phương thức di chuyển.
         move();
-        // kiểm tra và kết thúc SuperBallPowerUp
-        if (isSuperBall && System.currentTimeMillis() > superBallEndTime) {
-            deactivateSuperBall();
-        }
     }
 
     @Override
@@ -186,11 +185,6 @@ public class Ball extends MovableObject {
     public void activateSuperBall(long duration) {
         this.isSuperBall = true;
         this.image = this.superImage;
-        long now = System.currentTimeMillis();
-        // Tính thời gian còn lại của hiệu ứng cũ (nếu có)
-        long remainingTime = (this.superBallEndTime > now) ? (this.superBallEndTime - now) : 0;
-        // Thời gian kết thúc mới = Hiện tại + Thời gian còn lại + Thời gian mới
-        this.superBallEndTime = System.currentTimeMillis() + remainingTime + duration;
     }
 
     /**
