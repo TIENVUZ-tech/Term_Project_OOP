@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class GameManager {
     private Paddle paddle;
-    private Ball ball;
+    private List<Ball> balls;
     private List<Brick> bricks;
 
     private int score;
@@ -37,6 +37,12 @@ public class GameManager {
         initGame();
     }
 
+    public void addBall(Ball b) {
+        if (this.balls != null) {
+            this.balls.add(b);
+        }
+    }
+
     /**
      * Khởi tạo game mới
      */
@@ -51,7 +57,8 @@ public class GameManager {
 
     private void initRound(int round) {
         paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 0, 0, 35, null);
-        ball = new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 5 + round, 1, -1);
+        balls = new ArrayList<>(); // Khởi tạo danh sách
+        balls.add(new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 5 + round, 1, -1));
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         activePowerUps = new ArrayList<>();
@@ -130,7 +137,9 @@ public class GameManager {
 
         if (gameState != GameState.PLAYING) return;
 
-        ball.move();
+        for (Ball b : balls ) {
+            b.move();
+        }
         paddle.update();
 
         // PowerUps rơi xuống
@@ -145,12 +154,21 @@ public class GameManager {
         checkCollisions();
 
         // Nếu bóng rơi ra ngoài
-        if (ball.getY() > GAME_HEIGHT) {
+        java.util.Iterator<Ball> ballIterator = balls.iterator();
+        while (ballIterator.hasNext()) {
+            Ball b = ballIterator.next();
+            if (b.getY() > GAME_HEIGHT) {
+                ballIterator.remove(); // Xóa quả bóng bị rơi
+            }
+        }
+
+        // Nếu KHÔNG CÒN bóng nào trên màn hình -> mất mạng
+        if (balls.isEmpty()) {
             lives--;
             if (lives <= 0) {
                 gameState = GameState.GAME_OVER;
             } else {
-                resetBallAndPaddle();
+                resetBallAndPaddle(); // Reset lại màn (tạo 1 bóng mới)
             }
         }
 
@@ -186,8 +204,10 @@ public class GameManager {
             PowerUp p = iterator.next();
             // Giả sử bạn có phương thức isExpired() trong PowerUp để kiểm tra
             if (p.isExpired()) {
-                p.removeEffect(paddle, ball); // Gỡ bỏ hiệu ứng
-                iterator.remove(); // Xóa khỏi danh sách active
+                for (Ball b : balls) {
+                    p.removeEffect(paddle, b);
+                }
+                iterator.remove();
             }
         }
     }
@@ -196,22 +216,24 @@ public class GameManager {
      * Xử lý va chạm giữa bóng và các cạnh của khung trò chơi (Tường).
      */
     private void checkWallCollisions() {
-        // Va chạm Cạnh Trái
-        if (ball.getX() < 0) {
-            ball.setX(0); // Đẩy bóng về sát lề
-            ball.setDirectionX(1); // Luôn đảo hướng sang phải
-        }
+        for (Ball ball : balls) {
+            // Va chạm Cạnh Trái
+            if (ball.getX() < 0) {
+                ball.setX(0); // Đẩy bóng về sát lề
+                ball.setDirectionX(1); // Luôn đảo hướng sang phải
+            }
 
-        // Va chạm Cạnh Phải
-        if (ball.getX() + ball.getWidth() > GAME_WIDTH) {
-            ball.setX(GAME_WIDTH - ball.getWidth()); // Đẩy bóng về sát lề
-            ball.setDirectionX(-1); // Luôn đảo hướng sang trái
-        }
+            // Va chạm Cạnh Phải
+            if (ball.getX() + ball.getWidth() > GAME_WIDTH) {
+                ball.setX(GAME_WIDTH - ball.getWidth()); // Đẩy bóng về sát lề
+                ball.setDirectionX(-1); // Luôn đảo hướng sang trái
+            }
 
-        // Va chạm Cạnh Trên
-        if (ball.getY() < 0) {
-            ball.setY(0); // Đẩy bóng về sát lề
-            ball.setDirectionY(1); // Luôn đảo hướng xuống
+            // Va chạm Cạnh Trên
+            if (ball.getY() < 0) {
+                ball.setY(0); // Đẩy bóng về sát lề
+                ball.setDirectionY(1); // Luôn đảo hướng xuống
+            }
         }
     }
 
@@ -219,67 +241,73 @@ public class GameManager {
      * Kiểm tra va chạm giữa các đối tượng
      */
     private void checkCollisions() {
-        // --- Ball vs Paddle (Logic Chống Kẹt) ---
-        if (ball.checkCollision(paddle)) {
-            // Đảm bảo bóng luôn bật lên khi va chạm với Paddle
-            if (ball.getDirectionY() > 0) { // Nếu bóng đang đi xuống
-                ball.setDirectionY(-1);      // Đảo hướng lên
+        for (Ball ball : new ArrayList<>(balls)) {
+            // --- Ball vs Paddle (Logic Chống Kẹt) ---
+            if (ball.checkCollision(paddle)) {
+                // Đảm bảo bóng luôn bật lên khi va chạm với Paddle
+                if (ball.getDirectionY() > 0) { // Nếu bóng đang đi xuống
+                    ball.setDirectionY(-1);      // Đảo hướng lên
+                }
+
+                // Đẩy bóng ra khỏi Paddle ngay lập tức để ngăn bị kẹt
+                ball.setY(paddle.getY() - ball.getHeight());
+
+                // Tính góc bật thông minh dựa trên vị trí va chạm
+                double relativeIntersectX = (ball.getX() + (ball.getWidth() / 2.0)) - (paddle.getX() + (paddle.getWidth() / 2.0));
+                // normalizedIntersectX: Giá trị từ -1.0 (cực trái) đến 1.0 (cực phải)
+                double normalizedIntersectX = relativeIntersectX / (paddle.getWidth() / 2.0);
+
+                // Thiết lập directionX để bóng đi theo góc, tránh đi thẳng lên
+                if (normalizedIntersectX < -0.1) {
+                    ball.setDirectionX(-1); // Bật sang trái
+                } else if (normalizedIntersectX > 0.1) {
+                    ball.setDirectionX(1); // Bật sang phải
+                }
+                    // Nếu va chạm gần tâm (-0.1 đến 0.1), directionX giữ nguyên
             }
-            
-            // Đẩy bóng ra khỏi Paddle ngay lập tức để ngăn bị kẹt
-            ball.setY(paddle.getY() - ball.getHeight());
-            
-            // Tính góc bật thông minh dựa trên vị trí va chạm
-            double relativeIntersectX = (ball.getX() + (ball.getWidth() / 2.0)) - (paddle.getX() + (paddle.getWidth() / 2.0));
-            // normalizedIntersectX: Giá trị từ -1.0 (cực trái) đến 1.0 (cực phải)
-            double normalizedIntersectX = relativeIntersectX / (paddle.getWidth() / 2.0); 
 
-            // Thiết lập directionX để bóng đi theo góc, tránh đi thẳng lên
-            if (normalizedIntersectX < -0.1) {
-                ball.setDirectionX(-1); // Bật sang trái
-            } else if (normalizedIntersectX > 0.1) {
-                ball.setDirectionX(1); // Bật sang phải
-            } 
-            // Nếu va chạm gần tâm (-0.1 đến 0.1), directionX giữ nguyên
-        }
-
-        // --- Ball vs Bricks (Logic Chống Kẹt) ---
-        for (int i = 0; i < bricks.size(); i++) {
-            Brick b = bricks.get(i);
-            if (!b.isDestroyed() && ball.checkCollision(b)) {
-                if (ball.getIsSuperBall()) {
-                    b.breakBrick();
-                } else {
-                    b.takeHit();
-                }
-                
-                // Đẩy lùi bóng một bước để thoát ra khỏi gạch (Fix Kẹt Brick)
-                // Lùi về vị trí trước khi va chạm
-                ball.setX(ball.getX() - ball.getSpeed() * ball.getDirectionX());
-                ball.setY(ball.getY() - ball.getSpeed() * ball.getDirectionY());
-
-                // Va chạm và Bật ngược (sử dụng logic bounceOff trong Ball.java)
-                ball.bounceOff(b);
-
-                b.takeHit();
-
-                if (b.isDestroyed()) {
-                    int points = switch (b.getType().toLowerCase()) {
-                        case "strong" -> 300;
-                        case "explosive" -> 200;
-                        case "quite" -> 150;
-                        default -> 100;
-                    };
-                    score += points;
-
-                    // Có thể rơi PowerUp ngẫu nhiên
-                    if (Math.random() < 0.2) {
-                        powerUps.add(new ExpandPaddlePowerUp(b.getX(), b.getY(), "EXPAND_PADDLE", 5000));
-                    } else  {
-                        powerUps.add(new SuperBallPowerUp(b.getX(), b.getY(), "SUPER_BALL", 5000));
+            // --- Ball vs Bricks (Logic Chống Kẹt) ---
+            for (int i = 0; i < bricks.size(); i++) {
+                Brick b = bricks.get(i);
+                if (!b.isDestroyed() && ball.checkCollision(b)) {
+                    if (ball.getIsSuperBall()) {
+                        b.breakBrick();
+                    } else {
+                        b.takeHit();
                     }
-                }
 
+                    // Đẩy lùi bóng một bước để thoát ra khỏi gạch (Fix Kẹt Brick)
+                    // Lùi về vị trí trước khi va chạm
+                    ball.setX(ball.getX() - ball.getSpeed() * ball.getDirectionX());
+                    ball.setY(ball.getY() - ball.getSpeed() * ball.getDirectionY());
+
+                    // Va chạm và Bật ngược (sử dụng logic bounceOff trong Ball.java)
+                    ball.bounceOff(b);
+
+                    b.takeHit();
+
+                    if (b.isDestroyed()) {
+                        int points = switch (b.getType().toLowerCase()) {
+                            case "strong" -> 300;
+                            case "explosive" -> 200;
+                            case "quite" -> 150;
+                            default -> 100;
+                        };
+                        score += points;
+
+                        // Có thể rơi PowerUp ngẫu nhiên
+                        double rand = Math.random(); // Lấy 1 số ngẫu nhiên
+
+                        if (rand < 0.1) { // 10% cơ hội
+                            powerUps.add(new ExpandPaddlePowerUp(b.getX(), b.getY(), "EXPAND_PADDLE", 5000));
+                        } else if (rand < 0.2) { // 10% cơ hội (tổng 20%)
+                            powerUps.add(new SuperBallPowerUp(b.getX(), b.getY(), "SUPER_BALL", 5000));
+                        } else if (rand < 0.3) { // 10% cơ hội (tổng 30%)
+                            powerUps.add(new MultiBallPowerUp(b.getX(), b.getY(), "MULTI_BALL", 1000));
+                        }
+                    }
+
+                }
             }
         }
 
@@ -293,12 +321,29 @@ public class GameManager {
                 continue;
             }
 
+            // Khi Paddle va chạm PowerUp
             if (p.checkCollision(paddle)) {
-                p.applyEffect(paddle, ball);
-                p.activate();
 
-                activePowerUps.add(p); // Chuyển nó sang danh sách active
-                powerUps.remove(i);    // Xóa khỏi danh sách đang rơi
+                // Loại 1: Power-up chỉ ảnh hưởng đến Paddle (chạy 1 lần)
+                if (p instanceof ExpandPaddlePowerUp) {
+                    // Ta truyền 'this' (manager) và 'null' (ball)
+                    p.applyEffect(this, paddle, null);
+                }
+
+                // Loại 2: Power-up ảnh hưởng đến TẤT CẢ bóng
+                else if (p instanceof SuperBallPowerUp ||
+                        p instanceof FastBallPowerUp ||
+                        p instanceof MultiBallPowerUp) {
+
+                    // Lặp qua bản sao của danh sách
+                    for (Ball b : new ArrayList<>(balls)) {
+                        p.applyEffect(this, paddle, b);
+                    }
+                }
+
+                p.activate();
+                activePowerUps.add(p);
+                powerUps.remove(i);
                 i--;
             }
         }
@@ -316,15 +361,13 @@ public class GameManager {
         );
 
         // Thiết lập lại vị trí và hướng/tốc độ ban đầu cho bóng
-        ball = new Ball(
+        balls.clear();
+        balls.add(new Ball(
                 GAME_WIDTH / 2.0,
                 GAME_HEIGHT - 70,
-                3,
-                -3,
-                5,
-                1,
-                -1
-        );
+                3, -3, 5,
+                1, -1
+        ));
         gameState = GameState.PAUSED;
     }
 
@@ -375,7 +418,9 @@ public class GameManager {
 
                 // VẼ GAME OBJECTS
                 renderer.drawPaddle(g, paddle);
-                renderer.drawBall(g, ball);
+                for (Ball b : balls) {
+                    renderer.drawBall(g, b);
+                }
 
                 for (Brick b : bricks) renderer.drawBrick(g, b);
                 for (PowerUp p : powerUps) renderer.drawPowerUp(g, p);
