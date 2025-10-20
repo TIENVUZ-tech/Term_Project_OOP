@@ -1,7 +1,7 @@
 package com.DevChickens.Arkanoid.entities.powerups;
 
 import com.DevChickens.Arkanoid.entities.Paddle;
-
+import com.DevChickens.Arkanoid.core.GameManager;
 import java.awt.Graphics;
 
 import com.DevChickens.Arkanoid.entities.Ball;
@@ -28,7 +28,7 @@ public class FastBallPowerUp extends PowerUp {
      * @param ball Quả bóng được tăng tốc.
      */
     @Override
-    public void applyEffect(Paddle paddle, Ball ball) {
+    public void applyEffect(GameManager manager, Paddle paddle, Ball ball) {
         ball.multiplySpeed(speedFactor);
     }
 

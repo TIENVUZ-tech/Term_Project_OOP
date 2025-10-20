@@ -1,9 +1,9 @@
 package com.DevChickens.Arkanoid.entities.powerups;
 
-import java.awt.Graphics;
-
+import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.entities.Ball;
 import com.DevChickens.Arkanoid.entities.Paddle;
+import java.awt.Graphics;
 
 /**
  * Loại PowerUp này sẽ làm cho bóng mạnh hơn.
@@ -22,7 +22,7 @@ public class SuperBallPowerUp extends PowerUp {
     }
 
     @Override
-    public void applyEffect(Paddle paddle, Ball ball) {
+    public void applyEffect(GameManager manager, Paddle paddle, Ball ball) {
         ball.activateSuperBall(this.getDuration());
     }
 

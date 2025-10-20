@@ -1,7 +1,7 @@
 package com.DevChickens.Arkanoid.entities.powerups;
 
 import com.DevChickens.Arkanoid.entities.Paddle;
-
+import com.DevChickens.Arkanoid.core.GameManager;
 import java.awt.Graphics;
 
 import com.DevChickens.Arkanoid.entities.Ball;
@@ -24,7 +24,7 @@ public class ExpandPaddlePowerUp extends PowerUp {
      * Áp dụng hiệu ứng: Lấy thông tin từ Paddle, tính toán và cập nhật lại Paddle.
      */
     @Override
-    public void applyEffect(Paddle paddle, Ball ball) {
+    public void applyEffect(GameManager manager, Paddle paddle, Ball ball) {
         // Tăng bộ đếm hiệu ứng trong paddle
         int currentCount = paddle.getExpandEffectCount();
         paddle.setExpandEffectCount(currentCount + 1);

@@ -1,9 +1,11 @@
 package com.DevChickens.Arkanoid.entities.powerups;
 
 import com.DevChickens.Arkanoid.entities.GameObject;
+import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.entities.Paddle;
 import com.DevChickens.Arkanoid.entities.Ball;
 import java.awt.Graphics;
+
 
 /**
  * Lớp trừu tượng cơ sở cho các vật phẩm tăng sức mạnh rơi ra khi phá gạch.
@@ -88,7 +90,7 @@ public abstract class PowerUp extends GameObject {
      * @param paddle Thanh trượt có thể bị ảnh hưởng.
      * @param ball Quả bóng có thể bị ảnh hưởng.
      */
-    public abstract void applyEffect(Paddle paddle, Ball ball);
+    public abstract void applyEffect(GameManager manager, Paddle paddle, Ball ball);
 
     /**
      * Gỡ bỏ Power-up khi hết hạn.
