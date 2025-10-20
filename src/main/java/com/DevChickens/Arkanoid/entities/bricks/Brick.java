@@ -53,6 +53,14 @@ public abstract class Brick extends GameObject {
     }
 
     /**
+     * Xử lý logic khi viên gạch va chạm với Super Ball.
+     */
+    public void breakBrick() {
+        // Gạch sẽ vỡ luôn khi va chạm với Super Ball
+        this.destroyed = true;
+    }
+    
+    /**
      * Kiểm tra xem viên gạch đã bị phá hủy hoàn toàn hay chưa.
      * @return true nếu gạch đã bị phá hủy, ngược lại false.
      */
