@@ -247,6 +247,11 @@ public class GameManager {
         for (int i = 0; i < bricks.size(); i++) {
             Brick b = bricks.get(i);
             if (!b.isDestroyed() && ball.checkCollision(b)) {
+                if (ball.getIsSuperBall()) {
+                    b.breakBrick();
+                } else {
+                    b.takeHit();
+                }
                 
                 // Đẩy lùi bóng một bước để thoát ra khỏi gạch (Fix Kẹt Brick)
                 // Lùi về vị trí trước khi va chạm
