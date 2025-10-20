@@ -6,7 +6,8 @@ import com.DevChickens.Arkanoid.entities.Ball;
 import com.DevChickens.Arkanoid.entities.Paddle;
 
 /**
- * Loại PowerUp này sẽ làm cho bóng mạnh hơn và bóng sẽ gây 2 sát thương mỗi khi va chạm với Brick.
+ * Loại PowerUp này sẽ làm cho bóng mạnh hơn.
+ * Bất kỳ loạt gạch nào chạm vào bóng sẽ bị vỡ
  */
 public class SuperBallPowerUp extends PowerUp {
     /**
@@ -23,11 +24,12 @@ public class SuperBallPowerUp extends PowerUp {
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
         ball.activateSuperBall(this.getDuration());
-        ball.update();
     }
 
     @Override
-    public void removeEffect(Paddle paddle, Ball ball) {}
+    public void removeEffect(Paddle paddle, Ball ball) {
+        ball.deactivateSuperBall();
+    }
 
     @Override
     public void render(Graphics g) {}
