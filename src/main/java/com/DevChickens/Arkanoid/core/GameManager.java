@@ -61,61 +61,7 @@ public class GameManager {
         powerUps = new ArrayList<>();
         activePowerUps = new ArrayList<>();
         isBallLaunched = false;
-        Random random = new Random();
-
-        // Số hàng và cột tăng dần theo round
-        int rows = 3 + round;       // round 1: 4 hàng, round 5: 8 hàng
-        int cols = 8 + (round / 2); // tăng dần
-
-        // chiều rộng cố định mong muốn cho viên gạch
-        final double BRICK_WIDTH = 85;
-        final double PADDING = 2; // Khoảng cách cho hàng và cột
-        final double TOP_OFFSET = 70; // khoảng cách từ lề trên xuống
-
-        // Chiều cao tạm thời, giá trị thật sẽ được tính trong mỗi class gạch
-        final double BRICK_HEIGHT = BRICK_WIDTH * (85.0 / 256.0);
-
-        // Tính toán tổng chiều rộng của toàn bộ lưới gạch
-        // Tổng chiều rộng = (số cột * chiều rộng gạch) + (số khoảng trống ở giữa * padding)
-        double totalGridWidth = (cols * BRICK_WIDTH) + ((cols - 1) * PADDING);
-
-        // Căn giữa toàn bộ lưới gạch bằng cách tính vị trí X bắt đầu
-        double startX = (GAME_WIDTH - totalGridWidth) / 2;
-
-        // Độ khó: càng cao càng có nhiều gạch khó
-        double strongChance = 0.1 * round;
-        double explosiveChance = 0.05 * round;
-        double quiteChance = 0.15 * round;
-
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                String type;
-                double r = random.nextDouble();
-                if (r < explosiveChance) type = "explosive";
-                else if (r < explosiveChance + strongChance) type = "strong";
-                else if (r < explosiveChance + strongChance + quiteChance) type = "quite";
-                else type = "normal";
-
-                int hitPoints = switch (type) {
-                    case "strong" -> 3;
-                    case "explosive" -> 1;
-                    case "quite" -> 2;
-                    default -> 1;
-                };
-                // Sử dụng các biến PADDING đã tính toán ở trên để đặt vị trí
-                double brickX = startX + col * (BRICK_WIDTH + PADDING);
-                double brickY = TOP_OFFSET + row * (BRICK_HEIGHT + PADDING);
-
-                bricks.add(BrickFactory.createBrick(
-                        brickX,
-                        brickY,
-                        BRICK_WIDTH,  // Truyền chiều rộng mới
-                        BRICK_HEIGHT, // Truyền chiều cao mới
-                        hitPoints,
-                        type
-                ));
-            }
-        }
+        bricks = LevelLoader.createLevel(round, GAME_WIDTH);
     }
 
     public void update() {
@@ -201,16 +147,12 @@ public class GameManager {
                 }
             }
         } else {
-        // --- PHẦN THÊM MỚI ---
-        // Nếu bóng CHƯA được phóng, cho nó dính vào paddle
+
             if (!balls.isEmpty()) {
-                // Giả định rằng quả bóng đầu tiên là quả bóng chính
                 Ball mainBall = balls.get(0);
 
-                // Tính toán vị trí X để bóng ở giữa paddle
                 double ballNewX = paddle.getX() + (paddle.getWidth() / 2) - (mainBall.getWidth() / 2);
 
-                // Tính toán vị trí Y để bóng ở ngay trên paddle
                 double ballNewY = paddle.getY() - mainBall.getHeight();
 
                 mainBall.setX(ballNewX);
@@ -289,8 +231,6 @@ public class GameManager {
 
                     // Va chạm và Bật ngược (sử dụng logic bounceOff trong Ball.java)
                     ball.bounceOff(b);
-
-                    b.takeHit();
 
                     if (b.isDestroyed()) {
                         int points = switch (b.getType().toLowerCase()) {
