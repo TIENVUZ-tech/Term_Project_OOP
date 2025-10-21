@@ -121,8 +121,9 @@ public class Paddle extends MovableObject {
      * Phương thức moveLeft() (di chuyển sang trái speed đơn vị).
      */
     public void moveLeft() {
+        super.setDx(-speed);
         if (this.getX() > 0) {
-            setX(getX() - speed); // cập nhật lại toạ độ trục x của paddle.
+            setX(getX() + super.getDx()); // cập nhật lại toạ độ trục x của paddle.
         }
     }
 
@@ -130,8 +131,9 @@ public class Paddle extends MovableObject {
      * Phương thức moveRight() (di chuyển sang phải speed đơn vị).
      */
     public void moveRight() {
+        super.setDx(speed);
         if(this.getX() + this.getWidth() < 920) {
-            setX(getX() + speed); // cập nhật lại toạn độ trục x của paddle.
+            setX(getX() + super.getDx()); // cập nhật lại toạn độ trục x của paddle.
         }
     }
 
