@@ -94,28 +94,21 @@ public class Ball extends MovableObject {
         return this.isSuperBall;
     }
 
-    /* Phương thức  */
-    
-    // --- Logic Game ---
-
     @Override
     public void move() {
         /* Di chuyển bóng dựa vào speed và hướng (directionX/Y). 
-           Chúng ta không dùng getDx() và getDy() ở đây. */
-        setX(getX() + speed * directionX); 
-        setY(getY() + speed * directionY); 
+        * Chúng ta không dùng getDx() và getDy() ở đây. */
+        setDx(speed * directionX);
+        setDy(speed * directionY);
+        setX(getX() + getDx()); 
+        setY(getY() + getDy()); 
     }
 
     @Override
-    public void update() {
-        // gọi phương thức di chuyển.
-        move();
-    }
+    public void update() {}
 
     @Override
-    public void render(Graphics g) {
-        
-    }
+    public void render(Graphics g) {}
 
     /**
      * Phương thức checkCollistion().
