@@ -11,9 +11,6 @@ import java.awt.*;
  */
 public class Renderer {
 
-    // =========================
-    // Vẽ đối tượng gameplay
-    // =========================
     public void drawPaddle(Graphics g, Paddle paddle) {
         Graphics2D g2d = (Graphics2D) g;
         if (paddle.getImage() != null) {

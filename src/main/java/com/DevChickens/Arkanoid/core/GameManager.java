@@ -27,6 +27,7 @@ public class GameManager {
     private List<PowerUp> powerUps; // Power-up đang rơi
     private List<PowerUp> activePowerUps; // Power-up đang có hiệu lực
     private Renderer renderer;
+    private boolean isBallLaunched;
 
     // Kích thước khu vực chơi (Tường)
     public static final int GAME_WIDTH = 920;
@@ -43,13 +44,10 @@ public class GameManager {
         }
     }
 
-    /**
-     * Khởi tạo game mới
-     */
     public void initGame() {
         score = 0;
         lives = 3;
-        currentRound = 1; // Bắt đầu từ round 1
+        currentRound = 1;
         gameState = GameState.MENU;
         initRound(currentRound); // Khởi tạo round đầu tiên
         activePowerUps = new ArrayList<>();
@@ -62,6 +60,7 @@ public class GameManager {
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         activePowerUps = new ArrayList<>();
+        isBallLaunched = false;
         Random random = new Random();
 
         // Số hàng và cột tăng dần theo round
@@ -83,7 +82,7 @@ public class GameManager {
         // Căn giữa toàn bộ lưới gạch bằng cách tính vị trí X bắt đầu
         double startX = (GAME_WIDTH - totalGridWidth) / 2;
 
-        // Độ khó: càng cao càng có nhiều gạch “khó”
+        // Độ khó: càng cao càng có nhiều gạch khó
         double strongChance = 0.1 * round;
         double explosiveChance = 0.05 * round;
         double quiteChance = 0.15 * round;
@@ -119,9 +118,6 @@ public class GameManager {
         }
     }
 
-    /**
-     * Cập nhật logic game
-     */
     public void update() {
         // Nếu chưa chơi thì không update
         if (gameState == GameState.MENU || gameState == GameState.GAME_OVER || gameState == GameState.VICTORY) return;
@@ -137,72 +133,11 @@ public class GameManager {
 
         if (gameState != GameState.PLAYING) return;
 
-        for (Ball b : balls ) {
-            b.move();
-        }
         paddle.update();
 
-        // PowerUps rơi xuống
-        for (PowerUp p : powerUps) {
-            p.update();
-        }
-
-        // Kiểm tra va chạm TƯỜNG
-        checkWallCollisions();
-
-        // Kiểm tra va chạm giữa các vật thể (Paddle, Bricks, PowerUps)
-        checkCollisions();
-
-        // Nếu bóng rơi ra ngoài
-        java.util.Iterator<Ball> ballIterator = balls.iterator();
-        while (ballIterator.hasNext()) {
-            Ball b = ballIterator.next();
-            if (b.getY() > GAME_HEIGHT) {
-                ballIterator.remove(); // Xóa quả bóng bị rơi
-            }
-        }
-
-        // Nếu KHÔNG CÒN bóng nào trên màn hình -> mất mạng
-        if (balls.isEmpty()) {
-            lives--;
-            if (lives <= 0) {
-                gameState = GameState.GAME_OVER;
-            } else {
-                resetBallAndPaddle(); // Reset lại màn (tạo 1 bóng mới)
-            }
-        }
-
-        // Kiểm tra thắng
-        boolean allBreakableDestroyed = true;
-        for (Brick b : bricks) {
-            // Bỏ qua gạch không thể phá (StrongBrick)
-            if (b instanceof StrongBrick) {
-                continue;
-            }
-
-            // Nếu còn gạch bình thường chưa vỡ → chưa thắng
-            if (!b.isDestroyed()) {
-                allBreakableDestroyed = false;
-                break;
-            }
-        }
-
-        if (allBreakableDestroyed) {
-            if (currentRound < maxRounds) {
-                currentRound++;
-                initRound(currentRound);
-                gameState = GameState.NEXT_ROUND;
-                nextRoundStartTime = System.currentTimeMillis();
-            } else {
-                gameState = GameState.VICTORY;
-            }
-        }
-
-        // Kiểm tra và gỡ bỏ Power-up hết hạn
         java.util.Iterator<PowerUp> iterator = activePowerUps.iterator();
         while (iterator.hasNext()) {
             PowerUp p = iterator.next();
-            // Giả sử bạn có phương thức isExpired() trong PowerUp để kiểm tra
             if (p.isExpired()) {
                 for (Ball b : balls) {
                     p.removeEffect(paddle, b);
@@ -210,8 +145,79 @@ public class GameManager {
                 iterator.remove();
             }
         }
-    }
 
+        if (isBallLaunched) {
+            for (Ball b : balls) {
+                b.move();
+            }
+
+            for (PowerUp p : powerUps) {
+                p.update();
+            }
+
+            checkWallCollisions();
+
+            checkCollisions();
+
+            java.util.Iterator<Ball> ballIterator = balls.iterator();
+            while (ballIterator.hasNext()) {
+                Ball b = ballIterator.next();
+                if (b.getY() > GAME_HEIGHT) {
+                    ballIterator.remove(); // Xóa quả bóng bị rơi
+                }
+            }
+
+            if (balls.isEmpty()) {
+                lives--;
+                if (lives <= 0) {
+                    gameState = GameState.GAME_OVER;
+                } else {
+                    resetBallAndPaddle(); // Reset lại màn (tạo 1 bóng mới)
+                }
+            }
+
+            // Kiểm tra thắng
+            boolean allBreakableDestroyed = true;
+            for (Brick b : bricks) {
+                if (b instanceof StrongBrick) {
+                    continue;
+                }
+
+                // Nếu còn gạch bình thường chưa vỡ → chưa thắng
+                if (!b.isDestroyed()) {
+                    allBreakableDestroyed = false;
+                    break;
+                }
+            }
+
+            if (allBreakableDestroyed) {
+                if (currentRound < maxRounds) {
+                    currentRound++;
+                    initRound(currentRound);
+                    gameState = GameState.NEXT_ROUND;
+                    nextRoundStartTime = System.currentTimeMillis();
+                } else {
+                    gameState = GameState.VICTORY;
+                }
+            }
+        } else {
+        // --- PHẦN THÊM MỚI ---
+        // Nếu bóng CHƯA được phóng, cho nó dính vào paddle
+            if (!balls.isEmpty()) {
+                // Giả định rằng quả bóng đầu tiên là quả bóng chính
+                Ball mainBall = balls.get(0);
+
+                // Tính toán vị trí X để bóng ở giữa paddle
+                double ballNewX = paddle.getX() + (paddle.getWidth() / 2) - (mainBall.getWidth() / 2);
+
+                // Tính toán vị trí Y để bóng ở ngay trên paddle
+                double ballNewY = paddle.getY() - mainBall.getHeight();
+
+                mainBall.setX(ballNewX);
+                mainBall.setY(ballNewY);
+            }
+        }
+    }
     /**
      * Xử lý va chạm giữa bóng và các cạnh của khung trò chơi (Tường).
      */
@@ -368,7 +374,7 @@ public class GameManager {
                 3, -3, 5,
                 1, -1
         ));
-        gameState = GameState.PAUSED;
+        isBallLaunched = false;
     }
 
     /**
@@ -388,6 +394,11 @@ public class GameManager {
                     paddle.moveRight();
                 if (keyCode == java.awt.event.KeyEvent.VK_P)
                     gameState = GameState.PAUSED;
+                if (keyCode == java.awt.event.KeyEvent.VK_SPACE) {
+                    if (!isBallLaunched) {
+                        isBallLaunched = true;
+                    }
+                }
                 break;
 
             case PAUSED:
