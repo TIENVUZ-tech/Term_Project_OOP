@@ -317,40 +317,41 @@ public class GameManager {
         isBallLaunched = false;
     }
 
-    /**
-     * Nhận input từ bàn phím
-     */
-    public void handleInput(int keyCode) {
+    public void onConfirmPressed() {
         switch (gameState) {
             case MENU:
-                if (keyCode == java.awt.event.KeyEvent.VK_ENTER)
-                    gameState = GameState.PLAYING;
+                gameState = GameState.PLAYING;
                 break;
-
-            case PLAYING:
-                if (keyCode == java.awt.event.KeyEvent.VK_LEFT)
-                    paddle.moveLeft();
-                if (keyCode == java.awt.event.KeyEvent.VK_RIGHT)
-                    paddle.moveRight();
-                if (keyCode == java.awt.event.KeyEvent.VK_P)
-                    gameState = GameState.PAUSED;
-                if (keyCode == java.awt.event.KeyEvent.VK_SPACE) {
-                    if (!isBallLaunched) {
-                        isBallLaunched = true;
-                    }
-                }
-                break;
-
-            case PAUSED:
-                if (keyCode == java.awt.event.KeyEvent.VK_P)
-                    gameState = GameState.PLAYING;
-                break;
-
             case GAME_OVER:
             case VICTORY:
-                if (keyCode == java.awt.event.KeyEvent.VK_ENTER)
-                    initGame();
+                initGame(); // Chơi lại game mới
                 break;
+        }
+    }
+
+    public void onPausePressed() {
+        if (gameState == GameState.PLAYING) {
+            gameState = GameState.PAUSED;
+        } else if (gameState == GameState.PAUSED) {
+            gameState = GameState.PLAYING;
+        }
+    }
+
+    public void onLaunchPressed() {
+        if (gameState == GameState.PLAYING && !isBallLaunched) {
+            isBallLaunched = true;
+        }
+    }
+
+    public void onMoveLeftPressed() {
+        if (gameState == GameState.PLAYING) {
+            paddle.moveLeft();
+        }
+    }
+
+    public void onMoveRightPressed() {
+        if (gameState == GameState.PLAYING) {
+            paddle.moveRight();
         }
     }
 
