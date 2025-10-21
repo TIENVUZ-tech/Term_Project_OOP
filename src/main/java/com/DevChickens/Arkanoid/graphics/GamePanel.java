@@ -1,19 +1,21 @@
 package com.DevChickens.Arkanoid.graphics;
 
 import com.DevChickens.Arkanoid.core.GameManager;
+import com.DevChickens.Arkanoid.input.InputHandler; // <-- 1. THÊM IMPORT
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+// import java.awt.event.KeyEvent;     // <-- Không cần nữa
+// import java.awt.event.KeyListener; // <-- 2. XÓA IMPORT NÀY
 
 /**
  * GamePanel là nơi hiển thị game và chứa vòng lặp game (game loop).
- *  - Gọi GameManager.update() để cập nhật logic
- *  - repaint() để vẽ lại game
- *  - Lắng nghe sự kiện bàn phím và chuyển cho GameManager xử lý
+ * - Gọi GameManager.update() để cập nhật logic
+ * - repaint() để vẽ lại game
+ * - (ĐÃ SỬA) Ủy quyền việc lắng nghe phím cho InputHandler
  */
-public class GamePanel extends JPanel implements Runnable, KeyListener {
+// 3. BỎ "implements KeyListener"
+public class GamePanel extends JPanel implements Runnable {
 
     private GameManager manager;
     private Thread gameThread;
@@ -25,13 +27,19 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         setPreferredSize(new Dimension(GameManager.GAME_WIDTH, GameManager.GAME_HEIGHT));
         setBackground(Color.BLACK);
         setOpaque(false);
-        setFocusable(true);
-        requestFocus();
-        addKeyListener(this);
+        setFocusable(true); // <-- Tốt, bạn đã có dòng này
+        requestFocus();     // <-- Tốt, bạn đã có dòng này
+
+        // 4. SỬA CHỖ NÀY
+        // addKeyListener(this); // Xóa dòng cũ
+
+        // Thay bằng InputHandler mới
+        InputHandler inputHandler = new InputHandler(this.manager);
+        addKeyListener(inputHandler);
+        // --- KẾT THÚC SỬA ---
 
         startGameLoop();
     }
-
     private void startGameLoop() {
         running = true;
         gameThread = new Thread(this);
@@ -68,18 +76,4 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         manager.draw(g);
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-        manager.handleInput(e.getKeyCode());
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        // không cần
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-        // không cần
-    }
 }
