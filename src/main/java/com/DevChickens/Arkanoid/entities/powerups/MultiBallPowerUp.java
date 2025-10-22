@@ -26,20 +26,26 @@ public class MultiBallPowerUp extends PowerUp {
         double baseSpeed = originalBall.getSpeed();
         boolean isSuper = originalBall.getIsSuperBall();
         int originalDirX = originalBall.getDirectionX(); // Lấy hướng X cũ
+        int originalDirY = originalBall.getDirectionY();
+
+        // bóng 1 chéo bên trái 45 độ so với bóng gốc
+        int rawX1 = originalDirX + originalDirY;
+        int rawY1 = -originalDirX + originalDirY;
+
+        // bóng 2 chéo bên phải 45 độ so với bóng gốc
+        int rawX2 = originalDirX - originalDirY;
+        int rawY2 = originalDirX + originalDirY;
+
+        // Chuẩn hóa kết quả về (-1, 0, 1)
+        // tránh các trường hợp ra 2 hoặc -2
+        int newDirX1 = (int) Math.signum(rawX1);
+        int newDirY1 = (int) Math.signum(rawY1);
+        int newDirX2 = (int) Math.signum(rawX2);
+        int newDirY2 = (int) Math.signum(rawY2);
 
         // Tạo 2 bóng mới
-        // Bóng mới 1: Bay hướng lên trái
-        Ball newBall1 = new Ball(startX, startY, 0, 0, baseSpeed, -1, -1);
-
-        // Bóng mới 2: Bay hướng Llên phải
-        Ball newBall2 = new Ball(startX, startY, 0, 0, baseSpeed, 1, -1);
-
-        // XỬ LÝ BÓNG GỐC
-        // Đổi hướng X của bóng gốc (nếu đang sang phải thì đổi sang trái)
-        originalBall.setDirectionX(originalDirX * -1);
-        // BẮT BUỘC nó bay LÊN
-        originalBall.setDirectionY(-1);
-        // ---------------------------------------------------
+        Ball newBall1 = new Ball(startX, startY, 0, 0, baseSpeed, newDirX1, newDirY1);
+        Ball newBall2 = new Ball(startX, startY, 0, 0, baseSpeed, newDirX2, newDirY2);
 
         if (isSuper) {
             newBall1.activateSuperBall(0);
