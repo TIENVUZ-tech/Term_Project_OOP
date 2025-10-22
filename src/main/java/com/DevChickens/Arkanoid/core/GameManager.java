@@ -5,7 +5,10 @@ import com.DevChickens.Arkanoid.entities.bricks.*;
 import com.DevChickens.Arkanoid.entities.powerups.*;
 import com.DevChickens.Arkanoid.enums.GameState;
 import com.DevChickens.Arkanoid.graphics.Renderer;
-
+import java.util.Queue;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.HashSet;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -147,7 +150,6 @@ public class GameManager {
                 }
             }
         } else {
-
             if (!balls.isEmpty()) {
                 Ball mainBall = balls.get(0);
 
@@ -241,6 +243,11 @@ public class GameManager {
                         };
                         score += points;
 
+                        // Nếu viên gạch bị phá hủy là gạch nổ, kích hoạt vụ nổ
+                        if (b instanceof ExplosiveBrick) {
+                            processExplosion(b);
+                        }
+
                         // Có thể rơi PowerUp ngẫu nhiên
                         double rand = Math.random(); // Lấy 1 số ngẫu nhiên
 
@@ -295,6 +302,91 @@ public class GameManager {
         }
     }
 
+    /**
+     * Xử lý một vụ nổ, bắt đầu từ một viên gạch.
+     * @param initialBrick Viên gạch nổ ban đầu (vừa bị bóng phá hủy).
+     */
+    private void processExplosion(Brick initialBrick) {
+        // Hàng đợi để xử lý nổ dây chuyền (BFS)
+        Queue<Brick> explosionQueue = new LinkedList<>();
+        // Set để đảm bảo mỗi viên gạch nổ chỉ nổ 1 lần
+        Set<Brick> alreadyExploded = new HashSet<>();
+
+        // bắt đầu với viên gạch gốc
+        explosionQueue.add(initialBrick);
+        alreadyExploded.add(initialBrick);
+
+        while (!explosionQueue.isEmpty()) {
+            Brick currentExplosion = explosionQueue.poll();
+
+            // Lấy thông số của viên gạch đang nổ
+            double brickWidth = currentExplosion.getWidth();
+            double brickHeight = currentExplosion.getHeight();
+            double centerX = currentExplosion.getX() + brickWidth / 2.0;
+            double centerY = currentExplosion.getY() + brickHeight / 2.0;
+
+            // Bán kính nổ 1 ô xung quanh mỗi bên
+            // phạm vi là ô vuông cạch 3 viên, viên nổ là trung tâm
+            double radiusX = brickWidth * 1.5;
+            double radiusY = brickHeight * 1.5;
+
+            // Tính toán vùng ảnh hưởng
+            double explosionLeft = centerX - radiusX;
+            double explosionRight = centerX + radiusX;
+            double explosionTop = centerY - radiusY;
+            double explosionBottom = centerY + radiusY;
+
+            // Duyệt qua tất cả các viên gạch trong màn chơi
+            for (Brick neighbor : bricks) {
+                // Bỏ qua nếu gạch đã bị phá hủy
+                if (neighbor.isDestroyed()) {
+                    continue;
+                }
+                // Bỏ qua nếu là chính viên gạch đang nổ
+                if (neighbor == currentExplosion) {
+                    continue;
+                }
+                // Lấy phạm vi của gạch lân cận
+                double otherLeft = neighbor.getX();
+                double otherRight = neighbor.getX() + neighbor.getWidth();
+                double otherTop = neighbor.getY();
+                double otherBottom = neighbor.getY() + neighbor.getHeight();
+
+                // Kiểm tra xem gạch lân cận có nằm trong vùng nổ không (AABB collision)
+                boolean overlaps = (otherLeft < explosionRight &&
+                        otherRight > explosionLeft &&
+                        otherTop < explosionBottom &&
+                        otherBottom > explosionTop);
+
+                if (overlaps) {
+                    // Gây sát thương (trừ 1 máu)
+                    neighbor.takeHit();
+
+                    // Nếu gạch lân cận này bị phá hủy bởi vụ nổ
+                    if (neighbor.isDestroyed()) {
+
+                        // Cộng điểm cho gạch bị phá hủy bởi vụ nổ
+                        int points = switch (neighbor.getType().toLowerCase()) {
+                            case "strong" -> 300;
+                            case "explosive" -> 200;
+                            case "quite" -> 150;
+                            default -> 100;
+                        };
+                        score += points;
+
+                        // nêu là gạch nổ và ch có trong hàng đợi
+                        if (neighbor instanceof ExplosiveBrick &&
+                                !alreadyExploded.contains(neighbor))
+                        {
+                            // Thêm nó vào hàng đợi để xử lý nổ tiếp
+                            explosionQueue.add(neighbor);
+                            alreadyExploded.add(neighbor);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Reset bóng và paddle khi mất mạng
