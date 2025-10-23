@@ -32,6 +32,9 @@ public class GameManager {
     private Renderer renderer;
     private boolean isBallLaunched;
 
+    private boolean isMovingLeft = false;
+    private boolean isMovingRight = false;
+
     // Kích thước khu vực chơi (Tường)
     public static final int GAME_WIDTH = 920;
     public static final int GAME_HEIGHT = 690;
@@ -54,10 +57,12 @@ public class GameManager {
         gameState = GameState.MENU;
         initRound(currentRound); // Khởi tạo round đầu tiên
         activePowerUps = new ArrayList<>();
+        isMovingLeft = false;
+        isMovingRight = false;
     }
 
     private void initRound(int round) {
-        paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 0, 0, 35, null);
+        paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 0, 0, 8, null);
         balls = new ArrayList<>(); // Khởi tạo danh sách
         balls.add(new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 5 + round, 1, -1));
         bricks = new ArrayList<>();
@@ -65,6 +70,8 @@ public class GameManager {
         activePowerUps = new ArrayList<>();
         isBallLaunched = false;
         bricks = LevelLoader.createLevel(round, GAME_WIDTH);
+        isMovingLeft = false;
+        isMovingRight = false;
     }
 
     public void update() {
@@ -81,6 +88,12 @@ public class GameManager {
         }
 
         if (gameState != GameState.PLAYING) return;
+
+        if (isMovingLeft) {
+            paddle.moveLeft();
+        } else if (isMovingRight) {
+            paddle.moveRight();
+        }
 
         paddle.update();
 
@@ -407,6 +420,9 @@ public class GameManager {
                 1, -1
         ));
         isBallLaunched = false;
+
+        isMovingLeft = false;
+        isMovingRight = false;
     }
 
     public void onConfirmPressed() {
@@ -437,14 +453,23 @@ public class GameManager {
 
     public void onMoveLeftPressed() {
         if (gameState == GameState.PLAYING) {
-            paddle.moveLeft();
+            isMovingLeft = true;
+
         }
     }
 
     public void onMoveRightPressed() {
         if (gameState == GameState.PLAYING) {
-            paddle.moveRight();
+            isMovingRight = true;
         }
+    }
+
+    public void onMoveLeftReleased() {
+        isMovingLeft = false;
+    }
+
+    public void onMoveRightReleased() {
+        isMovingRight = false;
     }
 
     /**

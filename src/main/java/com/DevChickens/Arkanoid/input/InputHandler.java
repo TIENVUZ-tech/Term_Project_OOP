@@ -39,5 +39,15 @@ public class InputHandler extends KeyAdapter {
     @Override
     public void keyReleased(KeyEvent e) {
         int keyCode = e.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.VK_LEFT:
+                manager.onMoveLeftReleased();
+                break;
+            case KeyEvent.VK_RIGHT:
+                manager.onMoveRightReleased();
+                break;
+        }
     }
+
+
 }
