@@ -18,6 +18,7 @@ public class GameManager {
     private Paddle paddle;
     private List<Ball> balls;
     private List<Brick> bricks;
+    private List<Bullet> bullets;
 
     private int score;
     private int lives;
@@ -34,6 +35,11 @@ public class GameManager {
 
     private boolean isMovingLeft = false;
     private boolean isMovingRight = false;
+
+    // các thông số cho GunPaddle bắn đạn.
+    private boolean isFiring = false; // flag
+    private long lastFireTime = 0; // bộ đếm thời gian
+    private final long FIRE_RATE_DELAY = 400; // 400ms giữa các lần bắn.
 
     // Kích thước khu vực chơi (Tường)
     public static final int GAME_WIDTH = 920;
@@ -68,6 +74,7 @@ public class GameManager {
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         activePowerUps = new ArrayList<>();
+        bullets = new ArrayList<>();
         isBallLaunched = false;
         bricks = LevelLoader.createLevel(round, GAME_WIDTH);
         isMovingLeft = false;
@@ -97,12 +104,42 @@ public class GameManager {
 
         paddle.update();
 
+        // Xử lý bắn đạn
+        if (paddle.getIsGunPaddle() && isFiring) {
+            long now = System.currentTimeMillis();
+
+            // Kiểm tra thời gian và bắn đạn
+            if (now - lastFireTime >= FIRE_RATE_DELAY) {
+                // vị trí của súng.
+                final double GUN_OFFSET_X = paddle.getWidth() * 0.1;
+                final double BULLET_SPEED = 15;
+                final double BULLET_WIDTH = paddle.getWidth() * 0.1;
+                // vị trí bắt đầu bắn.
+                double startY = paddle.getY();
+                // ví trí súng trái
+                double leftX = paddle.getX() + GUN_OFFSET_X;
+                // vị trí súng phải
+                double rightX = paddle.getX() + paddle.getWidth() - GUN_OFFSET_X - BULLET_WIDTH;
+
+                // Khởi tạo các viên đạn
+                Bullet b1 = new Bullet(leftX, startY, 0, 0, BULLET_SPEED);
+                Bullet b2 = new Bullet(rightX, startY, 0, 0, BULLET_SPEED);
+
+                bullets.add(b1);
+                bullets.add(b2);
+
+                // cập nhật lại thời gian bắn lần cuối.
+                lastFireTime = now;
+            }
+        }
+
         java.util.Iterator<PowerUp> iterator = activePowerUps.iterator();
         while (iterator.hasNext()) {
             PowerUp p = iterator.next();
             if (p.isExpired()) {
                 for (Ball b : balls) {
                     p.removeEffect(paddle, b);
+                    offFire();
                 }
                 iterator.remove();
             }
@@ -116,6 +153,10 @@ public class GameManager {
             for (PowerUp p : powerUps) {
                 p.update();
             }
+            
+            for (Bullet bullet : bullets) {
+                bullet.move();
+            }
 
             checkWallCollisions();
 
@@ -128,6 +169,17 @@ public class GameManager {
                     ballIterator.remove(); // Xóa quả bóng bị rơi
                 }
             }
+            
+            // Logic loại bỏ đạn ra khỏi màn hình.
+            java.util.Iterator<Bullet> bulletIterator = bullets.iterator();
+            while (bulletIterator.hasNext()) {
+                Bullet b = bulletIterator.next();
+                if (b.getY() + b.getHeight() < 0) {
+                    // xóa đạn nếu đạn đi khỏi cạnh trên.
+                    bulletIterator.remove();
+                }
+            }
+
 
             if (balls.isEmpty()) {
                 lives--;
@@ -270,9 +322,55 @@ public class GameManager {
                             powerUps.add(new SuperBallPowerUp(b.getX(), b.getY(), "SUPER_BALL", 5000));
                         } else if (rand < 0.3) { // 10% cơ hội (tổng 30%)
                             powerUps.add(new MultiBallPowerUp(b.getX(), b.getY(), "MULTI_BALL", 1000));
+                        } else if (rand < 0.4) { // 10% cơ hội (tổng 40%)
+                            powerUps.add(new GunPaddlePowerUp(b.getX(), b.getY(), "GUN_PADDLE", 5000));
                         }
                     }
 
+                }
+            }
+        }
+        
+        // Bullet vs Bricks (logic va chạm)
+        java.util.Iterator<Bullet> bulletIterator = bullets.iterator();
+        while (bulletIterator.hasNext()) {
+            Bullet currentBullet = bulletIterator.next();
+
+            for (int i = 0; i < bricks.size(); i++) {
+                Brick b = bricks.get(i);
+
+                if (!b.isDestroyed() && currentBullet.checkCollision(b)) {
+                    b.takeHit(); // gây sát thương cho gạch
+
+                    if (b.isDestroyed()) {
+                        // cộng điểm
+                        int points = switch (b.getType().toLowerCase()) {
+                            case "strong" -> 300;
+                            case "explosive" -> 200;
+                            case "quite" -> 150;
+                            default -> 100;
+                        };
+                        score += points;
+                        
+                        if (b instanceof ExplosiveBrick) {
+                            processExplosion(b);
+                        }
+                        // Có thể rơi PowerUp ngẫu nhiên
+                        double rand = Math.random(); // Lấy 1 số ngẫu nhiên
+
+                        if (rand < 0.1) { // 10% cơ hội
+                            powerUps.add(new ExpandPaddlePowerUp(b.getX(), b.getY(), "EXPAND_PADDLE", 5000));
+                        } else if (rand < 0.2) { // 10% cơ hội (tổng 20%)
+                            powerUps.add(new SuperBallPowerUp(b.getX(), b.getY(), "SUPER_BALL", 5000));
+                        } else if (rand < 0.3) { // 10% cơ hội (tổng 30%)
+                            powerUps.add(new MultiBallPowerUp(b.getX(), b.getY(), "MULTI_BALL", 1000));
+                        } else if (rand < 0.4) { // 10% cơ hội (tổng 40%)
+                            powerUps.add(new GunPaddlePowerUp(b.getX(), b.getY(), "GUN_PADDLE", 5000));
+                        }
+                    }
+                    // loại bỏ đạn khi va chạm với gạch
+                    bulletIterator.remove();
+                    break;
                 }
             }
         }
@@ -294,9 +392,12 @@ public class GameManager {
                 if (p instanceof ExpandPaddlePowerUp) {
                     // Ta truyền 'this' (manager) và 'null' (ball)
                     p.applyEffect(this, paddle, null);
+                } else if (p instanceof GunPaddlePowerUp) {
+                    // Loại 2: Gunpaddle.
+                    p.applyEffect(null, paddle, null);
+                    onFire();
                 }
-
-                // Loại 2: Power-up ảnh hưởng đến TẤT CẢ bóng
+                // Loại 3: Power-up ảnh hưởng đến TẤT CẢ bóng
                 else if (p instanceof SuperBallPowerUp ||
                         p instanceof FastBallPowerUp ||
                         p instanceof MultiBallPowerUp) {
@@ -472,6 +573,18 @@ public class GameManager {
         isMovingRight = false;
     }
 
+    // Cho phép bắn đạn
+    public void onFire() {
+        if (gameState == GameState.PLAYING && paddle.getIsGunPaddle()) {
+            isFiring = true;
+        }
+    }
+
+    // Không cho phép bắn đạn
+    public void offFire() {
+        isFiring = false;
+    }
+
     /**
      * Vẽ các đối tượng lên màn hình
      */
@@ -489,6 +602,10 @@ public class GameManager {
                 renderer.drawPaddle(g, paddle);
                 for (Ball b : balls) {
                     renderer.drawBall(g, b);
+                }
+                
+                for (Bullet b : bullets) {
+                    renderer.drawBullet(g, b);
                 }
 
                 for (Brick b : bricks) renderer.drawBrick(g, b);
