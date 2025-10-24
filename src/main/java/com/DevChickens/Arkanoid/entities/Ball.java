@@ -105,7 +105,10 @@ public class Ball extends MovableObject {
     }
 
     @Override
-    public void update() {}
+    public void update() {
+        // cập nhật vị trí của bóng.
+        move();
+    }
 
     @Override
     public void render(Graphics g) {}
