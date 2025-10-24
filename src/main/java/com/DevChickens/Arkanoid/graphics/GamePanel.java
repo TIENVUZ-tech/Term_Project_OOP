@@ -5,16 +5,10 @@ import com.DevChickens.Arkanoid.input.InputHandler; // <-- 1. THÊM IMPORT
 
 import javax.swing.*;
 import java.awt.*;
-// import java.awt.event.KeyEvent;     // <-- Không cần nữa
-// import java.awt.event.KeyListener; // <-- 2. XÓA IMPORT NÀY
 
 /**
  * GamePanel là nơi hiển thị game và chứa vòng lặp game (game loop).
- * - Gọi GameManager.update() để cập nhật logic
- * - repaint() để vẽ lại game
- * - (ĐÃ SỬA) Ủy quyền việc lắng nghe phím cho InputHandler
  */
-// 3. BỎ "implements KeyListener"
 public class GamePanel extends JPanel implements Runnable {
 
     private GameManager manager;
@@ -27,16 +21,12 @@ public class GamePanel extends JPanel implements Runnable {
         setPreferredSize(new Dimension(GameManager.GAME_WIDTH, GameManager.GAME_HEIGHT));
         setBackground(Color.BLACK);
         setOpaque(false);
-        setFocusable(true); // <-- Tốt, bạn đã có dòng này
-        requestFocus();     // <-- Tốt, bạn đã có dòng này
+        setFocusable(true);
+        requestFocus();
 
-        // 4. SỬA CHỖ NÀY
-        // addKeyListener(this); // Xóa dòng cũ
 
-        // Thay bằng InputHandler mới
         InputHandler inputHandler = new InputHandler(this.manager);
         addKeyListener(inputHandler);
-        // --- KẾT THÚC SỬA ---
 
         startGameLoop();
     }

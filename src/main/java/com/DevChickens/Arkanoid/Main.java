@@ -2,6 +2,7 @@ package com.DevChickens.Arkanoid;
 
 import javax.swing.*;
 import com.DevChickens.Arkanoid.core.GameManager;
+import com.DevChickens.Arkanoid.graphics.AssetLoader;
 import com.DevChickens.Arkanoid.graphics.GamePanel;
 
 /**
@@ -9,6 +10,7 @@ import com.DevChickens.Arkanoid.graphics.GamePanel;
  */
 public class Main {
     public static void main(String[] args) {
+        AssetLoader.loadAllAssets();
         SwingUtilities.invokeLater(() -> {
             // Tạo cửa sổ chính
             JFrame frame = new JFrame("Arkanoid - DevChickens");

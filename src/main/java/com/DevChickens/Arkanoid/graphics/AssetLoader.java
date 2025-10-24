@@ -1,27 +1,56 @@
 package com.DevChickens.Arkanoid.graphics;
 
-import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Lớp tiện ích (utility class) dùng để tải các tài nguyên cho game, ví dụ như hình ảnh.
- * Tất cả các phương thức trong lớp này đều là 'static' để có thể gọi trực tiếp
- * mà không cần tạo đối tượng của lớp: AssetLoader.loadImage(...)
- */
 public class AssetLoader {
+
+    // Thêm các biến để lưu ảnh.
+    public static BufferedImage MENU_BACKGROUND;
+    public static List<BufferedImage> ROUND_BACKGROUNDS;
+    public static final int MAX_ROUNDS = 5;
+
+    public static void loadAllAssets() {
+        System.out.println("Bắt đầu tải tài nguyên (assets)...");
+
+        MENU_BACKGROUND = loadImage("/images/background_menu_galaxy.png");
+
+        System.out.println("Tải ảnh nền các round...");
+        ROUND_BACKGROUNDS = new ArrayList<>();
+        for (int i = 1; i <= MAX_ROUNDS; i++) {
+            BufferedImage bg = loadImage("/images/round" + i + ".jpg");
+            ROUND_BACKGROUNDS.add(bg);
+        }
+
+        System.out.println("Tải tài nguyên thành công!");
+    }
 
     public static BufferedImage loadImage(String path) {
         try {
-            // ImageIO.read() đọc file ảnh.
-            // AssetLoader.class.getResource(path) tìm và lấy file từ trong thư mục resources.
             return ImageIO.read(AssetLoader.class.getResource(path));
-        } catch (IOException e) {
-            // Nếu có lỗi (ví dụ: file không tồn tại, sai đường dẫn), in ra lỗi và thoát.
+        } catch (Exception e) {
             System.err.println("Lỗi: không thể tải ảnh tại đường dẫn: " + path);
-            e.printStackTrace();
-            System.exit(1); // Thoát game vì không thể tải tài nguyên cần thiết.
+            return null;
         }
-        return null;
+    }
+
+    public static BufferedImage getRoundBackground(int round) {
+        // Trừ 1 vì round 1 nằm ở index 0 của List
+        int index = round - 1;
+
+        if (index < 0 || index >= ROUND_BACKGROUNDS.size()) {
+            return ROUND_BACKGROUNDS.get(0); // Trả về ảnh nền round 1
+        }
+
+        BufferedImage bg = ROUND_BACKGROUNDS.get(index);
+
+        if (bg == null) {
+            return ROUND_BACKGROUNDS.get(0); // Trả về ảnh round 1 dự phòng
+        }
+
+        return bg;
     }
 }

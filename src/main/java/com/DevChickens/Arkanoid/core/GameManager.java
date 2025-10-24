@@ -509,7 +509,7 @@ public class GameManager {
         paddle = new Paddle(
                 GAME_WIDTH / 2.0,
                 GAME_HEIGHT - 50,
-                0, 0, 35, null
+                0, 0, 8, null
         );
 
         // Thiết lập lại vị trí và hướng/tốc độ ban đầu cho bóng
@@ -595,8 +595,7 @@ public class GameManager {
                 break;
             case PLAYING:
             case PAUSED:
-                g.setColor(Color.BLACK);
-                g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+                renderer.drawGameBackground(g, GAME_WIDTH, GAME_HEIGHT, currentRound);
 
                 // VẼ GAME OBJECTS
                 renderer.drawPaddle(g, paddle);

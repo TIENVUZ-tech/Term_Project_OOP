@@ -5,16 +5,33 @@ import com.DevChickens.Arkanoid.entities.bricks.*;
 import com.DevChickens.Arkanoid.entities.powerups.*;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
- * Renderer vẽ toàn bộ đối tượng và màn hình của Arkanoid
+ * Renderer vẽ toàn bộ đối tượng và màn hình của Arkanoid.
  */
 public class Renderer {
+
+    private Font titleFont;
+    private Font instructionFont;
+    private Font smallFont;
+
+    public Renderer() {
+        // Khởi tạo các font này một lần duy nhất.
+        try {
+            titleFont = new Font("Arial", Font.BOLD, 72);
+            instructionFont = new Font("Arial", Font.PLAIN, 28);
+            smallFont = new Font("Arial", Font.PLAIN, 20);
+        } catch (Exception e) {
+            titleFont = new Font("SansSerif", Font.BOLD, 72);
+            instructionFont = new Font("SansSerif", Font.PLAIN, 28);
+            smallFont = new Font("SansSerif", Font.PLAIN, 20);
+        }
+    }
 
     public void drawPaddle(Graphics g, Paddle paddle) {
         Graphics2D g2d = (Graphics2D) g;
         if (paddle.getImage() != null) {
-            // SỬA LẠI THÀNH ĐÚNG
             g2d.drawImage(paddle.getImage(),
                     (int) paddle.getX(),
                     (int) paddle.getY(),
@@ -24,10 +41,8 @@ public class Renderer {
     }
 
     public void drawBall(Graphics g, Ball ball) {
-        // Ép kiểu g sang Graphics2D
         Graphics2D g2d = (Graphics2D) g;
         if (ball.getImage() != null) {
-            // Dùng g2d để vẽ
             g2d.drawImage(ball.getImage(), (int) ball.getX(), (int) ball.getY(),
                     (int) ball.getWidth(), (int) ball.getHeight(), null);
         }
@@ -63,71 +78,160 @@ public class Renderer {
     }
 
     public void drawMenu(Graphics g, int w, int h) {
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, w, h);
+        if (AssetLoader.MENU_BACKGROUND != null) {
+            g.drawImage(AssetLoader.MENU_BACKGROUND, 0, 0, w, h, null);
+        }
 
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 36));
-        g.drawString("ARKANOID", w / 2 - 100, h / 2 - 50);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g.setFont(new Font("Arial", Font.PLAIN, 20));
-        g.drawString("Press ENTER to Start", w / 2 - 100, h / 2);
+        g2d.setFont(titleFont);
+        g2d.setColor(Color.WHITE);
+        String title = "ARKANOID";
+        // Căn giữa text tự động.
+        FontMetrics fm = g2d.getFontMetrics();
+        int titleX = (w - fm.stringWidth(title)) / 2;
+        int titleY = h / 2 - 50; // Đặt ở nửa trên màn hình
+        g2d.drawString(title, titleX, titleY);
+
+        g2d.setFont(instructionFont);
+        String instruction = "Press ENTER to Start";
+        fm = g2d.getFontMetrics();
+        int instructionX = (w - fm.stringWidth(instruction)) / 2;
+        int instructionY = h / 2 + 40; // Đặt ở nửa dưới
+
+        if (System.currentTimeMillis() / 500 % 2 == 0) {
+            g2d.drawString(instruction, instructionX, instructionY);
+        }
+    }
+
+    public void drawGameBackground(Graphics g, int w, int h, int round) {
+        BufferedImage bg = AssetLoader.getRoundBackground(round);
+
+        if (bg != null) {
+            g.drawImage(bg, 0, 0, w, h, null);
+        } else {
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, w, h);
+        }
     }
 
     public void drawPause(Graphics g, int w, int h) {
-        g.setColor(Color.BLACK);
+        g.setColor(new Color(0, 0, 0, 150)); // Màu đen mờ (Alpha = 150).
         g.fillRect(0, 0, w, h);
 
-        g.setColor(Color.YELLOW);
-        g.setFont(new Font("Arial", Font.BOLD, 36));
-        g.drawString("PAUSED", w / 2 - 80, h / 2);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.setColor(Color.YELLOW);
 
-        g.setFont(new Font("Arial", Font.PLAIN, 20));
-        g.drawString("Press P to Resume", w / 2 - 100, h / 2 + 40);
+        // Vẽ chữ PAUSED
+        g2d.setFont(titleFont); // Dùng font lớn
+        String text = "PAUSED";
+        FontMetrics fm = g2d.getFontMetrics();
+        int x = (w - fm.stringWidth(text)) / 2;
+        int y = h / 2;
+        g2d.drawString(text, x, y);
+
+        // Vẽ hướng dẫn
+        g2d.setFont(instructionFont);
+        text = "Press P to Resume";
+        fm = g2d.getFontMetrics();
+        x = (w - fm.stringWidth(text)) / 2;
+        y = h / 2 + 50;
+        g2d.drawString(text, x, y);
     }
 
     public void drawNextRound(Graphics g, int width, int height, int round) {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, width, height);
 
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 48));
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.setColor(Color.WHITE);
+
+        // Vẽ "ROUND X"
+        g2d.setFont(titleFont);
         String text = "ROUND " + round;
-        int textWidth = g.getFontMetrics().stringWidth(text);
-        g.drawString(text, (width - textWidth) / 2, height / 2);
+        FontMetrics fm = g2d.getFontMetrics();
+        int x = (width - fm.stringWidth(text)) / 2;
+        int y = height / 2;
+        g2d.drawString(text, x, y);
 
-        g.setFont(new Font("Arial", Font.PLAIN, 20));
-        g.drawString("Get Ready...", (width / 2) - 50, (height / 2) + 40);
+        // Vẽ "Get Ready..."
+        g2d.setFont(instructionFont);
+        text = "Get Ready...";
+        fm = g2d.getFontMetrics();
+        x = (width - fm.stringWidth(text)) / 2;
+        y = height / 2 + 50;
+        g2d.drawString(text, x, y);
     }
-
 
     public void drawGameOver(Graphics g, int w, int h, int score) {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, w, h);
 
-        g.setColor(Color.RED);
-        g.setFont(new Font("Arial", Font.BOLD, 36));
-        g.drawString("GAME OVER", w / 2 - 120, h / 2 - 50);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.PLAIN, 20));
-        g.drawString("Final Score: " + score, w / 2 - 80, h / 2);
+        // Vẽ "GAME OVER"
+        g2d.setFont(titleFont);
+        g2d.setColor(Color.RED);
+        String text = "GAME OVER";
+        FontMetrics fm = g2d.getFontMetrics();
+        int x = (w - fm.stringWidth(text)) / 2;
+        int y = h / 2 - 50;
+        g2d.drawString(text, x, y);
 
-        g.drawString("Press ENTER to Restart", w / 2 - 120, h / 2 + 40);
+        // Vẽ Điểm
+        g2d.setFont(instructionFont);
+        g2d.setColor(Color.WHITE);
+        text = "Final Score: " + score;
+        fm = g2d.getFontMetrics();
+        x = (w - fm.stringWidth(text)) / 2;
+        y = h / 2 + 20;
+        g2d.drawString(text, x, y);
+
+        // Vẽ Hướng dẫn
+        g2d.setFont(smallFont); // Dùng font nhỏ hơn
+        text = "Press ENTER to Restart";
+        fm = g2d.getFontMetrics();
+        x = (w - fm.stringWidth(text)) / 2;
+        y = h / 2 + 60;
+        g2d.drawString(text, x, y);
     }
 
     public void drawVictory(Graphics g, int w, int h, int score) {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, w, h);
 
-        g.setColor(Color.GREEN);
-        g.setFont(new Font("Arial", Font.BOLD, 36));
-        g.drawString("YOU WIN!", w / 2 - 100, h / 2 - 50);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.PLAIN, 20));
-        g.drawString("Final Score: " + score, w / 2 - 80, h / 2);
+        // Vẽ "YOU WIN!"
+        g2d.setFont(titleFont);
+        g2d.setColor(Color.GREEN);
+        String text = "YOU WIN!";
+        FontMetrics fm = g2d.getFontMetrics();
+        int x = (w - fm.stringWidth(text)) / 2;
+        int y = h / 2 - 50;
+        g2d.drawString(text, x, y);
 
-        g.drawString("Press ENTER to Play Again", w / 2 - 140, h / 2 + 40);
+        // Vẽ Điểm
+        g2d.setFont(instructionFont);
+        g2d.setColor(Color.WHITE);
+        text = "Final Score: " + score;
+        fm = g2d.getFontMetrics();
+        x = (w - fm.stringWidth(text)) / 2;
+        y = h / 2 + 20;
+        g2d.drawString(text, x, y);
+
+        // Vẽ Hướng dẫn
+        g2d.setFont(smallFont);
+        text = "Press ENTER to Play Again";
+        fm = g2d.getFontMetrics();
+        x = (w - fm.stringWidth(text)) / 2;
+        y = h / 2 + 60;
+        g2d.drawString(text, x, y);
     }
 }
