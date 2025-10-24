@@ -3,6 +3,7 @@ package com.DevChickens.Arkanoid.entities;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.graphics.AssetLoader;;
 
 public class Bullet extends MovableObject {
@@ -30,9 +31,22 @@ public class Bullet extends MovableObject {
         this.speed = speed;
         
         // Đọc ảnh từ thư mục images
-        this.image = AssetLoader.loadImage("/images/Bullte.png");
+        this.image = AssetLoader.loadImage("/images/Bullet.png");
+
         // Thiết lập các thông số kích thước cho viên đạn.
         if (this.image != null) {
+            final double PADDLE_WIDTH = 6.0;
+            final double BULLET_WIDTH = 0.1; // 10% của paddle.
+
+            double targetWidth = GameManager.GAME_WIDTH / PADDLE_WIDTH * BULLET_WIDTH;
+
+            // tính toán chiều cao để giữ nguyên tỷ lệ ảnh gốc.
+            double aspectRatio = (double) this.image.getHeight() / this.image.getWidth();
+            double targetHeight = targetWidth * aspectRatio;
+
+            // đặt kích thước cho viên đạn
+            this.setWidth(targetWidth);
+            this.setHeight(targetHeight);
         }
     }
 
