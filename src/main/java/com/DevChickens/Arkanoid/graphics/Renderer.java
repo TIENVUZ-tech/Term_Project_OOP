@@ -54,6 +54,14 @@ public class Renderer {
         g.drawString(p.getType(), (int) p.getX() + 2, (int) p.getY() + 15);
     }
 
+    public void drawBullet(Graphics g, Bullet bullet) {
+        Graphics2D g2d = (Graphics2D) g;
+        if (bullet.getImage() != null) {
+            g2d.drawImage(bullet.getImage(), (int) bullet.getX(), (int) bullet.getY(), 
+            (int) bullet.getWidth(), (int) bullet.getHeight(), null);
+        }
+    }
+
     public void drawMenu(Graphics g, int w, int h) {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, w, h);
