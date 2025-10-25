@@ -8,13 +8,14 @@ import java.util.List;
 
 public class AssetLoader {
 
-    // Thêm các biến để lưu ảnh.
     public static BufferedImage MENU_BACKGROUND;
     public static List<BufferedImage> ROUND_BACKGROUNDS;
     public static final int MAX_ROUNDS = 5;
 
     public static BufferedImage PAUSE_ICON;
     public static BufferedImage PLAY_ICON;
+    // Biến để lưu các frame của vụ nổ
+    public static List<BufferedImage> EXPLOSION_FRAMES;
 
     public static void loadAllAssets() {
         System.out.println("Bắt đầu tải tài nguyên (assets)...");
@@ -30,8 +31,23 @@ public class AssetLoader {
 
         PAUSE_ICON = loadImage("/images/pause_icon.png");
         PLAY_ICON = loadImage("/images/play_icon.png");
+        System.out.println("Tải ảnh vụ nổ...");
+        EXPLOSION_FRAMES = loadExplosionFrames("/images/", "boom", 4);
 
         System.out.println("Tải tài nguyên thành công!");
+    }
+
+    public static List<BufferedImage> loadExplosionFrames(String basePath, String prefix, int numberOfFrames) {
+        List<BufferedImage> frames = new ArrayList<>();
+        for (int i = 1; i <= numberOfFrames; i++) {
+            // Sẽ tạo ra đường dẫn "/images/boom1.png", "/images/boom2.png", ...
+            String path = basePath + prefix + i + ".png";
+            BufferedImage frame = loadImage(path); // Dùng lại hàm loadImage() của bạn
+            if (frame != null) {
+                frames.add(frame);
+            }
+        }
+        return frames;
     }
 
     public static BufferedImage loadImage(String path) {

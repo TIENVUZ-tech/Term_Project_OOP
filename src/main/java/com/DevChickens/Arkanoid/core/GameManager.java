@@ -5,6 +5,7 @@ import com.DevChickens.Arkanoid.entities.bricks.*;
 import com.DevChickens.Arkanoid.entities.powerups.*;
 import com.DevChickens.Arkanoid.enums.GameState;
 import com.DevChickens.Arkanoid.graphics.Renderer;
+import com.DevChickens.Arkanoid.entities.effects.Explosion;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.Set;
@@ -24,6 +25,7 @@ public class GameManager {
     private List<Ball> balls;
     private List<Brick> bricks;
     private List<Bullet> bullets;
+    private List<Explosion> explosions;
 
     private int score;
     private int lives;
@@ -99,6 +101,7 @@ public class GameManager {
         powerUps = new ArrayList<>();
         activePowerUps = new ArrayList<>();
         bullets = new ArrayList<>();
+        explosions = new ArrayList<>();
         isBallLaunched = false;
         bricks = LevelLoader.createLevel(round, GAME_WIDTH);
         isMovingLeft = false;
@@ -169,6 +172,16 @@ public class GameManager {
                     offFire();
                 }
                 iterator.remove();
+            }
+        }
+
+        // UPDATE vụ nổ
+        java.util.Iterator<Explosion> expIterator = explosions.iterator();
+        while (expIterator.hasNext()) {
+            Explosion exp = expIterator.next();
+            exp.update();
+            if (exp.isFinished()) {
+                expIterator.remove(); // Xóa vụ nổ nếu đã chạy xong
             }
         }
 
@@ -339,6 +352,9 @@ public class GameManager {
 
                         // Nếu viên gạch bị phá hủy là gạch nổ, kích hoạt vụ nổ
                         if (b instanceof ExplosiveBrick) {
+                            double explosionX = b.getX() + b.getWidth() / 2.0;
+                            double explosionY = b.getY() + b.getHeight() / 2.0;
+                            explosions.add(new Explosion(explosionX, explosionY, b.getWidth() * 2, b.getHeight() * 2));
                             processExplosion(b);
                         }
 
@@ -382,6 +398,9 @@ public class GameManager {
                         score += points;
 
                         if (b instanceof ExplosiveBrick) {
+                            double explosionX = b.getX() + b.getWidth() / 2.0;
+                            double explosionY = b.getY() + b.getHeight() / 2.0;
+                            explosions.add(new Explosion(explosionX, explosionY, b.getWidth() * 2, b.getHeight() * 2));
                             processExplosion(b);
                         }
                         // Có thể rơi PowerUp ngẫu nhiên
@@ -668,6 +687,9 @@ public class GameManager {
 
                 for (Brick b : bricks) renderer.drawBrick(g, b);
                 for (PowerUp p : powerUps) renderer.drawPowerUp(g, p);
+                for (Explosion exp : explosions) {
+                    renderer.drawExplosion(g, exp);
+                }
 
                 // VẼ UI
                 g.setColor(Color.WHITE);

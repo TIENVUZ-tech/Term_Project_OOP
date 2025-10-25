@@ -1,4 +1,5 @@
 package com.DevChickens.Arkanoid.graphics;
+import com.DevChickens.Arkanoid.entities.effects.Explosion;
 
 import com.DevChickens.Arkanoid.entities.*;
 import com.DevChickens.Arkanoid.entities.bricks.*;
@@ -364,5 +365,8 @@ public class Renderer {
         if (backRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
         else g2d.setColor(Color.WHITE);
         g2d.drawString(textBack, backX, backY);
+    }
+    public void drawExplosion(Graphics g, Explosion explosion) {
+        explosion.render(g);
     }
 }
