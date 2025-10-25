@@ -74,13 +74,12 @@ public class LevelLoader {
                     case 'S' -> "strong";
                     case 'E' -> "explosive";
                     case 'Q' -> "quite";
-                    case 'N' -> "normal";
                     default -> "normal";
                 };
 
                 int hitPoints = switch (type) {
                     case "quite" -> 2;
-                    case "explosive" -> 2;
+                    case "explosive" -> 1;
                     default -> 1;
                 };
 
