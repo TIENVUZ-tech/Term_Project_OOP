@@ -4,8 +4,11 @@ import com.DevChickens.Arkanoid.entities.*;
 import com.DevChickens.Arkanoid.entities.bricks.*;
 import com.DevChickens.Arkanoid.entities.powerups.*;
 
+import com.DevChickens.Arkanoid.enums.GameState;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
+import java.awt.Rectangle;
 
 /**
  * Renderer vẽ toàn bộ đối tượng và màn hình của Arkanoid.
@@ -77,33 +80,69 @@ public class Renderer {
         }
     }
 
-    public void drawMenu(Graphics g, int w, int h) {
+    public void drawMenu(Graphics g, int w, int h, int mouseX, int mouseY,
+                         Rectangle playRect, Rectangle highScoresRect, Rectangle exitRect) {
+
+        // 1. Vẽ nền
         if (AssetLoader.MENU_BACKGROUND != null) {
             g.drawImage(AssetLoader.MENU_BACKGROUND, 0, 0, w, h, null);
+        } else {
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, w, h);
         }
 
+        // 2. Dùng Graphics2D
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // 3. Vẽ Tiêu đề (đẩy lên cao một chút)
         g2d.setFont(titleFont);
         g2d.setColor(Color.WHITE);
         String title = "ARKANOID";
-        // Căn giữa text tự động.
-        FontMetrics fm = g2d.getFontMetrics();
-        int titleX = (w - fm.stringWidth(title)) / 2;
-        int titleY = h / 2 - 50; // Đặt ở nửa trên màn hình
+        FontMetrics fmTitle = g2d.getFontMetrics();
+        int titleX = (w - fmTitle.stringWidth(title)) / 2;
+        int titleY = h / 2 - 70;
         g2d.drawString(title, titleX, titleY);
 
+        // 4. --- VẼ CÁC NÚT BẤM ---
         g2d.setFont(instructionFont);
-        String instruction = "Press ENTER to Start";
-        fm = g2d.getFontMetrics();
-        int instructionX = (w - fm.stringWidth(instruction)) / 2;
-        int instructionY = h / 2 + 40; // Đặt ở nửa dưới
+        FontMetrics fm = g2d.getFontMetrics();
 
-        if (System.currentTimeMillis() / 500 % 2 == 0) {
-            g2d.drawString(instruction, instructionX, instructionY);
-        }
+        // Tọa độ "PLAY" (Nút 1)
+        String textPlay = "PLAY";
+        int playX = (w - fm.stringWidth(textPlay)) / 2;
+        int playY = h / 2 + 20;
+
+        // Tọa độ "HIGH SCORES" (Nút 2)
+        String textScores = "HIGH SCORES";
+        int scoresX = (w - fm.stringWidth(textScores)) / 2;
+        int scoresY = playY + 50;
+
+        // Tọa độ "EXIT" (Nút 3)
+        String textExit = "EXIT";
+        int exitX = (w - fm.stringWidth(textExit)) / 2;
+        int exitY = scoresY + 50;
+
+        // --- Cập nhật "nút" (Rect) và vẽ ---
+        // (Tính toán vị trí chính xác của chữ để bắt click)
+
+        // Vẽ PLAY
+        playRect.setBounds(playX, playY - fm.getAscent(), fm.stringWidth(textPlay), fm.getHeight());
+        if (playRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW); // Highlight
+        else g2d.setColor(Color.WHITE);
+        g2d.drawString(textPlay, playX, playY);
+
+        // Vẽ HIGH SCORES
+        highScoresRect.setBounds(scoresX, scoresY - fm.getAscent(), fm.stringWidth(textScores), fm.getHeight());
+        if (highScoresRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW); // Highlight
+        else g2d.setColor(Color.WHITE);
+        g2d.drawString(textScores, scoresX, scoresY);
+
+        // Vẽ EXIT
+        exitRect.setBounds(exitX, exitY - fm.getAscent(), fm.stringWidth(textExit), fm.getHeight());
+        if (exitRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW); // Highlight
+        else g2d.setColor(Color.WHITE);
+        g2d.drawString(textExit, exitX, exitY);
     }
 
     public void drawGameBackground(Graphics g, int w, int h, int round) {
@@ -233,5 +272,97 @@ public class Renderer {
         x = (w - fm.stringWidth(text)) / 2;
         y = h / 2 + 60;
         g2d.drawString(text, x, y);
+    }
+
+    /**
+     * Vẽ icon Pause/Play
+     */
+    public void drawPauseIcon(Graphics g, GameState state, int mouseX, int mouseY, Rectangle pauseRect) {
+        BufferedImage icon = null;
+
+        // Chọn icon dựa trên trạng thái game
+        if (state == GameState.PLAYING) {
+            icon = AssetLoader.PAUSE_ICON;
+        } else { // (state == GameState.PAUSED)
+            icon = AssetLoader.PLAY_ICON;
+        }
+
+        if (icon == null) {
+            // Vẽ dự phòng nếu ảnh lỗi
+            g.setColor(Color.WHITE);
+            g.drawRect(pauseRect.x, pauseRect.y, pauseRect.width, pauseRect.height);
+            if (state == GameState.PLAYING) g.drawString("II", pauseRect.x + 10, pauseRect.y + 30);
+            else g.drawString(">", pauseRect.x + 10, pauseRect.y + 30);
+            return;
+        }
+
+        Graphics2D g2d = (Graphics2D) g;
+
+        // Thêm hiệu ứng highlight khi di chuột qua
+        if (pauseRect.contains(mouseX, mouseY)) {
+            // Vẽ một lớp mờ màu trắng (tăng độ sáng)
+            g2d.setColor(new Color(255, 255, 255, 100));
+            g2d.fillRect(pauseRect.x, pauseRect.y, pauseRect.width, pauseRect.height);
+        }
+
+        // Vẽ icon
+        g2d.drawImage(icon, pauseRect.x, pauseRect.y, pauseRect.width, pauseRect.height, null);
+    }
+
+    /**
+     * Vẽ màn hình Bảng Xếp Hạng
+     */
+    public void drawHighScores(Graphics g, int w, int h, int mouseX, int mouseY,
+                               Rectangle backRect, List<Integer> scores) {
+
+        // 1. Vẽ nền (dùng chung nền round 1)
+        drawGameBackground(g, w, h, 1);
+
+        // 2. Dùng Graphics2D
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        // 3. Vẽ Tiêu đề
+        g2d.setFont(titleFont);
+        g2d.setColor(Color.YELLOW);
+        String title = "HIGH SCORES";
+        FontMetrics fmTitle = g2d.getFontMetrics();
+        int titleX = (w - fmTitle.stringWidth(title)) / 2;
+        int titleY = 100;
+        g2d.drawString(title, titleX, titleY);
+
+        // 4. Vẽ danh sách điểm
+        g2d.setFont(instructionFont);
+        g2d.setColor(Color.WHITE);
+        FontMetrics fm = g2d.getFontMetrics();
+
+        int startY = titleY + 100; // Vị trí dòng điểm đầu tiên
+        if (scores == null || scores.isEmpty()) {
+            String noScores = "No scores yet!";
+            int noScoresX = (w - fm.stringWidth(noScores)) / 2;
+            g2d.drawString(noScores, noScoresX, startY);
+        } else {
+            for (int i = 0; i < scores.size(); i++) {
+                String rank = (i + 1) + ".";
+                String scoreText = scores.get(i).toString();
+
+                // Căn lề: Rank bên trái, Score bên phải
+                g2d.drawString(rank, w / 2 - 150, startY + i * 40);
+                g2d.drawString(scoreText, w / 2 - 50, startY + i * 40);
+            }
+        }
+
+        // 5. --- Vẽ nút "BACK" (dùng chuột) ---
+        String textBack = "BACK";
+        int backX = (w - fm.stringWidth(textBack)) / 2;
+        int backY = h - 70; // Đặt ở gần đáy
+
+        // Cập nhật "nút"
+        backRect.setBounds(backX, backY - fm.getAscent(), fm.stringWidth(textBack), fm.getHeight());
+
+        // Vẽ highlight
+        if (backRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+        else g2d.setColor(Color.WHITE);
+        g2d.drawString(textBack, backX, backY);
     }
 }

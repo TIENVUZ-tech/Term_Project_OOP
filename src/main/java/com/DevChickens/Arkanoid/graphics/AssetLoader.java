@@ -13,6 +13,9 @@ public class AssetLoader {
     public static List<BufferedImage> ROUND_BACKGROUNDS;
     public static final int MAX_ROUNDS = 5;
 
+    public static BufferedImage PAUSE_ICON;
+    public static BufferedImage PLAY_ICON;
+
     public static void loadAllAssets() {
         System.out.println("Bắt đầu tải tài nguyên (assets)...");
 
@@ -24,6 +27,9 @@ public class AssetLoader {
             BufferedImage bg = loadImage("/images/round" + i + ".jpg");
             ROUND_BACKGROUNDS.add(bg);
         }
+
+        PAUSE_ICON = loadImage("/images/pause_icon.png");
+        PLAY_ICON = loadImage("/images/play_icon.png");
 
         System.out.println("Tải tài nguyên thành công!");
     }

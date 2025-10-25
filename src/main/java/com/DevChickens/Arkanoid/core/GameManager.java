@@ -12,7 +12,12 @@ import java.util.HashSet;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 public class GameManager {
     private Paddle paddle;
@@ -41,12 +46,31 @@ public class GameManager {
     private long lastFireTime = 0; // bộ đếm thời gian
     private final long FIRE_RATE_DELAY = 400; // 400ms giữa các lần bắn.
 
+    private int mouseX, mouseY; // Tọa độ chuột
+    private Rectangle playButtonRect;
+    private Rectangle highScoresButtonRect;
+    private Rectangle exitButtonRect;
+    private Rectangle backButtonRect;
+    private Rectangle pauseButtonRect;
+
+    private List<Integer> highScores;
+    private static final String SCORE_FILE = "highscores.txt";
+
     // Kích thước khu vực chơi (Tường)
     public static final int GAME_WIDTH = 920;
     public static final int GAME_HEIGHT = 690;
 
     public GameManager() {
         renderer = new Renderer();
+        playButtonRect = new Rectangle();
+        highScoresButtonRect = new Rectangle();
+        exitButtonRect = new Rectangle();
+        backButtonRect = new Rectangle();
+
+        int iconSize = 40;
+        int padding = 10;
+        pauseButtonRect = new Rectangle(GAME_WIDTH - iconSize - padding, padding, iconSize, iconSize);
+
         initGame();
     }
 
@@ -70,7 +94,7 @@ public class GameManager {
     private void initRound(int round) {
         paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 0, 0, 10, null);
         balls = new ArrayList<>(); // Khởi tạo danh sách
-        balls.add(new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 5 + round, 1, -1));
+        balls.add(new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 3 + round, 1, -1));
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         activePowerUps = new ArrayList<>();
@@ -83,8 +107,10 @@ public class GameManager {
 
     public void update() {
         // Nếu chưa chơi thì không update
-        if (gameState == GameState.MENU || gameState == GameState.GAME_OVER || gameState == GameState.VICTORY) return;
-
+        if (gameState == GameState.MENU || gameState == GameState.GAME_OVER ||
+                gameState == GameState.VICTORY || gameState == GameState.HIGH_SCORES) {
+            return;
+        }
         // Hiển thị "ROUND X" vài giây trước khi bắt đầu chơi
         if (gameState == GameState.NEXT_ROUND) {
             long now = System.currentTimeMillis();
@@ -94,6 +120,7 @@ public class GameManager {
             return; // Dừng update logic game trong lúc hiển thị round
         }
 
+        if (gameState == GameState.PAUSED) return;
         if (gameState != GameState.PLAYING) return;
 
         if (isMovingLeft) {
@@ -184,6 +211,7 @@ public class GameManager {
             if (balls.isEmpty()) {
                 lives--;
                 if (lives <= 0) {
+                    addScore(this.score);
                     gameState = GameState.GAME_OVER;
                 } else {
                     resetBallAndPaddle(); // Reset lại màn (tạo 1 bóng mới)
@@ -211,6 +239,7 @@ public class GameManager {
                     gameState = GameState.NEXT_ROUND;
                     nextRoundStartTime = System.currentTimeMillis();
                 } else {
+                    addScore(this.score);
                     gameState = GameState.VICTORY;
                 }
             }
@@ -326,7 +355,7 @@ public class GameManager {
                             powerUps.add(new GunPaddlePowerUp(b.getX(), b.getY(), "GUN_PADDLE", 5000));
                         }
                     }
-
+                    break;
                 }
             }
         }
@@ -530,12 +559,9 @@ public class GameManager {
 
     public void onConfirmPressed() {
         switch (gameState) {
-            case MENU:
-                gameState = GameState.PLAYING;
-                break;
             case GAME_OVER:
             case VICTORY:
-                initGame(); // Chơi lại game mới
+                initGame();
                 break;
         }
     }
@@ -587,13 +613,44 @@ public class GameManager {
         isFiring = false;
     }
 
+    public void onMouseMove(int x, int y) {
+        // Luôn cập nhật tọa độ chuột
+        this.mouseX = x;
+        this.mouseY = y;
+    }
+
+    public void onMouseClick(int x, int y) {
+        // Lọc sự kiện click dựa trên TRẠNG THÁI GAME
+
+        if (gameState == GameState.PLAYING || gameState == GameState.PAUSED) {
+            if (pauseButtonRect.contains(x, y)) {
+                onPausePressed(); // Gọi hàm pause/resume có sẵn
+            }
+        }
+        else if (gameState == GameState.MENU) {
+            if (playButtonRect.contains(x, y)) {
+                gameState = GameState.PLAYING;
+            } else if (highScoresButtonRect.contains(x, y)) {
+                gameState = GameState.HIGH_SCORES;
+            } else if (exitButtonRect.contains(x, y)) {
+                System.exit(0);
+            }
+        }
+        else if (gameState == GameState.HIGH_SCORES) {
+            if (backButtonRect.contains(x, y)) {
+                gameState = GameState.MENU;
+            }
+        }
+    }
+
     /**
      * Vẽ các đối tượng lên màn hình
      */
     public void draw(Graphics g) {
         switch (gameState) {
             case MENU:
-                renderer.drawMenu(g, GAME_WIDTH, GAME_HEIGHT);
+                renderer.drawMenu(g, GAME_WIDTH, GAME_HEIGHT, mouseX, mouseY,
+                        playButtonRect, highScoresButtonRect, exitButtonRect);
                 break;
             case PLAYING:
             case PAUSED:
@@ -618,11 +675,16 @@ public class GameManager {
                 g.drawString("Lives: " + lives, 10, 40);
                 g.drawString("Round: " + currentRound + "/" + maxRounds, 10, 60);
 
+                renderer.drawPauseIcon(g, gameState, mouseX, mouseY, pauseButtonRect);
 
                 // VẼ MÀN HÌNH PAUSED
                 if (gameState == GameState.PAUSED) {
                     renderer.drawPause(g, GAME_WIDTH, GAME_HEIGHT);
                 }
+                break;
+            case HIGH_SCORES:
+                renderer.drawHighScores(g, GAME_WIDTH, GAME_HEIGHT, mouseX, mouseY,
+                        backButtonRect, highScores);
                 break;
             case NEXT_ROUND:
                 renderer.drawNextRound(g, GAME_WIDTH, GAME_HEIGHT, currentRound);
@@ -633,6 +695,38 @@ public class GameManager {
             case VICTORY:
                 renderer.drawVictory(g, GAME_WIDTH, GAME_HEIGHT, score);
                 break;
+        }
+    }
+
+    private List<Integer> loadScores() {
+        try {
+            return Files.lines(Paths.get(SCORE_FILE))
+                    .map(s -> s.replaceAll("\\s", "")) // Xóa khoảng trắng
+                    .filter(s -> !s.isEmpty()) // Bỏ qua dòng trống
+                    .map(Integer::parseInt)
+                    .sorted(Collections.reverseOrder())
+                    .limit(10) // Chỉ lấy Top 10
+                    .collect(Collectors.toList());
+        } catch (IOException | NumberFormatException e) {
+            System.out.println("Chưa có file điểm. Đang tạo mới...");
+            return new ArrayList<>();
+        }
+    }
+
+    private void addScore(int newScore) {
+        if (newScore <= 0) return; // Không lưu điểm 0
+
+        try {
+            // Ghi điểm mới vào cuối file, mỗi điểm một dòng
+            Files.write(Paths.get(SCORE_FILE),
+                    (newScore + "\n").getBytes(),
+                    StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+
+            // Sau khi thêm, tải lại danh sách để nó được cập nhật
+            this.highScores = loadScores();
+
+        } catch (IOException e) {
+            System.err.println("Lỗi khi lưu điểm: " + e.getMessage());
         }
     }
 }

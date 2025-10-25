@@ -24,9 +24,11 @@ public class GamePanel extends JPanel implements Runnable {
         setFocusable(true);
         requestFocus();
 
-
         InputHandler inputHandler = new InputHandler(this.manager);
         addKeyListener(inputHandler);
+
+        addMouseListener(inputHandler);
+        addMouseMotionListener(inputHandler);
 
         startGameLoop();
     }

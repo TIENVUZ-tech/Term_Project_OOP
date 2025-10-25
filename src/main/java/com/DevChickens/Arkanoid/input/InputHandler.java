@@ -1,11 +1,12 @@
 package com.DevChickens.Arkanoid.input;
-
 import com.DevChickens.Arkanoid.core.GameManager;
-
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseEvent;
 
-public class InputHandler extends KeyAdapter {
+public class InputHandler extends KeyAdapter implements MouseListener, MouseMotionListener {
 
     private GameManager manager;
 
@@ -48,6 +49,20 @@ public class InputHandler extends KeyAdapter {
                 break;
         }
     }
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        manager.onMouseMove(e.getX(), e.getY());
+    }
 
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        manager.onMouseClick(e.getX(), e.getY());
+    }
+
+    @Override public void mouseDragged(MouseEvent e) { mouseMoved(e); } // Coi kéo chuột như di chuột
+    @Override public void mousePressed(MouseEvent e) {}
+    @Override public void mouseReleased(MouseEvent e) {}
+    @Override public void mouseEntered(MouseEvent e) {}
+    @Override public void mouseExited(MouseEvent e) {}
 
 }
