@@ -68,7 +68,7 @@ public class GameManager {
     }
 
     private void initRound(int round) {
-        paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 0, 0, 8, null);
+        paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 0, 0, 10, null);
         balls = new ArrayList<>(); // Khởi tạo danh sách
         balls.add(new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 5 + round, 1, -1));
         bricks = new ArrayList<>();
@@ -153,7 +153,7 @@ public class GameManager {
             for (PowerUp p : powerUps) {
                 p.update();
             }
-            
+
             for (Bullet bullet : bullets) {
                 bullet.move();
             }
@@ -169,7 +169,7 @@ public class GameManager {
                     ballIterator.remove(); // Xóa quả bóng bị rơi
                 }
             }
-            
+
             // Logic loại bỏ đạn ra khỏi màn hình.
             java.util.Iterator<Bullet> bulletIterator = bullets.iterator();
             while (bulletIterator.hasNext()) {
@@ -330,7 +330,7 @@ public class GameManager {
                 }
             }
         }
-        
+
         // Bullet vs Bricks (logic va chạm)
         java.util.Iterator<Bullet> bulletIterator = bullets.iterator();
         while (bulletIterator.hasNext()) {
@@ -351,7 +351,7 @@ public class GameManager {
                             default -> 100;
                         };
                         score += points;
-                        
+
                         if (b instanceof ExplosiveBrick) {
                             processExplosion(b);
                         }
@@ -503,27 +503,29 @@ public class GameManager {
     }
 
     /**
-     * Reset bóng và paddle khi mất mạng
+     * Reset bóng và paddle khi mất mạng.
      */
     private void resetBallAndPaddle() {
         paddle = new Paddle(
-                GAME_WIDTH / 2.0,
+                GAME_WIDTH / 2.0 - 50,
                 GAME_HEIGHT - 50,
-                0, 0, 8, null
+                0, 0, 10, null
         );
 
-        // Thiết lập lại vị trí và hướng/tốc độ ban đầu cho bóng
         balls.clear();
         balls.add(new Ball(
                 GAME_WIDTH / 2.0,
                 GAME_HEIGHT - 70,
-                3, -3, 5,
+                3, -3,
+                5 + currentRound,
                 1, -1
         ));
-        isBallLaunched = false;
 
+        isBallLaunched = false;
         isMovingLeft = false;
         isMovingRight = false;
+
+        offFire();
     }
 
     public void onConfirmPressed() {
@@ -602,7 +604,7 @@ public class GameManager {
                 for (Ball b : balls) {
                     renderer.drawBall(g, b);
                 }
-                
+
                 for (Bullet b : bullets) {
                     renderer.drawBullet(g, b);
                 }
