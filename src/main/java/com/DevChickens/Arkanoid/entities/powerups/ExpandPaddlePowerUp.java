@@ -11,13 +11,20 @@ import com.DevChickens.Arkanoid.entities.Ball;
  */
 public class ExpandPaddlePowerUp extends PowerUp {
 
+    /* Các tham số cho chiều rộng và chiều cao của PowerUp. */
+    private static final int EXPANDPADDLEPOWERUP_WIDTH = 40;
+    private static final int EXPANDPADDLEPOWERUP_HEIGHT = 20;
+    /* Đường dẫn tới ảnh. */
+    private static final String FILEPATH = "/images/ExpandPaddlePowerUp.png";
+
     /**
      * Khởi tạo Power-up làm dài thanh trượt.
      * @param x Tọa độ X ban đầu.
      * @param y Tọa độ Y ban đầu.
      */
     public ExpandPaddlePowerUp(double x, double y, String type, long duration) {
-        super(x, y, type, duration);
+        super(x, y, type, duration, FILEPATH, 
+        EXPANDPADDLEPOWERUP_WIDTH, EXPANDPADDLEPOWERUP_HEIGHT);
     }
 
     /**

@@ -3,13 +3,19 @@ package com.DevChickens.Arkanoid.entities.powerups;
 import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.entities.Ball;
 import com.DevChickens.Arkanoid.entities.Paddle;
-
 import java.awt.Graphics;
 
 public class MultiBallPowerUp extends PowerUp {
 
+    /* Tham số chiều cao và chiều rộng của vật thể. */
+    private static final int MULTIBALLPOWERUP_WIDTH = 30;
+    private static final int MULTIBALLPOWERUP_HEIGHT = 25;
+    /* Đường dẫn tới file ảnh. */
+    private static final String FILEPATH = "/images/MultiBallPowerUp.png";
+
     public MultiBallPowerUp(double x, double y, String type, long duration) {
-        super(x, y, type, duration);
+        super(x, y, type, duration, FILEPATH, 
+        MULTIBALLPOWERUP_WIDTH, MULTIBALLPOWERUP_HEIGHT);
     }
 
     /**

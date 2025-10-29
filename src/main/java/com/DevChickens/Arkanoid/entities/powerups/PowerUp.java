@@ -3,8 +3,11 @@ package com.DevChickens.Arkanoid.entities.powerups;
 import com.DevChickens.Arkanoid.entities.GameObject;
 import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.entities.Paddle;
+import com.DevChickens.Arkanoid.graphics.AssetLoader;
 import com.DevChickens.Arkanoid.entities.Ball;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 
 /**
@@ -20,6 +23,8 @@ public abstract class PowerUp extends GameObject {
     private long activationTime;
     /** Trạng thái kích hoạt của Power-up. */
     private boolean isActive = false;
+    /* Biến lưu ảnh. */
+    protected BufferedImage image;
 
     /**
      * Phương thức khởi tạo chung cho mọi Power-up.
@@ -27,11 +32,23 @@ public abstract class PowerUp extends GameObject {
      * @param y Vị trí Y ban đầu.
      * @param type Chuỗi ký tự định danh loại Power-up.
      * @param duration Thời gian hiệu lực.
+     * @param filePath Đường dẫn tới ảnh cần load.
      */
-    public PowerUp(double x, double y, String type, long duration) {
-        super(x, y, 30, 30); // Giả sử kích thước Power-up là 30x30
+    public PowerUp(double x, double y, String type, long duration, 
+    String filePath, int width, int height) {
+        super(x, y, width, height); 
         this.type = type;
         this.duration = duration;
+        try {
+            this.image = AssetLoader.loadImage(filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }   
+    }
+
+    /* Getter cho image. */
+    public Image getImage() {
+        return this.image;
     }
 
     /**

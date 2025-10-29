@@ -3,6 +3,7 @@ package com.DevChickens.Arkanoid.entities.powerups;
 import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.entities.Ball;
 import com.DevChickens.Arkanoid.entities.Paddle;
+
 import java.awt.Graphics;
 
 /**
@@ -10,6 +11,13 @@ import java.awt.Graphics;
  * Bất kỳ loạt gạch nào chạm vào bóng sẽ bị vỡ
  */
 public class SuperBallPowerUp extends PowerUp {
+
+     /* Tham số chiều cao và chiều rộng của vật thể. */
+    private static final int SUPERBALLPOWERUP_WIDTH = 30;
+    private static final int SUPERBALLPOWERUP_HEIGHT = 30;
+    /* Đường dẫn tới file ảnh. */
+    private static final String FILEPATH = "/images/SuperBallPowerUp.png";
+
     /**
      * Constructor.
      * @param x (tọa độ x).
@@ -18,7 +26,8 @@ public class SuperBallPowerUp extends PowerUp {
      * @param duration (thời gian tồn tại).
      */
     public SuperBallPowerUp(double x, double y, String type, long duration) {
-        super(x, y, type, duration);
+        super(x, y, type, duration, FILEPATH, 
+        SUPERBALLPOWERUP_WIDTH, SUPERBALLPOWERUP_HEIGHT);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.DevChickens.Arkanoid.entities.powerups;
 
 import java.awt.Graphics;
-
 import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.entities.Paddle;
 import com.DevChickens.Arkanoid.entities.Ball;
@@ -11,6 +10,13 @@ import com.DevChickens.Arkanoid.entities.Ball;
  * kèm theo hai chiếc súng, khi đạn gặp gạch thì sẽ làm cho gạch bị vỡ.
  */
 public class GunPaddlePowerUp extends PowerUp {
+
+    /* Tham số chiều cao và chiều rộng của vật thể. */
+    private static final int GUNPADDLEPOWERUP_WIDTH = 30;
+    private static final int GUNPADDLEPOWERUP_HEIGHT = 20;
+    /* Đường dẫn tới file ảnh. */
+    private static final String FILEPATH = "/images/GunPaddlePowerUp.png";
+
     /**
      * Constructor.
      * @param x (tọa độ x).
@@ -19,7 +25,8 @@ public class GunPaddlePowerUp extends PowerUp {
      * @param duration (thời gian tồn tại).
      */
     public GunPaddlePowerUp(double x, double y, String type, long duration) {
-        super(x, y, type, duration);
+        super(x, y, type, duration, FILEPATH, 
+        GUNPADDLEPOWERUP_WIDTH, GUNPADDLEPOWERUP_HEIGHT);
     }
 
     @Override

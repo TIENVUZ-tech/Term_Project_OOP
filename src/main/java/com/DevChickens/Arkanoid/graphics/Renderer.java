@@ -64,13 +64,20 @@ public class Renderer {
     }
 
     public void drawPowerUp(Graphics g, PowerUp p) {
-        g.setColor(Color.GREEN);
+        Graphics2D g2d = (Graphics2D) g;
+        if (p.getImage() != null) {
+            g2d.drawImage(p.getImage(), (int) p.getX(), (int) p.getY(), 
+            (int) p.getWidth(), (int) p.getHeight(), null);
+        } else {
+            g.setColor(Color.GREEN);
         g.fillRect((int) p.getX(), (int) p.getY(),
                 (int) p.getWidth(), (int) p.getHeight());
 
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 12));
         g.drawString(p.getType(), (int) p.getX() + 2, (int) p.getY() + 15);
+        }
+        
     }
 
     public void drawBullet(Graphics g, Bullet bullet) {
