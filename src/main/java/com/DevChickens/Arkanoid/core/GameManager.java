@@ -141,9 +141,9 @@ public class GameManager {
             // Kiểm tra thời gian và bắn đạn
             if (now - lastFireTime >= FIRE_RATE_DELAY) {
                 // vị trí của súng.
-                final double GUN_OFFSET_X = paddle.getWidth() * 0.1;
+                final double GUN_OFFSET_X = paddle.getWidth() * 0.29;
                 final double BULLET_SPEED = 15;
-                final double BULLET_WIDTH = paddle.getWidth() * 0.1;
+                final double BULLET_WIDTH = paddle.getWidth() * 0.05;
                 // vị trí bắt đầu bắn.
                 double startY = paddle.getY();
                 // ví trí súng trái
@@ -361,14 +361,16 @@ public class GameManager {
                         // Có thể rơi PowerUp ngẫu nhiên
                         double rand = Math.random(); // Lấy 1 số ngẫu nhiên
 
-                        if (rand < 0.1) { // 10% cơ hội
+                        if (rand < 0.05) { // 5% cơ hội
                             powerUps.add(new ExpandPaddlePowerUp(b.getX(), b.getY(), "EXPAND_PADDLE", 5000));
-                        } else if (rand < 0.2) { // 10% cơ hội (tổng 20%)
+                        } else if (rand < 0.1) { // 5% cơ hội (tổng 10%)
                             powerUps.add(new SuperBallPowerUp(b.getX(), b.getY(), "SUPER_BALL", 5000));
-                        } else if (rand < 0.3) { // 10% cơ hội (tổng 30%)
+                        } else if (rand < 0.15) { // 5% cơ hội (tổng 15%)
                             powerUps.add(new MultiBallPowerUp(b.getX(), b.getY(), "MULTI_BALL", 1000));
-                        } else if (rand < 0.4) { // 10% cơ hội (tổng 40%)
+                        } else if (rand < 0.2) { // 5% cơ hội (tổng 20%)
                             powerUps.add(new GunPaddlePowerUp(b.getX(), b.getY(), "GUN_PADDLE", 5000));
+                        } else if (rand < 0.25) { // 5% cơ hội (tổng 25%)
+                            powerUps.add(new FastBallPowerUp(b.getX(), b.getY(), "FAST_BALL", 5000));
                         }
                     }
                     break;
@@ -406,14 +408,16 @@ public class GameManager {
                         // Có thể rơi PowerUp ngẫu nhiên
                         double rand = Math.random(); // Lấy 1 số ngẫu nhiên
 
-                        if (rand < 0.1) { // 10% cơ hội
+                        if (rand < 0.05) { // 5% cơ hội
                             powerUps.add(new ExpandPaddlePowerUp(b.getX(), b.getY(), "EXPAND_PADDLE", 5000));
-                        } else if (rand < 0.2) { // 10% cơ hội (tổng 20%)
+                        } else if (rand < 0.1) { // 5% cơ hội (tổng 10%)
                             powerUps.add(new SuperBallPowerUp(b.getX(), b.getY(), "SUPER_BALL", 5000));
-                        } else if (rand < 0.3) { // 10% cơ hội (tổng 30%)
+                        } else if (rand < 0.15) { // 5% cơ hội (tổng 15%)
                             powerUps.add(new MultiBallPowerUp(b.getX(), b.getY(), "MULTI_BALL", 1000));
-                        } else if (rand < 0.4) { // 10% cơ hội (tổng 40%)
+                        } else if (rand < 0.2) { // 5% cơ hội (tổng 20%)
                             powerUps.add(new GunPaddlePowerUp(b.getX(), b.getY(), "GUN_PADDLE", 5000));
+                        } else if (rand < 0.25) { // 5% cơ hội (tổng 25%)
+                            powerUps.add(new FastBallPowerUp(b.getX(), b.getY(), "FAST_BALL", 5000));
                         }
                     }
                     // loại bỏ đạn khi va chạm với gạch
