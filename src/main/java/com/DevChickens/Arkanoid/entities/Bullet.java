@@ -36,7 +36,7 @@ public class Bullet extends MovableObject {
         // Thiết lập các thông số kích thước cho viên đạn.
         if (this.image != null) {
             final double PADDLE_WIDTH = 6.0;
-            final double BULLET_WIDTH = 0.1; // 10% của paddle.
+            final double BULLET_WIDTH = 0.05; // 5% của paddle.
 
             double targetWidth = GameManager.GAME_WIDTH / PADDLE_WIDTH * BULLET_WIDTH;
 
