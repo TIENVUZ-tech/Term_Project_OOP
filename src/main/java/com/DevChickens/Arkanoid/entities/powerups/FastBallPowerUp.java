@@ -13,8 +13,6 @@ import com.DevChickens.Arkanoid.entities.Ball;
 public class FastBallPowerUp extends PowerUp {
 
     private final double speedFactor = 1.5; // Hệ số tăng tốc
-    /* Biến lưu ảnh. */
-    private BufferedImage image;
     /* Tham số chiều cao và chiều rộng của vật thể. */
     private static final int FASTBALLPOWERUP_WIDTH = 20;
     private static final int FASTBALLPOWERUP_HEIGHT = 30;
