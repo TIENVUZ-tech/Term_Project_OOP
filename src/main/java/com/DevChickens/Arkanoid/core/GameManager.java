@@ -55,6 +55,10 @@ public class GameManager {
     private Rectangle backButtonRect;
     private Rectangle pauseButtonRect;
 
+    private Rectangle pauseContinueButton;
+    private Rectangle pauseRestartButton;
+    private Rectangle pauseExitButton;
+
     private List<Integer> highScores;
     private static final String SCORE_FILE = "highscores.txt";
 
@@ -72,6 +76,16 @@ public class GameManager {
         int iconSize = 40;
         int padding = 10;
         pauseButtonRect = new Rectangle(GAME_WIDTH - iconSize - padding, padding, iconSize, iconSize);
+
+        int buttonWidth = 250;
+        int buttonHeight = 50;
+        int centerX = GAME_WIDTH / 2 - (buttonWidth / 2);
+        int gap = 20; // Khoảng cách giữa các nút
+        int startY = GAME_HEIGHT / 2 - (buttonHeight * 3 + gap * 2) / 2;
+
+        pauseContinueButton = new Rectangle(centerX, startY, buttonWidth, buttonHeight);
+        pauseRestartButton = new Rectangle(centerX, startY + buttonHeight + gap, buttonWidth, buttonHeight);
+        pauseExitButton = new Rectangle(centerX, startY + (buttonHeight + gap) * 2, buttonWidth, buttonHeight);
 
         initGame();
     }
@@ -96,7 +110,7 @@ public class GameManager {
     private void initRound(int round) {
         paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 0, 0, 10, null);
         balls = new ArrayList<>(); // Khởi tạo danh sách
-        balls.add(new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 3 + round, 1, -1));
+        balls.add(new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 5 + round, 1, -1));
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         activePowerUps = new ArrayList<>();
@@ -641,15 +655,30 @@ public class GameManager {
     public void onMouseClick(int x, int y) {
         // Lọc sự kiện click dựa trên TRẠNG THÁI GAME
 
-        if (gameState == GameState.PLAYING || gameState == GameState.PAUSED) {
+        if (gameState == GameState.PLAYING) {
             if (pauseButtonRect.contains(x, y)) {
                 onPausePressed(); // Gọi hàm pause/resume có sẵn
             }
         }
+        else if (gameState == GameState.PAUSED) {
+            if (pauseButtonRect.contains(x, y)) {
+                onPausePressed();
+            } else if (pauseContinueButton.contains(x, y)) {
+                onPausePressed();
+            } else if (pauseRestartButton.contains(x, y)) {
+                initRound(currentRound); // Tải lại round hiện tại
+                gameState = GameState.NEXT_ROUND;
+                nextRoundStartTime = System.currentTimeMillis();
+            } else if (pauseExitButton.contains(x, y)) {
+                initGame();
+            }
+        }
         else if (gameState == GameState.MENU) {
             if (playButtonRect.contains(x, y)) {
-                gameState = GameState.PLAYING;
+                gameState = GameState.NEXT_ROUND;
+                nextRoundStartTime = System.currentTimeMillis();
             } else if (highScoresButtonRect.contains(x, y)) {
+                this.highScores = loadScores();
                 gameState = GameState.HIGH_SCORES;
             } else if (exitButtonRect.contains(x, y)) {
                 System.exit(0);
@@ -659,6 +688,9 @@ public class GameManager {
             if (backButtonRect.contains(x, y)) {
                 gameState = GameState.MENU;
             }
+        }
+        else if (gameState == GameState.GAME_OVER || gameState == GameState.VICTORY) {
+            initGame();
         }
     }
 
@@ -701,7 +733,8 @@ public class GameManager {
 
                 // VẼ MÀN HÌNH PAUSED
                 if (gameState == GameState.PAUSED) {
-                    renderer.drawPause(g, GAME_WIDTH, GAME_HEIGHT);
+                    renderer.drawPause(g, GAME_WIDTH, GAME_HEIGHT, mouseX, mouseY,
+                            pauseContinueButton, pauseRestartButton, pauseExitButton);
                 }
                 break;
             case HIGH_SCORES:

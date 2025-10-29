@@ -18,11 +18,9 @@ public class AssetLoader {
     public static List<BufferedImage> EXPLOSION_FRAMES;
 
     public static void loadAllAssets() {
-        System.out.println("Bắt đầu tải tài nguyên (assets)...");
 
         MENU_BACKGROUND = loadImage("/images/background_menu_galaxy.png");
 
-        System.out.println("Tải ảnh nền các round...");
         ROUND_BACKGROUNDS = new ArrayList<>();
         for (int i = 1; i <= MAX_ROUNDS; i++) {
             BufferedImage bg = loadImage("/images/round" + i + ".jpg");
@@ -34,7 +32,6 @@ public class AssetLoader {
         System.out.println("Tải ảnh vụ nổ...");
         EXPLOSION_FRAMES = loadExplosionFrames("/images/", "boom", 4);
 
-        System.out.println("Tải tài nguyên thành công!");
     }
 
     public static List<BufferedImage> loadExplosionFrames(String basePath, String prefix, int numberOfFrames) {

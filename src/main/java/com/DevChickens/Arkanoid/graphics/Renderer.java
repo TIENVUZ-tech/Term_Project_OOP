@@ -157,29 +157,53 @@ public class Renderer {
         }
     }
 
-    public void drawPause(Graphics g, int w, int h) {
+    /**
+     * Vẽ màn hình PAUSE với các nút (Continue, Restart, Exit)
+     */
+    public void drawPause(Graphics g, int w, int h, int mouseX, int mouseY,
+                          Rectangle continueBtn, Rectangle restartBtn, Rectangle exitBtn) {
+
+        // 1. Vẽ lớp phủ mờ (như cũ)
         g.setColor(new Color(0, 0, 0, 150)); // Màu đen mờ (Alpha = 150).
         g.fillRect(0, 0, w, h);
 
+        // 2. Dùng Graphics2D và bật khử răng cưa
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2d.setColor(Color.YELLOW);
 
-        // Vẽ chữ PAUSED
-        g2d.setFont(titleFont); // Dùng font lớn
-        String text = "PAUSED";
-        FontMetrics fm = g2d.getFontMetrics();
-        int x = (w - fm.stringWidth(text)) / 2;
-        int y = h / 2;
-        g2d.drawString(text, x, y);
-
-        // Vẽ hướng dẫn
+        // 3. Chuẩn bị Font (dùng chung font instruction)
+        // (Chúng ta sẽ vẽ các nút, không cần chữ "PAUSED" to nữa)
         g2d.setFont(instructionFont);
-        text = "Press P to Resume";
-        fm = g2d.getFontMetrics();
-        x = (w - fm.stringWidth(text)) / 2;
-        y = h / 2 + 50;
-        g2d.drawString(text, x, y);
+        FontMetrics fm = g2d.getFontMetrics();
+
+        // --- Vẽ Nút "Continue" ---
+        String textContinue = "Continue";
+        // Căn giữa text bên trong Rectangle
+        int continueX = continueBtn.x + (continueBtn.width - fm.stringWidth(textContinue)) / 2;
+        int continueY = continueBtn.y + (continueBtn.height - fm.getHeight()) / 2 + fm.getAscent();
+
+        // Vẽ highlight (giống hệt drawMenu)
+        if (continueBtn.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+        else g2d.setColor(Color.WHITE);
+        g2d.drawString(textContinue, continueX, continueY);
+
+        // --- Vẽ Nút "Restart Level" ---
+        String textRestart = "Restart Level";
+        int restartX = restartBtn.x + (restartBtn.width - fm.stringWidth(textRestart)) / 2;
+        int restartY = restartBtn.y + (restartBtn.height - fm.getHeight()) / 2 + fm.getAscent();
+
+        if (restartBtn.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+        else g2d.setColor(Color.WHITE);
+        g2d.drawString(textRestart, restartX, restartY);
+
+        // --- Vẽ Nút "Exit to Menu" ---
+        String textExit = "Exit to Menu";
+        int exitX = exitBtn.x + (exitBtn.width - fm.stringWidth(textExit)) / 2;
+        int exitY = exitBtn.y + (exitBtn.height - fm.getHeight()) / 2 + fm.getAscent();
+
+        if (exitBtn.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+        else g2d.setColor(Color.WHITE);
+        g2d.drawString(textExit, exitX, exitY);
     }
 
     public void drawNextRound(Graphics g, int width, int height, int round) {
