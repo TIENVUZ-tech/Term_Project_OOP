@@ -1,21 +1,25 @@
 package com.DevChickens.Arkanoid.entities;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-
 import com.DevChickens.Arkanoid.core.GameManager;
-import com.DevChickens.Arkanoid.graphics.AssetLoader;;
+import com.DevChickens.Arkanoid.graphics.AssetLoader;
+
+/**
+ * Bullet kế thừa từ MovebleObject. Viên đạn mà Paddle sẽ bắn ra khi ăn GunPaddlePowerUp.
+ * Thuộc tính: speed(tốc độ của viên dạn), image(ảnh của viên dạn).
+ * Phương thức: move, update, checkCollision.
+ * @author Vũ Văn Tiến.
+ */
 
 public class Bullet extends MovableObject {
-    /*Tốc độ di chuyển của đạn. */
-    private double speed;
-    /*Hướng di chuyển của đạn theo phương ngang.
-     */
-    private static final int directionX = 0;
-    /*Hướng di chuyển của đạn theo phương dọc.*/
-    private  static final int directionY = -1;
-    /*Biến chứa ảnh của viên đạn.*/
-    private BufferedImage image;
+
+    private static final int DIRECTION_X = 0; // Hướng di chuyển của đạn theo phương ngang.
+    private static final int DIRECTION_Y = -1; // Hướng di chuyển của đạn theo phương dọc.
+
+    private double speed; // Tốc độ di chuyển của đạn.
+    private BufferedImage image; // Biến chứa ảnh của viên đạn.
 
     /**
      * Phương thức khởi tạo Bullet, giữ nguyên 9 tham số đầu vào.
@@ -25,32 +29,37 @@ public class Bullet extends MovableObject {
      * @param dy (tốc độ di chuyển theo chiều y - được truyền lên lớp cha)
      * @param speed (tốc độ di chuyển tổng - được dùng trong move())
      */
-    public Bullet(double x, double y, double dx, double dy, 
-    double speed) {
+    public Bullet(double x, double y, double dx, double dy,
+            double speed) { // LỖI: Sửa thụt lề ngắt dòng (Mục 4.2)
         super(x, y, 0, 0, dx, dy);
         this.speed = speed;
-        
-        // Đọc ảnh từ thư mục images
-        this.image = AssetLoader.loadImage("/images/Bullet.png");
+        try {
+            // Đọc ảnh từ thư mục images
+            this.image = AssetLoader.loadImage("/images/Bullet.png");
 
-        // Thiết lập các thông số kích thước cho viên đạn.
-        if (this.image != null) {
-            final double PADDLE_WIDTH = 6.0;
-            final double BULLET_WIDTH = 0.05; // 5% của paddle.
+            // Thiết lập các thông số kích thước cho viên đạn.
+            if (this.image != null) {
+                final double PADDLE_WIDTH = 6.0;
+                final double BULLET_WIDTH = 0.05; // 5% của paddle.
 
-            double targetWidth = GameManager.GAME_WIDTH / PADDLE_WIDTH * BULLET_WIDTH;
+                double targetWidth = GameManager.GAME_WIDTH / PADDLE_WIDTH * BULLET_WIDTH;
 
-            // tính toán chiều cao để giữ nguyên tỷ lệ ảnh gốc.
-            double aspectRatio = (double) this.image.getHeight() / this.image.getWidth();
-            double targetHeight = targetWidth * aspectRatio;
+                // tính toán chiều cao để giữ nguyên tỷ lệ ảnh gốc.
+                double aspectRatio = (double) this.image.getHeight() / this.image.getWidth();
+                double targetHeight = targetWidth * aspectRatio;
 
-            // đặt kích thước cho viên đạn
-            this.setWidth(targetWidth);
-            this.setHeight(targetHeight);
+                // đặt kích thước cho viên đạn
+                this.setWidth(targetWidth);
+                this.setHeight(targetHeight);
+            }
+        } catch (Exception e) {
+            // In ra lỗi gốc.
+            e.printStackTrace();
+            // Ném ra ngoại lệ và dừng chương trình.
+            throw new RuntimeException("Lỗi không thể tải ảnh cho Bullet", e);
         }
     }
 
-    /*getter và setter cho speed. */
     public void setSpeed(double speed) {
         this.speed = speed;
     }
@@ -59,7 +68,6 @@ public class Bullet extends MovableObject {
         return this.speed;
     }
 
-    /*getter cho ảnh. */
     public BufferedImage getImage() {
         return this.image;
     }
@@ -67,23 +75,36 @@ public class Bullet extends MovableObject {
     @Override
     public void move() {
         // Cách thức di chuyển thẳng đứng của các viên đạn.
-        setDx(speed * directionX);
-        setDy(speed * directionY);
+        setDx(speed * DIRECTION_X);
+        setDy(speed * DIRECTION_Y);
         setX(getX() + getDx());
         setY(getY() + getDy());
     }
 
     @Override
-    public void render(Graphics g) {}
+    public void update() {
+        // Cập nhật lại vị trí sau khi di chuyển.
+        move();
+    }
 
     @Override
-    public void update() {}
+    public void render(Graphics g) {
+         Graphics2D g2d = (Graphics2D) g;
+        if (this.getImage() != null) {
+            g2d.drawImage(this.getImage(), (int) this.getX(), (int) this.getY(), 
+            (int) this.getWidth(), (int) this.getHeight(), null);
+        }
+    }
 
+    /**
+     * Phương thức checkCollision để kiểm tra va chạm giữa Bullet và các vật thể khác.
+     * @param other
+     * @return
+     */
     public boolean checkCollision(GameObject other) {
-        boolean conditionOne   = this.getX() < other.getX() + other.getWidth();
-        boolean conditionTwo   = this.getX() + this.getWidth() > other.getX();
-        boolean conditionThree = this.getY() < other.getY() + other.getHeight();
-        boolean conditionFour  = this.getY() + this.getHeight() > other.getY();
-        return conditionOne && conditionTwo && conditionThree && conditionFour;
+        return (this.getX() < other.getX() + other.getWidth()) &&
+               (this.getX() + this.getWidth() > other.getX()) &&
+               (this.getY() < other.getY() + other.getHeight()) &&
+               (this.getY() + this.getHeight() > other.getY());
     }
 }
