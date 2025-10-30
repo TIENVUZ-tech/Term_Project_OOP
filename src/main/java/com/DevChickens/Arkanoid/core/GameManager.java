@@ -149,7 +149,7 @@ public class GameManager {
         paddle.update();
 
         // Xử lý bắn đạn
-        if (paddle.getIsGunPaddle() && isFiring) {
+        if (paddle.isGunPaddle() && isFiring) {
             long now = System.currentTimeMillis();
 
             // Kiểm tra thời gian và bắn đạn
@@ -201,7 +201,7 @@ public class GameManager {
 
         if (isBallLaunched) {
             for (Ball b : balls) {
-                b.move();
+                b.update();
             }
 
             for (PowerUp p : powerUps) {
@@ -209,7 +209,7 @@ public class GameManager {
             }
 
             for (Bullet bullet : bullets) {
-                bullet.move();
+                bullet.update();
             }
 
             checkWallCollisions();
@@ -613,7 +613,7 @@ public class GameManager {
 
     // Cho phép bắn đạn
     public void onFire() {
-        if (gameState == GameState.PLAYING && paddle.getIsGunPaddle()) {
+        if (gameState == GameState.PLAYING && paddle.isGunPaddle()) {
             isFiring = true;
         }
     }
@@ -685,17 +685,17 @@ public class GameManager {
                 renderer.drawGameBackground(g, GAME_WIDTH, GAME_HEIGHT, currentRound);
 
                 // VẼ GAME OBJECTS
-                renderer.drawPaddle(g, paddle);
+                paddle.render(g);
                 for (Ball b : balls) {
-                    renderer.drawBall(g, b);
+                    b.render(g);
                 }
 
                 for (Bullet b : bullets) {
-                    renderer.drawBullet(g, b);
+                    b.render(g);
                 }
 
-                for (Brick b : bricks) renderer.drawBrick(g, b);
-                for (PowerUp p : powerUps) renderer.drawPowerUp(g, p);
+                for (Brick b : bricks) b.render(g);;
+                for (PowerUp p : powerUps) p.render(g);
                 for (Explosion exp : explosions) {
                     renderer.drawExplosion(g, exp);
                 }
