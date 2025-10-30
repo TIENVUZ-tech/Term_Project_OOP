@@ -6,6 +6,7 @@ import com.DevChickens.Arkanoid.entities.Paddle;
 import com.DevChickens.Arkanoid.graphics.AssetLoader;
 import com.DevChickens.Arkanoid.entities.Ball;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
@@ -42,7 +43,10 @@ public abstract class PowerUp extends GameObject {
         try {
             this.image = AssetLoader.loadImage(filePath);
         } catch (Exception e) {
+            // In ra lỗi gốc
             e.printStackTrace();
+            // Ném ra ngoại lệ và dừng chương trình.
+            throw new RuntimeException("Lỗi tải ảnh tại đường dẫn: " + filePath);
         }   
     }
 
@@ -102,6 +106,15 @@ public abstract class PowerUp extends GameObject {
         }
     }
 
+    @Override
+    public void render(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        if (this.getImage() != null) {
+            g2d.drawImage(this.getImage(), (int) this.getX(), (int) this.getY(), 
+            (int) this.getWidth(), (int) this.getHeight(), null);
+        }
+    }
+
     /**
      * Áp dụng Power-up.
      * @param paddle Thanh trượt có thể bị ảnh hưởng.
@@ -115,9 +128,4 @@ public abstract class PowerUp extends GameObject {
      * @param ball Quả bóng có thể bị ảnh hưởng.
      */
     public abstract void removeEffect(Paddle paddle, Ball ball);
-
-    @Override
-    public void render(Graphics g) {
-        // Có thể vẽ biểu tượng power-up ở đây
-    }
 }

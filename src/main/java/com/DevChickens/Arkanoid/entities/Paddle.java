@@ -1,35 +1,32 @@
 package com.DevChickens.Arkanoid.entities;
+
+import com.DevChickens.Arkanoid.core.GameManager;
+import com.DevChickens.Arkanoid.entities.powerups.PowerUp;
+import com.DevChickens.Arkanoid.graphics.AssetLoader;
+
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
 /**
  * Paddle (Kế thừa từ MovableObject): Thanh đỡ mà người chơi điều khiển.
  * Thuộc tính: speed, currentPowerUp.
- * Phương thức: moveLeft(), moveRight(), applyPowerUp(). 
+ * Phương thức: moveLeft(), moveRight(), applyPowerUp().
+ * @author Vũ Văn Tiến.
  */
-
-import java.awt.Graphics;
-import com.DevChickens.Arkanoid.core.GameManager;
-import com.DevChickens.Arkanoid.entities.powerups.PowerUp;
-import com.DevChickens.Arkanoid.graphics.AssetLoader; // Thêm import
-import java.awt.image.BufferedImage;
-
 public class Paddle extends MovableObject {
-    /* Tốc độ di chuyển của Paddle theo phương ngang.
-     * với mỗi lần cập nhật thì vị trí của paddle thay đổi speed (pixel).
-     */
+
+    // Tốc độ di chuyển của Paddle theo phương ngang.
+    // với mỗi lần cập nhật thì vị trí của paddle thay đổi speed (pixel).
     private double speed;
-    /* Tham chiếu đến PowerUp mà hiện tại paddle đang áp dụng. */
-    private PowerUp currentPowerUp;
-    /* Biến lưu ảnh của Paddle. */
-    private BufferedImage image;
-    /* Biến lưu ảnh của paddle bình thường.*/
-    private BufferedImage normalPaddle;
-    /* Biến lưu ảnh của LaserPadlee.*/
-    private BufferedImage gunPaddle;
-    /* Biến để lưu kích thước GỐC của paddle. */
-    private final double baseWidth;
-    /* Biến lưu tình trạng của paddle (laserPaddle hoặc thường). */
-    private boolean isGunPaddle = false;
-    /* Biến để đếm số lượng hiệu ứng "Expand" đang có hiệu lực. */
-    private int expandEffectCount;
+    private PowerUp currentPowerUp;      // Tham chiếu đến PowerUp mà hiện tại paddle đang áp dụng.
+    private BufferedImage image;         // Biến lưu ảnh của Paddle.
+    private BufferedImage normalPaddle;  // Biến lưu ảnh của paddle bình thường.
+    private BufferedImage gunPaddle;     // Biến lưu ảnh của LaserPadlee.
+    private final double baseWidth;      // Biến để lưu kích thước gốc của paddle.
+    private boolean isGunPaddle = false; // Biến lưu tình trạng của paddle (laserPaddle hoặc thường).
+    private int expandEffectCount;       // Biến để đếm số lượng hiệu ứng "Expand" đang có hiệu lực.
 
     /**
      * Phương thức khởi tạo Paddle.
@@ -41,43 +38,52 @@ public class Paddle extends MovableObject {
      * @param currentPowerUp (PowerUp hiện tại mà paddle đang dùng)
      */
     public Paddle(double x, double y,
-     double dx, double dy, double speed, PowerUp currentPowerUp) {
+            double dx, double dy, double speed, PowerUp currentPowerUp) {
         super(x, y, 0, 0, dx, dy);
         this.speed = speed;
         this.currentPowerUp = currentPowerUp;
-        this.normalPaddle = AssetLoader.loadImage("/images/NormalPaddle.png");
-        this.gunPaddle = AssetLoader.loadImage("/images/GunPaddle.png");
-        this.image = this.normalPaddle;
         double targetWidth = 0;
-        if (this.image != null) {
-            // Định nghĩa chiều rộng mong muốn tương đối so với chiều rộng màn hình
-            // Ví dụ: 1/6 chiều rộng màn hình
-            final double DESIRED_SCREEN_WIDTH_RATIO = 6.0;
-            targetWidth = GameManager.GAME_WIDTH / DESIRED_SCREEN_WIDTH_RATIO; // Chiều rộng paddle mong muốn
+        try {
+            this.normalPaddle = AssetLoader.loadImage("/images/NormalPaddle.png");
+            this.gunPaddle = AssetLoader.loadImage("/images/GunPaddle.png");
 
-            // Tính toán chiều cao để giữ nguyên tỷ lệ ảnh gốc
-            double aspectRatio = (double) this.image.getHeight() / this.image.getWidth();
-            double targetHeight = targetWidth * aspectRatio;
+            // Lỗi khi không tải được ảnh NormalPaddle.
+            if (this.normalPaddle == null) {
+                throw new IOException("Không thể tải tệp ảnh mặc định của Paddle: /images/normalPaddle.png");
+            }
+            this.image = this.normalPaddle;
 
-            // Đặt kích thước cho Paddle
-            this.setWidth(targetWidth);
-            this.setHeight(targetHeight);
+            if (this.image != null) {
+                /* Định nghĩa chiều rộng mong muốn tương đối so với chiều rộng màn hình
+                 * (1/6 chiều rộng màn hình) */
+                final double DESIRED_SCREEN_WIDTH_RATIO = 6.0;
+                targetWidth = GameManager.GAME_WIDTH / DESIRED_SCREEN_WIDTH_RATIO; // Chiều rộng paddle mong muốn
 
-            // Đặt vị trí ban đầu của Paddle
-            // X: giữa màn hình theo chiều ngang
-            this.setX((GameManager.GAME_WIDTH / 2) - (this.getWidth() / 2));
-            // Y: cách đáy màn hình một khoảng nhất định (ví dụ 50px)
-            final double MARGIN_FROM_BOTTOM = 10;
-            this.setY(GameManager.GAME_HEIGHT - this.getHeight() - MARGIN_FROM_BOTTOM);
+                // Tính toán chiều cao để giữ nguyên tỷ lệ ảnh gốc
+                double aspectRatio = (double) this.image.getHeight() / this.image.getWidth();
+                double targetHeight = targetWidth * aspectRatio;
 
+                // Đặt kích thước cho Paddle
+                this.setWidth(targetWidth);
+                this.setHeight(targetHeight);
+
+                // Đặt vị trí ban đầu của Paddle
+                // X: giữa màn hình theo chiều ngang
+                this.setX((GameManager.GAME_WIDTH / 2) - (this.getWidth() / 2));
+                // Y: cách đáy màn hình một khoảng nhất định.
+                final double MARGIN_FROM_BOTTOM = 10;
+                this.setY(GameManager.GAME_HEIGHT - this.getHeight() - MARGIN_FROM_BOTTOM);
+            }
+        } catch (Exception e) {
+            // In ra lỗi gốc.
+            e.printStackTrace();
+            // Ném ra lỗi để dừng game.
+            throw new RuntimeException("Không thể tải ảnh cho Padlle", e);
         }
-        this.baseWidth = targetWidth;         // MỚI: Lưu lại kích thước gốc
-        this.expandEffectCount = 0;
+        this.baseWidth = targetWidth; // lưu lại kích thước gốc.
+        this.expandEffectCount = 0; 
     }
 
-    /** Phương thức getter và setter của speed (tốc độ).
-     * @param speed
-    */
     public void setSpeed(double speed) {
         this.speed = speed;
     }
@@ -86,18 +92,14 @@ public class Paddle extends MovableObject {
         return this.speed;
     }
 
-    /*Phương thức getter và setter cho isLaserPaddle. */
-    public void setIsLaserPaddle(boolean isGunPaddle) {
+    public void setIsGunPaddle(boolean isGunPaddle) {
         this.isGunPaddle = isGunPaddle;
     }
 
-    public boolean getIsGunPaddle() {
+    public boolean isGunPaddle() {
         return this.isGunPaddle;
     }
 
-    /** Phương thức getter và setter của currentPowerUp (trạng thái PowerUp hiện tại của Paddle).
-     * @param currentPowerUp
-    */
     public void setCurrentPowerUp(PowerUp currentPowerUp) {
         this.currentPowerUp = currentPowerUp;
     }
@@ -106,20 +108,25 @@ public class Paddle extends MovableObject {
         return this.currentPowerUp;
     }
 
-    /** Lấy kích thước gốc. */
     public double getBaseWidth() {
         return this.baseWidth;
     }
 
-    /** Lấy số lượng hiệu ứng "Expand" đang có. */
     public int getExpandEffectCount() {
         return this.expandEffectCount;
     }
 
-    /** Thiết lập số lượng hiệu ứng "Expand". */
     public void setExpandEffectCount(int count) {
         if (count >= 0) {
             this.expandEffectCount = count;
+        }
+    }
+
+    public BufferedImage getImage() {
+        if (isGunPaddle) {
+            return this.gunPaddle;
+        } else {
+            return this.normalPaddle;
         }
     }
 
@@ -145,12 +152,18 @@ public class Paddle extends MovableObject {
         // đặt tốc độ về 0 sau khi di chuyển.
         super.setDx(0);
     }
-
     @Override
-    public void render(Graphics g) {}
-    /**
-     * Phương thức moveLeft() (di chuyển sang trái speed đơn vị).
-     */
+    public void render(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        if (this.getImage() != null) {
+            g2d.drawImage(this.getImage(),
+                    (int) this.getX(),
+                    (int) this.getY(),
+                    (int) this.getWidth(),
+                    (int) this.getHeight(), null);
+        }
+    }
+
     public void moveLeft() {
         // cập nhật tốc độ.
         super.setDx(-this.getSpeed());
@@ -172,16 +185,8 @@ public class Paddle extends MovableObject {
         this.currentPowerUp = p;
     }
 
-    public BufferedImage getImage() {
-        if (isGunPaddle) {
-            return this.gunPaddle;
-        } else {
-            return this.normalPaddle;
-        }
-    }
-
     /**
-     * Phương thức activateLaserPaddle. 
+     * Phương thức activateGunPaddle.
      */
     public void activateGunPaddle(long duration) {
         this.isGunPaddle = true;

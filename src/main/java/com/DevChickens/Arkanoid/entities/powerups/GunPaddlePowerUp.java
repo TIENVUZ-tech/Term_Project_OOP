@@ -12,8 +12,8 @@ import com.DevChickens.Arkanoid.entities.Ball;
 public class GunPaddlePowerUp extends PowerUp {
 
     /* Tham số chiều cao và chiều rộng của vật thể. */
-    private static final int GUNPADDLEPOWERUP_WIDTH = 30;
-    private static final int GUNPADDLEPOWERUP_HEIGHT = 20;
+    private static final int GUNPADDLEPOWERUP_WIDTH = 60;
+    private static final int GUNPADDLEPOWERUP_HEIGHT = 40;
     /* Đường dẫn tới file ảnh. */
     private static final String FILEPATH = "/images/GunPaddlePowerUp.png";
 
@@ -38,9 +38,4 @@ public class GunPaddlePowerUp extends PowerUp {
     public void removeEffect(Paddle paddle, Ball ball) {
         paddle.deactivateGunPaddle();
     }
-
-    @Override
-    public void render (Graphics g) {}
-
-    
 }

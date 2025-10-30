@@ -13,7 +13,7 @@ public class ExpandPaddlePowerUp extends PowerUp {
 
     /* Các tham số cho chiều rộng và chiều cao của PowerUp. */
     private static final int EXPANDPADDLEPOWERUP_WIDTH = 40;
-    private static final int EXPANDPADDLEPOWERUP_HEIGHT = 20;
+    private static final int EXPANDPADDLEPOWERUP_HEIGHT = 30;
     /* Đường dẫn tới ảnh. */
     private static final String FILEPATH = "/images/ExpandPaddlePowerUp.png";
 
@@ -73,7 +73,4 @@ public class ExpandPaddlePowerUp extends PowerUp {
         double widthChange = newWidth - oldWidth;
         paddle.setX(paddle.getX() - widthChange / 2.0);
     }
-
-    @Override
-    public void render(Graphics g) {}
 }

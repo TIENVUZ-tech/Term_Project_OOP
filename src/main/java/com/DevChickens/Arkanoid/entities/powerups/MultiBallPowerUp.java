@@ -8,8 +8,8 @@ import java.awt.Graphics;
 public class MultiBallPowerUp extends PowerUp {
 
     /* Tham số chiều cao và chiều rộng của vật thể. */
-    private static final int MULTIBALLPOWERUP_WIDTH = 30;
-    private static final int MULTIBALLPOWERUP_HEIGHT = 25;
+    private static final int MULTIBALLPOWERUP_WIDTH = 60;
+    private static final int MULTIBALLPOWERUP_HEIGHT = 40;
     /* Đường dẫn tới file ảnh. */
     private static final String FILEPATH = "/images/MultiBallPowerUp.png";
 
@@ -66,11 +66,6 @@ public class MultiBallPowerUp extends PowerUp {
 
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
-
-    }
-
-    @Override
-    public void render(Graphics g) {
 
     }
 }

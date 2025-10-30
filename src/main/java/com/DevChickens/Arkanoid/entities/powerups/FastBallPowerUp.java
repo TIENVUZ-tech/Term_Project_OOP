@@ -14,8 +14,8 @@ public class FastBallPowerUp extends PowerUp {
 
     private final double speedFactor = 1.5; // Hệ số tăng tốc
     /* Tham số chiều cao và chiều rộng của vật thể. */
-    private static final int FASTBALLPOWERUP_WIDTH = 20;
-    private static final int FASTBALLPOWERUP_HEIGHT = 30;
+    private static final int FASTBALLPOWERUP_WIDTH = 40;
+    private static final int FASTBALLPOWERUP_HEIGHT = 60;
     /* Đường dẫn tới file ảnh. */
     private static final String FILEPATH = "/images/FastBallPowerUp.png";
 
@@ -54,7 +54,4 @@ public class FastBallPowerUp extends PowerUp {
     public void removeEffect(Paddle paddle, Ball ball) {
         ball.multiplySpeed(1 / speedFactor);
     }
-
-    @Override
-    public void render(Graphics g) {}
 }

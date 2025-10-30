@@ -13,8 +13,8 @@ import java.awt.Graphics;
 public class SuperBallPowerUp extends PowerUp {
 
      /* Tham số chiều cao và chiều rộng của vật thể. */
-    private static final int SUPERBALLPOWERUP_WIDTH = 30;
-    private static final int SUPERBALLPOWERUP_HEIGHT = 30;
+    private static final int SUPERBALLPOWERUP_WIDTH = 50;
+    private static final int SUPERBALLPOWERUP_HEIGHT = 60;
     /* Đường dẫn tới file ảnh. */
     private static final String FILEPATH = "/images/SuperBallPowerUp.png";
 
@@ -40,6 +40,4 @@ public class SuperBallPowerUp extends PowerUp {
         ball.deactivateSuperBall();
     }
 
-    @Override
-    public void render(Graphics g) {}
 }
