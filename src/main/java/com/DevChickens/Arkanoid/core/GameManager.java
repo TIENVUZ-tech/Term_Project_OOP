@@ -371,21 +371,7 @@ public class GameManager {
                             explosions.add(new Explosion(explosionX, explosionY, b.getWidth() * 2, b.getHeight() * 2));
                             processExplosion(b);
                         }
-
-                        // Có thể rơi PowerUp ngẫu nhiên
-                        double rand = Math.random(); // Lấy 1 số ngẫu nhiên
-
-                        if (rand < 0.05) { // 5% cơ hội
-                            powerUps.add(new ExpandPaddlePowerUp(b.getX(), b.getY(), "EXPAND_PADDLE", 5000));
-                        } else if (rand < 0.1) { // 5% cơ hội (tổng 10%)
-                            powerUps.add(new SuperBallPowerUp(b.getX(), b.getY(), "SUPER_BALL", 5000));
-                        } else if (rand < 0.15) { // 5% cơ hội (tổng 15%)
-                            powerUps.add(new MultiBallPowerUp(b.getX(), b.getY(), "MULTI_BALL", 1000));
-                        } else if (rand < 0.2) { // 5% cơ hội (tổng 20%)
-                            powerUps.add(new GunPaddlePowerUp(b.getX(), b.getY(), "GUN_PADDLE", 5000));
-                        } else if (rand < 0.25) { // 5% cơ hội (tổng 25%)
-                            powerUps.add(new FastBallPowerUp(b.getX(), b.getY(), "FAST_BALL", 5000));
-                        }
+                        trySpawnPowerUp(b);
                     }
                     break;
                 }
@@ -419,20 +405,7 @@ public class GameManager {
                             explosions.add(new Explosion(explosionX, explosionY, b.getWidth() * 2, b.getHeight() * 2));
                             processExplosion(b);
                         }
-                        // Có thể rơi PowerUp ngẫu nhiên
-                        double rand = Math.random(); // Lấy 1 số ngẫu nhiên
-
-                        if (rand < 0.05) { // 5% cơ hội
-                            powerUps.add(new ExpandPaddlePowerUp(b.getX(), b.getY(), "EXPAND_PADDLE", 5000));
-                        } else if (rand < 0.1) { // 5% cơ hội (tổng 10%)
-                            powerUps.add(new SuperBallPowerUp(b.getX(), b.getY(), "SUPER_BALL", 5000));
-                        } else if (rand < 0.15) { // 5% cơ hội (tổng 15%)
-                            powerUps.add(new MultiBallPowerUp(b.getX(), b.getY(), "MULTI_BALL", 1000));
-                        } else if (rand < 0.2) { // 5% cơ hội (tổng 20%)
-                            powerUps.add(new GunPaddlePowerUp(b.getX(), b.getY(), "GUN_PADDLE", 5000));
-                        } else if (rand < 0.25) { // 5% cơ hội (tổng 25%)
-                            powerUps.add(new FastBallPowerUp(b.getX(), b.getY(), "FAST_BALL", 5000));
-                        }
+                        trySpawnPowerUp(b); // Phương thức gọi powerup.
                     }
                     // loại bỏ đạn khi va chạm với gạch
                     bulletIterator.remove();
@@ -786,6 +759,16 @@ public class GameManager {
 
         } catch (IOException e) {
             System.err.println("Lỗi khi lưu điểm: " + e.getMessage());
+        }
+    }
+
+    private void trySpawnPowerUp(Brick destroyedBrick) {
+        PowerUp newPowerUp = PowerUpFactory.createRandomPowerUp(
+                destroyedBrick.getX(),
+                destroyedBrick.getY()
+        );
+        if (newPowerUp != null) {
+            powerUps.add(newPowerUp);
         }
     }
 }
