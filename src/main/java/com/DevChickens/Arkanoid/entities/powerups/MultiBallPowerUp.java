@@ -7,49 +7,54 @@ import java.awt.Graphics;
 
 public class MultiBallPowerUp extends PowerUp {
 
-    /* Tham số chiều cao và chiều rộng của vật thể. */
+
     private static final int MULTIBALLPOWERUP_WIDTH = 60;
     private static final int MULTIBALLPOWERUP_HEIGHT = 40;
-    /* Đường dẫn tới file ảnh. */
+
     private static final String FILEPATH = "/images/MultiBallPowerUp.png";
 
     public MultiBallPowerUp(double x, double y, String type, long duration) {
-        super(x, y, type, duration, FILEPATH, 
-        MULTIBALLPOWERUP_WIDTH, MULTIBALLPOWERUP_HEIGHT);
+        super(x, y, type, duration, FILEPATH,
+                MULTIBALLPOWERUP_WIDTH, MULTIBALLPOWERUP_HEIGHT);
     }
 
     /**
-     * Áp dụng hiệu ứng: Tạo 2 bóng mới VÀ thay đổi bóng gốc.
+     * Áp dụng hiệu ứng: Tạo 2 bóng mới tách ra 2 bên so với bóng gốc.
      * @param manager GameManager chính (để gọi addBall).
      * @param originalBall Quả bóng gốc ăn item.
      */
     @Override
     public void applyEffect(GameManager manager, Paddle paddle, Ball originalBall) {
 
-        // 1. Lấy thuộc tính của bóng gốc
+        // Lấy thuộc tính của bóng gốc
         double startX = originalBall.getX();
         double startY = originalBall.getY();
         double baseSpeed = originalBall.getSpeed();
         boolean isSuper = originalBall.getIsSuperBall();
-        int originalDirX = originalBall.getDirectionX(); // Lấy hướng X cũ
-        int originalDirY = originalBall.getDirectionY();
 
-        // bóng 1 chéo bên trái 45 độ so với bóng gốc
-        int rawX1 = originalDirX + originalDirY;
-        int rawY1 = -originalDirX + originalDirY;
+        // Lấy vector hướng (double) của bóng gốc
+        double originalDirX = originalBall.getDirectionX();
+        double originalDirY = originalBall.getDirectionY();
 
-        // bóng 2 chéo bên phải 45 độ so với bóng gốc
-        int rawX2 = originalDirX - originalDirY;
-        int rawY2 = originalDirX + originalDirY;
+        // Chuyển đổi vector hướng (dirX, dirY) về lại GÓC (radian)
+        // Dùng Math.atan2(y, x) để lấy góc hiện tại
+        double originalAngle = Math.atan2(originalDirY, originalDirX);
 
-        // Chuẩn hóa kết quả về (-1, 0, 1)
-        // tránh các trường hợp ra 2 hoặc -2
-        int newDirX1 = (int) Math.signum(rawX1);
-        int newDirY1 = (int) Math.signum(rawY1);
-        int newDirX2 = (int) Math.signum(rawX2);
-        int newDirY2 = (int) Math.signum(rawY2);
+        // Tính toán 2 góc mới (tách ra 2 bên, ví dụ: 30 độ mỗi bên)
+        double angleOffset = Math.toRadians(30); // 30 độ
 
-        // Tạo 2 bóng mới
+        double angle1 = originalAngle - angleOffset; // Góc mới 1 (lệch trái)
+        double angle2 = originalAngle + angleOffset; // Góc mới 2 (lệch phải)
+
+        // Chuyển đổi 2 góc mới trở lại thành 2 vector hướng (dirX, dirY)
+        // Dùng cos cho X và sin cho Y
+        double newDirX1 = Math.cos(angle1);
+        double newDirY1 = Math.sin(angle1);
+
+        double newDirX2 = Math.cos(angle2);
+        double newDirY2 = Math.sin(angle2);
+
+        // Tạo 2 bóng mới với vector hướng (double)
         Ball newBall1 = new Ball(startX, startY, 0, 0, baseSpeed, newDirX1, newDirY1);
         Ball newBall2 = new Ball(startX, startY, 0, 0, baseSpeed, newDirX2, newDirY2);
 
@@ -66,6 +71,6 @@ public class MultiBallPowerUp extends PowerUp {
 
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
-
+        // Không cần làm gì khi hết hạn
     }
 }
