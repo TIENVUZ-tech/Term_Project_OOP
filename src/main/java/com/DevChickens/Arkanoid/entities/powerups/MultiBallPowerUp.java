@@ -68,9 +68,4 @@ public class MultiBallPowerUp extends PowerUp {
     public void removeEffect(Paddle paddle, Ball ball) {
 
     }
-
-    @Override
-    public void render(Graphics g) {
-
-    }
 }

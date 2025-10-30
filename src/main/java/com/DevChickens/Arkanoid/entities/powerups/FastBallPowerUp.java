@@ -54,7 +54,4 @@ public class FastBallPowerUp extends PowerUp {
     public void removeEffect(Paddle paddle, Ball ball) {
         ball.multiplySpeed(1 / speedFactor);
     }
-
-    @Override
-    public void render(Graphics g) {}
 }

@@ -38,9 +38,4 @@ public class GunPaddlePowerUp extends PowerUp {
     public void removeEffect(Paddle paddle, Ball ball) {
         paddle.deactivateGunPaddle();
     }
-
-    @Override
-    public void render (Graphics g) {}
-
-    
 }

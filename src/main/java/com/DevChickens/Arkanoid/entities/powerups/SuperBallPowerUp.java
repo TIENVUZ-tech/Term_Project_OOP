@@ -40,6 +40,4 @@ public class SuperBallPowerUp extends PowerUp {
         ball.deactivateSuperBall();
     }
 
-    @Override
-    public void render(Graphics g) {}
 }

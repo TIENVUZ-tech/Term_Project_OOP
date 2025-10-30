@@ -73,7 +73,4 @@ public class ExpandPaddlePowerUp extends PowerUp {
         double widthChange = newWidth - oldWidth;
         paddle.setX(paddle.getX() - widthChange / 2.0);
     }
-
-    @Override
-    public void render(Graphics g) {}
 }
