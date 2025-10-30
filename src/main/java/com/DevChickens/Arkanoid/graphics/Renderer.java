@@ -167,19 +167,21 @@ public class Renderer {
     /**
      * Vẽ màn hình PAUSE với các nút (Continue, Restart, Exit)
      */
+    /**
+     * Vẽ màn hình PAUSE với các nút (Continue, Restart, Exit)
+     */
     public void drawPause(Graphics g, int w, int h, int mouseX, int mouseY,
                           Rectangle continueBtn, Rectangle restartBtn, Rectangle exitBtn) {
 
-        // 1. Vẽ lớp phủ mờ (như cũ)
+        // Vẽ lớp phủ mờ
         g.setColor(new Color(0, 0, 0, 150)); // Màu đen mờ (Alpha = 150).
         g.fillRect(0, 0, w, h);
 
-        // 2. Dùng Graphics2D và bật khử răng cưa
+        // Dùng Graphics2D và bật khử răng cưa
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        // 3. Chuẩn bị Font (dùng chung font instruction)
-        // (Chúng ta sẽ vẽ các nút, không cần chữ "PAUSED" to nữa)
+        // Chuẩn bị Font (dùng chung font instruction)
         g2d.setFont(instructionFont);
         FontMetrics fm = g2d.getFontMetrics();
 
@@ -189,27 +191,41 @@ public class Renderer {
         int continueX = continueBtn.x + (continueBtn.width - fm.stringWidth(textContinue)) / 2;
         int continueY = continueBtn.y + (continueBtn.height - fm.getHeight()) / 2 + fm.getAscent();
 
-        // Vẽ highlight (giống hệt drawMenu)
-        if (continueBtn.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
-        else g2d.setColor(Color.WHITE);
+        // Vẽ highlight
+        if (continueBtn.contains(mouseX, mouseY)) {
+            g2d.setColor(Color.YELLOW);
+        } else {
+            g2d.setColor(Color.WHITE);
+        }
+        g2d.drawRect(continueBtn.x, continueBtn.y, continueBtn.width, continueBtn.height);
         g2d.drawString(textContinue, continueX, continueY);
 
-        // --- Vẽ Nút "Restart Level" ---
+
+        // Vẽ Nút Restart Level
         String textRestart = "Restart Level";
         int restartX = restartBtn.x + (restartBtn.width - fm.stringWidth(textRestart)) / 2;
         int restartY = restartBtn.y + (restartBtn.height - fm.getHeight()) / 2 + fm.getAscent();
 
-        if (restartBtn.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
-        else g2d.setColor(Color.WHITE);
+        if (restartBtn.contains(mouseX, mouseY)) {
+            g2d.setColor(Color.YELLOW);
+        } else {
+            g2d.setColor(Color.WHITE);
+        }
+        g2d.drawRect(restartBtn.x, restartBtn.y, restartBtn.width, restartBtn.height);
         g2d.drawString(textRestart, restartX, restartY);
+
 
         // --- Vẽ Nút "Exit to Menu" ---
         String textExit = "Exit to Menu";
         int exitX = exitBtn.x + (exitBtn.width - fm.stringWidth(textExit)) / 2;
         int exitY = exitBtn.y + (exitBtn.height - fm.getHeight()) / 2 + fm.getAscent();
 
-        if (exitBtn.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
-        else g2d.setColor(Color.WHITE);
+        if (exitBtn.contains(mouseX, mouseY)) {
+            g2d.setColor(Color.YELLOW);
+        } else {
+            g2d.setColor(Color.WHITE);
+        }
+        g2d.drawRect(exitBtn.x, exitBtn.y, exitBtn.width, exitBtn.height);
         g2d.drawString(textExit, exitX, exitY);
     }
 
