@@ -11,6 +11,9 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.awt.Rectangle;
 
+import java.awt.image.BufferedImage;
+import java.awt.BasicStroke;
+
 /**
  * Renderer vẽ toàn bộ đối tượng và màn hình của Arkanoid.
  */
@@ -89,7 +92,8 @@ public class Renderer {
     }
 
     public void drawMenu(Graphics g, int w, int h, int mouseX, int mouseY,
-                         Rectangle playRect, Rectangle highScoresRect, Rectangle exitRect) {
+                         Rectangle playRect, Rectangle highScoresRect,
+                         Rectangle settingsRect, Rectangle exitRect) {
 
         // 1. Vẽ nền
         if (AssetLoader.MENU_BACKGROUND != null) {
@@ -112,7 +116,7 @@ public class Renderer {
         int titleY = h / 2 - 70;
         g2d.drawString(title, titleX, titleY);
 
-        // 4. --- VẼ CÁC NÚT BẤM ---
+        // 4. VẼ CÁC NÚT BẤM
         g2d.setFont(instructionFont);
         FontMetrics fm = g2d.getFontMetrics();
 
@@ -125,6 +129,11 @@ public class Renderer {
         String textScores = "HIGH SCORES";
         int scoresX = (w - fm.stringWidth(textScores)) / 2;
         int scoresY = playY + 50;
+
+        // Tọa độ "SETTINGS"
+        String textSettings = "SETTINGS";
+        int settingsX = (w - fm.stringWidth(textSettings)) / 2;
+        int settingsY = scoresY + 50;
 
         // Tọa độ "EXIT" (Nút 3)
         String textExit = "EXIT";
@@ -145,6 +154,12 @@ public class Renderer {
         if (highScoresRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW); // Highlight
         else g2d.setColor(Color.WHITE);
         g2d.drawString(textScores, scoresX, scoresY);
+
+        // Vẽ SETTINGS
+        settingsRect.setBounds(settingsX, settingsY - fm.getAscent(), fm.stringWidth(textSettings), fm.getHeight());
+        if (settingsRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+        else g2d.setColor(Color.WHITE);
+        g2d.drawString(textSettings, settingsX, settingsY);
 
         // Vẽ EXIT
         exitRect.setBounds(exitX, exitY - fm.getAscent(), fm.stringWidth(textExit), fm.getHeight());
@@ -171,7 +186,8 @@ public class Renderer {
      * Vẽ màn hình PAUSE với các nút (Continue, Restart, Exit)
      */
     public void drawPause(Graphics g, int w, int h, int mouseX, int mouseY,
-                          Rectangle continueBtn, Rectangle restartBtn, Rectangle exitBtn) {
+                          Rectangle continueBtn, Rectangle restartBtn,
+                          Rectangle settingsBtn, Rectangle exitBtn) {
 
         // Vẽ lớp phủ mờ
         g.setColor(new Color(0, 0, 0, 150)); // Màu đen mờ (Alpha = 150).
@@ -214,6 +230,14 @@ public class Renderer {
         g2d.drawRect(restartBtn.x, restartBtn.y, restartBtn.width, restartBtn.height);
         g2d.drawString(textRestart, restartX, restartY);
 
+        // Vẽ nút setting
+        String textSettings = "Settings";
+        int settingsX = settingsBtn.x + (settingsBtn.width - fm.stringWidth(textSettings)) / 2;
+        int settingsY = settingsBtn.y + (settingsBtn.height - fm.getHeight()) / 2 + fm.getAscent();
+        if (settingsBtn.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+        else g2d.setColor(Color.WHITE);
+        g2d.drawRect(settingsBtn.x, settingsBtn.y, settingsBtn.width, settingsBtn.height);
+        g2d.drawString(textSettings, settingsX, settingsY);
 
         // --- Vẽ Nút "Exit to Menu" ---
         String textExit = "Exit to Menu";
@@ -415,5 +439,197 @@ public class Renderer {
     }
     public void drawExplosion(Graphics g, Explosion explosion) {
         explosion.render(g);
+    }
+
+    /**
+     * Vẽ màn hình Chọn Màn Chơi bằng hình ảnh
+     */
+    public void drawLevelSelect(Graphics g, int w, int h, int mouseX, int mouseY,
+                                Rectangle[] levelButtons, Rectangle backRect, int maxLevels) {
+
+        //  Vẽ nền
+        if (AssetLoader.MENU_BACKGROUND != null) {
+            g.drawImage(AssetLoader.MENU_BACKGROUND, 0, 0, w, h, null);
+        } else {
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, w, h);
+        }
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        // Vẽ Tiêu đề
+        g2d.setFont(titleFont);
+        g2d.setColor(Color.YELLOW);
+        String title = "SELECT LEVEL";
+        FontMetrics fmTitle = g2d.getFontMetrics();
+        int titleX = (w - fmTitle.stringWidth(title)) / 2;
+        int titleY = 150;
+        g2d.drawString(title, titleX, titleY);
+
+        // Vẽ 5 màn
+        g2d.setFont(instructionFont); // Dùng font instruction cho tên level
+        FontMetrics fm = g2d.getFontMetrics();
+
+        for (int i = 0; i < maxLevels; i++) {
+            Rectangle btn = levelButtons[i];
+
+            // Lấy ảnh từ ASSETLOADER
+            BufferedImage img = AssetLoader.getRoundBackground(i + 1);
+
+            // Vẽ ảnh thumbnail
+            if (img != null) {
+                g2d.drawImage(img, btn.x, btn.y, btn.width, btn.height, null);
+            }
+
+            // Vẽ tên "LEVEL X" bên dưới ảnh
+            g2d.setColor(Color.WHITE);
+            String text = "LEVEL " + (i + 1);
+            int textX = btn.x + (btn.width - fm.stringWidth(text)) / 2;
+            int textY = btn.y + btn.height + 25;
+            g2d.drawString(text, textX, textY);
+
+            // Vẽ viền highlight nếu chuột di qua
+            if (btn.contains(mouseX, mouseY)) {
+                g2d.setColor(new Color(255, 255, 0, 200)); // Màu vàng trong suốt
+                g2d.setStroke(new BasicStroke(2)); // Viền dày 5px
+                g2d.drawRect(btn.x, btn.y, btn.width, btn.height);
+                g2d.setStroke(new BasicStroke(1));
+            }
+        }
+
+        // 5. Vẽ nút "BACK"
+        g2d.setFont(instructionFont);
+        String textBack = "BACK";
+        int backX = backRect.x + (backRect.width - fm.stringWidth(textBack)) / 2;
+        int backY = backRect.y + (backRect.height - fm.getHeight()) / 2 + fm.getAscent();
+
+        // Vẽ highlight cho nút BACK
+        if (backRect.contains(mouseX, mouseY)) {
+            g2d.setColor(new Color(255, 255, 0, 200)); // Vàng trong suốt
+            g2d.setStroke(new BasicStroke(3)); // Viền dày 3px
+            g2d.drawRect(backRect.x, backRect.y, backRect.width, backRect.height);
+            g2d.setStroke(new BasicStroke(1));
+            g2d.setColor(Color.YELLOW);
+        } else {
+            g2d.setColor(Color.WHITE);
+        }
+        g2d.drawString(textBack, backX, backY);
+    }
+
+
+    /**
+     * Hàm xử lý trong Setting, vẽ một nút bấm có style giống hệt màn hình Pause
+     */
+    private void drawStyledButton(Graphics2D g2d, Rectangle rect, String text, boolean isHovered) {
+        FontMetrics fm = g2d.getFontMetrics();
+
+        int textX = rect.x + (rect.width - fm.stringWidth(text)) / 2;
+        int textY = rect.y + (rect.height - fm.getHeight()) / 2 + fm.getAscent();
+
+        if (isHovered) g2d.setColor(Color.YELLOW);
+        else g2d.setColor(Color.WHITE);
+
+        g2d.drawRect(rect.x, rect.y, rect.width, rect.height);
+        g2d.drawString(text, textX, textY);
+    }
+
+    /**
+     * Vẽ một thanh trượt (slider)
+     */
+    private void drawSlider(Graphics2D g2d, Rectangle rect, float value, String label, boolean isHovered) {
+        // Vẽ nhãn
+        g2d.setFont(smallFont); // Dùng font nhỏ
+        g2d.setColor(Color.WHITE);
+        g2d.drawString(label, rect.x, rect.y - 5);
+
+        // Vẽ %
+        g2d.drawString((int)(value * 100) + "%", rect.x + rect.width + 10, rect.y + rect.height / 2 + 5);
+
+        // Vẽ nền thanh trượt
+        g2d.setColor(new Color(50, 50, 50)); // Xám tối
+        g2d.fill(rect);
+
+        // Vẽ giá trị
+        if (isHovered) g2d.setColor(Color.YELLOW);
+        else g2d.setColor(Color.CYAN);
+        g2d.fillRect(rect.x, rect.y, (int)(rect.width * value), rect.height);
+
+        // Vẽ viền
+        if (isHovered) g2d.setColor(Color.YELLOW);
+        else g2d.setColor(Color.WHITE);
+        g2d.draw(rect);
+    }
+
+    /**
+     * Vẽ trang Settings chính
+     */
+    public void drawSettingsMain(Graphics g, int w, int h, int mx, int my,
+                                 Rectangle soundRect, Rectangle controlsRect, Rectangle backRect) {
+
+        // Vẽ nền mờ (giống drawPause)
+        g.setColor(new Color(0, 0, 0, 150));
+        g.fillRect(0, 0, w, h);
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        // Vẽ tiêu đề
+        g2d.setFont(titleFont);
+        g2d.setColor(Color.WHITE);
+        String title = "SETTINGS";
+        FontMetrics fmTitle = g2d.getFontMetrics(titleFont);
+        int titleX = (w - fmTitle.stringWidth(title)) / 2;
+        g2d.drawString(title, titleX, 150);
+
+        // Vẽ các nút
+        g2d.setFont(instructionFont); // Đặt font cho hàm drawStyledButton
+        drawStyledButton(g2d, soundRect, "Sound", soundRect.contains(mx, my));
+        drawStyledButton(g2d, backRect, "Back", backRect.contains(mx, my));
+
+        // Vẽ nút Controls
+        drawStyledButton(g2d, controlsRect, "Controls (WIP)", false);
+        g2d.setColor(new Color(100, 100, 100, 150));
+        g2d.fillRect(controlsRect.x, controlsRect.y, controlsRect.width, controlsRect.height);
+    }
+
+    /**
+     * HÀM MỚI: Vẽ trang Settings âm thanh
+     */
+    public void drawSettingsSound(Graphics g, int w, int h, int mx, int my,
+                                  Rectangle bgmRect, float bgmVol,
+                                  Rectangle paddleRect, float paddleVol,
+                                  Rectangle brickRect, float brickVol,
+                                  Rectangle wallRect, float wallVol,
+                                  Rectangle explosionRect, float explosionVol,
+                                  Rectangle backRect) {
+
+        // Vẽ nền mờ
+        g.setColor(new Color(0, 0, 0, 150));
+        g.fillRect(0, 0, w, h);
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        // Vẽ tiêu đề
+        g2d.setFont(titleFont.deriveFont(60f)); // Font nhỏ hơn 1 chút
+        g2d.setColor(Color.WHITE);
+        String title = "SOUND SETTINGS";
+        FontMetrics fmTitle = g2d.getFontMetrics();
+        int titleX = (w - fmTitle.stringWidth(title)) / 2;
+        g2d.drawString(title, titleX, 100);
+
+        // Vẽ các thanh trượt
+        Point mousePoint = new Point(mx, my); // Dùng Point để check hover
+
+        drawSlider(g2d, bgmRect, bgmVol, "Music Volume (WIP)", bgmRect.contains(mousePoint));
+        drawSlider(g2d, paddleRect, paddleVol, "Paddle Hit", paddleRect.contains(mousePoint));
+        drawSlider(g2d, brickRect, brickVol, "Brick Hit (WIP)", brickRect.contains(mousePoint));
+        drawSlider(g2d, wallRect, wallVol, "Wall Hit (WIP)", wallRect.contains(mousePoint));
+        drawSlider(g2d, explosionRect, explosionVol, "Explosion", explosionRect.contains(mousePoint));
+
+        // Vẽ nút Back
+        g2d.setFont(instructionFont); // Đặt font cho nút Back
+        drawStyledButton(g2d, backRect, "Back", backRect.contains(mx, my));
     }
 }

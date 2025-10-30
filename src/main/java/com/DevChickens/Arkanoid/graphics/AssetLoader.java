@@ -30,7 +30,7 @@ public class AssetLoader {
         PAUSE_ICON = loadImage("/images/pause_icon.png");
         PLAY_ICON = loadImage("/images/play_icon.png");
         System.out.println("Tải ảnh vụ nổ...");
-        EXPLOSION_FRAMES = loadExplosionFrames("/images/", "boom", 4);
+        EXPLOSION_FRAMES = loadExplosionFrames("/images/", "boom", 8);
 
     }
 
