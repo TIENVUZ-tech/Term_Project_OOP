@@ -1,10 +1,6 @@
 package com.DevChickens.Arkanoid.graphics;
 import com.DevChickens.Arkanoid.entities.effects.Explosion;
 
-import com.DevChickens.Arkanoid.entities.*;
-import com.DevChickens.Arkanoid.entities.bricks.*;
-import com.DevChickens.Arkanoid.entities.powerups.*;
-
 import com.DevChickens.Arkanoid.enums.GameState;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -30,61 +26,6 @@ public class Renderer {
             titleFont = new Font("SansSerif", Font.BOLD, 72);
             instructionFont = new Font("SansSerif", Font.PLAIN, 28);
             smallFont = new Font("SansSerif", Font.PLAIN, 20);
-        }
-    }
-
-    public void drawPaddle(Graphics g, Paddle paddle) {
-        Graphics2D g2d = (Graphics2D) g;
-        if (paddle.getImage() != null) {
-            g2d.drawImage(paddle.getImage(),
-                    (int) paddle.getX(),
-                    (int) paddle.getY(),
-                    (int) paddle.getWidth(),
-                    (int) paddle.getHeight(), null);
-        }
-    }
-
-    public void drawBall(Graphics g, Ball ball) {
-        Graphics2D g2d = (Graphics2D) g;
-        if (ball.getImage() != null) {
-            g2d.drawImage(ball.getImage(), (int) ball.getX(), (int) ball.getY(),
-                    (int) ball.getWidth(), (int) ball.getHeight(), null);
-        }
-    }
-
-    public void drawBrick(Graphics g, Brick brick) {
-        if (brick.isDestroyed() || brick.getImage() == null) {
-            return;
-        }
-        // Ép kiểu g sang Graphics2D
-        Graphics2D g2d = (Graphics2D) g;
-        // Dùng g2d để vẽ
-        g2d.drawImage(brick.getImage(), (int) brick.getX(), (int) brick.getY(),
-                (int) brick.getWidth(), (int) brick.getHeight(), null);
-    }
-
-    public void drawPowerUp(Graphics g, PowerUp p) {
-        Graphics2D g2d = (Graphics2D) g;
-        if (p.getImage() != null) {
-            g2d.drawImage(p.getImage(), (int) p.getX(), (int) p.getY(), 
-            (int) p.getWidth(), (int) p.getHeight(), null);
-        } else {
-            g.setColor(Color.GREEN);
-        g.fillRect((int) p.getX(), (int) p.getY(),
-                (int) p.getWidth(), (int) p.getHeight());
-
-        g.setColor(Color.BLACK);
-        g.setFont(new Font("Arial", Font.BOLD, 12));
-        g.drawString(p.getType(), (int) p.getX() + 2, (int) p.getY() + 15);
-        }
-        
-    }
-
-    public void drawBullet(Graphics g, Bullet bullet) {
-        Graphics2D g2d = (Graphics2D) g;
-        if (bullet.getImage() != null) {
-            g2d.drawImage(bullet.getImage(), (int) bullet.getX(), (int) bullet.getY(), 
-            (int) bullet.getWidth(), (int) bullet.getHeight(), null);
         }
     }
 
