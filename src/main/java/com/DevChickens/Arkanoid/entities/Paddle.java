@@ -96,7 +96,7 @@ public class Paddle extends MovableObject {
         this.isGunPaddle = isGunPaddle;
     }
 
-    public boolean isGunPaddle() {
+    public boolean getIsGunPaddle() {
         return this.isGunPaddle;
     }
 

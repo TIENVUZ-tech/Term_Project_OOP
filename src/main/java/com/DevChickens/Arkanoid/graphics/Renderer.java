@@ -32,6 +32,36 @@ public class Renderer {
         }
     }
 
+    public void drawPaddle(Graphics g, com.DevChickens.Arkanoid.entities.Paddle paddle) {
+        if (paddle != null) {
+            paddle.render(g);
+        }
+    }
+
+    public void drawBall(Graphics g, com.DevChickens.Arkanoid.entities.Ball ball) {
+        if (ball != null) {
+            ball.render(g);
+        }
+    }
+
+    public void drawBullet(Graphics g, com.DevChickens.Arkanoid.entities.Bullet bullet) {
+        if (bullet != null) {
+            bullet.render(g);
+        }
+    }
+
+    public void drawBrick(Graphics g, com.DevChickens.Arkanoid.entities.bricks.Brick brick) {
+        if (brick != null && !brick.isDestroyed()) {
+            brick.render(g);
+        }
+    }
+
+    public void drawPowerUp(Graphics g, com.DevChickens.Arkanoid.entities.powerups.PowerUp powerUp) {
+        if (powerUp != null) {
+            powerUp.render(g);
+        }
+    }
+
     public void drawMenu(Graphics g, int w, int h, int mouseX, int mouseY,
                          Rectangle playRect, Rectangle highScoresRect,
                          Rectangle settingsRect, Rectangle exitRect) {
@@ -506,7 +536,7 @@ public class Renderer {
      * Vẽ trang Settings chính
      */
     public void drawSettingsMain(Graphics g, int w, int h, int mx, int my,
-                                 Rectangle soundRect, Rectangle controlsRect, Rectangle backRect) {
+                                 Rectangle soundRect, Rectangle backRect) {
 
         // Vẽ nền mờ (giống drawPause)
         g.setColor(new Color(0, 0, 0, 150));
@@ -528,10 +558,6 @@ public class Renderer {
         drawStyledButton(g2d, soundRect, "Sound", soundRect.contains(mx, my));
         drawStyledButton(g2d, backRect, "Back", backRect.contains(mx, my));
 
-        // Vẽ nút Controls
-        drawStyledButton(g2d, controlsRect, "Controls (WIP)", false);
-        g2d.setColor(new Color(100, 100, 100, 150));
-        g2d.fillRect(controlsRect.x, controlsRect.y, controlsRect.width, controlsRect.height);
     }
 
     /**

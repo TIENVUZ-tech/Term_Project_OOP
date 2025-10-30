@@ -153,11 +153,10 @@
                 int settingsCenterX = GAME_WIDTH / 2 - (settingsBtnWidth / 2);
 
                 // Nút trong Main Settings
-                settingsSoundButtonRect = new Rectangle(settingsCenterX, 200, settingsBtnWidth, settingsBtnHeight);
-                settingsControlsButtonRect = new Rectangle(settingsCenterX, 300, settingsBtnWidth, settingsBtnHeight);
-                settingsBackRect = new Rectangle(settingsCenterX, 400, settingsBtnWidth, settingsBtnHeight);
+                settingsSoundButtonRect = new Rectangle(settingsCenterX, 250, settingsBtnWidth, settingsBtnHeight);
+                settingsBackRect = new Rectangle(settingsCenterX, 300, settingsBtnWidth, settingsBtnHeight);
 
-                // Nút trong Sound Settings
+                // Nút trong Sound Settingsx`
                 int sliderWidth = 400;
                 int sliderHeight = 20;
                 int sliderCenterX = GAME_WIDTH / 2 - (sliderWidth / 2);
@@ -827,11 +826,8 @@
                         case MAIN:
                             if (settingsSoundButtonRect.contains(x, y)) {
                                 currentSettingsPage = SettingsPage.SOUND;
-                            } else if (settingsControlsButtonRect.contains(x, y)) {
-                                // (Chưa làm) currentSettingsPage = SettingsPage.CONTROLS;
                             } else if (settingsBackRect.contains(x, y)) {
                                 gameState = previousGameState; // Quay lại (PAUSED hoặc MENU)
-                                // (Nên gọi hàm saveSettings() ở đây nếu có)
                             }
                             break;
 
@@ -967,7 +963,7 @@
                         switch (currentSettingsPage) {
                             case MAIN:
                                 renderer.drawSettingsMain(g, GAME_WIDTH, GAME_HEIGHT, mouseX, mouseY,
-                                        settingsSoundButtonRect, settingsControlsButtonRect, settingsBackRect);
+                                        settingsSoundButtonRect, settingsBackRect);
                                 break;
                             case SOUND:
                                 renderer.drawSettingsSound(g, GAME_WIDTH, GAME_HEIGHT, mouseX, mouseY,
