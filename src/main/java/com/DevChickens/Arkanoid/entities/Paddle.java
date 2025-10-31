@@ -92,11 +92,7 @@ public class Paddle extends MovableObject {
         return this.speed;
     }
 
-    public void setIsGunPaddle(boolean isGunPaddle) {
-        this.isGunPaddle = isGunPaddle;
-    }
-
-    public boolean getIsGunPaddle() {
+    public boolean isGunPaddle() {
         return this.isGunPaddle;
     }
 
@@ -188,7 +184,7 @@ public class Paddle extends MovableObject {
     /**
      * Phương thức activateGunPaddle.
      */
-    public void activateGunPaddle(long duration) {
+    public void activateGunPaddle() {
         this.isGunPaddle = true;
         this.image = gunPaddle;
     }

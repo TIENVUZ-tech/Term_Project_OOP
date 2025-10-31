@@ -31,7 +31,7 @@ public class GunPaddlePowerUp extends PowerUp {
 
     @Override
     public void applyEffect(GameManager manager, Paddle paddle, Ball ball) {
-        paddle.activateGunPaddle(this.getDuration());
+        paddle.activateGunPaddle();
     }
 
     @Override

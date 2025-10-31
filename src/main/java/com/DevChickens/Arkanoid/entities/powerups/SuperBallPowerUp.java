@@ -32,7 +32,7 @@ public class SuperBallPowerUp extends PowerUp {
 
     @Override
     public void applyEffect(GameManager manager, Paddle paddle, Ball ball) {
-        ball.activateSuperBall(this.getDuration());
+        ball.activateSuperBall();
     }
 
     @Override

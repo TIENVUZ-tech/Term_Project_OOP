@@ -30,7 +30,7 @@ public class MultiBallPowerUp extends PowerUp {
         double startX = originalBall.getX();
         double startY = originalBall.getY();
         double baseSpeed = originalBall.getSpeed();
-        boolean isSuper = originalBall.getIsSuperBall();
+        boolean isSuper = originalBall.isSuperBall();
 
         // Lấy vector hướng (double) của bóng gốc
         double originalDirX = originalBall.getDirectionX();
@@ -59,8 +59,8 @@ public class MultiBallPowerUp extends PowerUp {
         Ball newBall2 = new Ball(startX, startY, 0, 0, baseSpeed, newDirX2, newDirY2);
 
         if (isSuper) {
-            newBall1.activateSuperBall(0);
-            newBall2.activateSuperBall(0);
+            newBall1.activateSuperBall();
+            newBall2.activateSuperBall();
         }
 
         if (manager != null) {

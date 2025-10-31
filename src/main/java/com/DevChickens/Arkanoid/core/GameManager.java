@@ -241,7 +241,7 @@
                 paddle.update();
         
                 // Xử lý bắn đạn
-                if (paddle.getIsGunPaddle() && isFiring) {
+                if (paddle.isGunPaddle() && isFiring) {
                     long now = System.currentTimeMillis();
         
                     // Kiểm tra thời gian và bắn đạn
@@ -426,7 +426,7 @@
                     for (int i = 0; i < bricks.size(); i++) {
                         Brick b = bricks.get(i);
                         if (!b.isDestroyed() && ball.checkCollision(b)) {
-                            if (ball.getIsSuperBall()) {
+                            if (ball.isSuperBall()) {
                                 b.breakBrick();
                             } else {
                                 b.takeHit();
@@ -726,7 +726,7 @@
         
             // Cho phép bắn đạn
             public void onFire() {
-                if (gameState == GameState.PLAYING && paddle.getIsGunPaddle()) {
+                if (gameState == GameState.PLAYING && paddle.isGunPaddle()) {
                     isFiring = true;
                 }
             }

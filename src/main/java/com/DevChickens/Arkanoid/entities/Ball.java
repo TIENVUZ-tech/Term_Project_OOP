@@ -81,7 +81,7 @@ public class Ball extends MovableObject {
         return this.directionY;
     }
 
-    public boolean getIsSuperBall() {
+    public boolean isSuperBall() {
         return this.isSuperBall;
     }
 
@@ -184,7 +184,7 @@ public class Ball extends MovableObject {
         this.speed *= factor;
     }
 
-    public void activateSuperBall(long duration) {
+    public void activateSuperBall() {
         this.isSuperBall = true;
         this.image = this.superBall;
     }
