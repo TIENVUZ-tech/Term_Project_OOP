@@ -202,7 +202,7 @@
             private void initRound(int round) {
                 paddle = new Paddle(GAME_WIDTH / 2.0 - 50, GAME_HEIGHT - 50, 0, 0, 10, null);
                 balls = new ArrayList<>(); // Khởi tạo danh sách
-                balls.add(new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 5 + round, 1, -1));
+                balls.add(new Ball(GAME_WIDTH / 2.0, GAME_HEIGHT - 70, 3, -3, 5 + round, 0.7071, -0.7071));
                 bricks = new ArrayList<>();
                 powerUps = new ArrayList<>();
                 activePowerUps = new ArrayList<>();
@@ -383,19 +383,19 @@
                     // Va chạm Cạnh Trái
                     if (ball.getX() < 0) {
                         ball.setX(0); // Đẩy bóng về sát lề
-                        ball.setDirectionX(1); // Luôn đảo hướng sang phải
+                        ball.setDirectionX(Math.abs(ball.getDirectionX())); // Đảo hướng bóng.
                     }
         
                     // Va chạm Cạnh Phải
                     if (ball.getX() + ball.getWidth() > GAME_WIDTH) {
                         ball.setX(GAME_WIDTH - ball.getWidth()); // Đẩy bóng về sát lề
-                        ball.setDirectionX(-1); // Luôn đảo hướng sang trái
+                        ball.setDirectionX(-Math.abs(ball.getDirectionX()));
                     }
         
                     // Va chạm Cạnh Trên
                     if (ball.getY() < 0) {
                         ball.setY(0); // Đẩy bóng về sát lề
-                        ball.setDirectionY(1); // Luôn đảo hướng xuống
+                        ball.setDirectionY(Math.abs(ball.getDirectionY()));
                     }
                 }
             }
@@ -405,32 +405,21 @@
              */
             private void checkCollisions() {
                 for (Ball ball : new ArrayList<>(balls)) {
-                    // --- Ball vs Paddle (Logic Chống Kẹt) ---
-        
+                    // --- Ball vs Paddle (Logic Chống Kẹt & Góc Bật Thông Minh) ---
+
                     if (ball.checkCollision(paddle)) {
-                        // Đảm bảo bóng luôn bật lên khi va chạm với Paddle
-                        if (ball.getDirectionY() > 0) { // Nếu bóng đang đi xuống
-                            ball.setDirectionY(-1);      // Đảo hướng lên
+
+                        // Chỉ xử lý bật nếu bóng đang đi xuống
+                        if (ball.getDirectionY() > 0) {
+
+                            ball.bounceOff(paddle);
+
+                            // Đẩy bóng ra khỏi Paddle ngay lập tức để ngăn bị kẹt
+                            ball.setY(paddle.getY() - ball.getHeight());
+
+                            //Âm thanh khi bóng va chạm với paddle
+                            soundManager.playSound("paddle_hit", volumePaddle);
                         }
-        
-                        // Đẩy bóng ra khỏi Paddle ngay lập tức để ngăn bị kẹt
-                        ball.setY(paddle.getY() - ball.getHeight());
-        
-                        // Tính góc bật thông minh dựa trên vị trí va chạm
-                        double relativeIntersectX = (ball.getX() + (ball.getWidth() / 2.0)) - (paddle.getX() + (paddle.getWidth() / 2.0));
-                        // normalizedIntersectX: Giá trị từ -1.0 (cực trái) đến 1.0 (cực phải)
-                        double normalizedIntersectX = relativeIntersectX / (paddle.getWidth() / 2.0);
-        
-                        // Thiết lập directionX để bóng đi theo góc, tránh đi thẳng lên
-                        if (normalizedIntersectX < -0.1) {
-                            ball.setDirectionX(-1); // Bật sang trái
-                        } else if (normalizedIntersectX > 0.1) {
-                            ball.setDirectionX(1); // Bật sang phải
-                        }
-                            // Nếu va chạm gần tâm (-0.1 đến 0.1), directionX giữ nguyên
-        
-                        //Âm thanh khi bóng va chạm với paddle
-                        soundManager.playSound("paddle_hit", volumePaddle);
                     }
         
                     // --- Ball vs Bricks (Logic Chống Kẹt) ---
@@ -681,7 +670,7 @@
                         GAME_HEIGHT - 70,
                         3, -3,
                         5 + currentRound,
-                        1, -1
+                        0.7071, -0.7071
                 ));
         
                 isBallLaunched = false;
