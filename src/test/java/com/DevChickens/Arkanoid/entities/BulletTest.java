@@ -106,6 +106,21 @@ public class BulletTest {
         }
 
         @Test
+        @DisplayName("Logic: update() tự hủy khi chạm tường trên (Y < 0)")
+        void testUpdate_Destroys_When_HittingTopWall() {
+            
+            // Đặt bullet ở vị trí Y=5. Sau khi move(), Y sẽ là 5 - 7 = -2 (tức < 0)
+            bullet.setY(5.0);
+            assertFalse(bullet.isDestroyed(), "Đạn chưa bị hủy ban đầu");
+
+            // Di chuyển
+            bullet.update();
+
+            // Kiểm tra
+            assertTrue(bullet.isDestroyed(), "Đạn phải tự hủy khi Y < 0");
+        }
+
+        @Test
         @DisplayName("Logic: checkCollision() phát hiện va chạm AABB")
         void testCheckCollision() {
             // Đặt kích thước cho Bullet

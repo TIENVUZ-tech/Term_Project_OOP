@@ -111,6 +111,75 @@ public class BallTest {
         }
 
         @Test
+        @DisplayName("Logic: update() tự hủy (isDestroyed) khi chạm tường dưới")
+        void testUpdate_DestroysBall_When_HittingBottomWall() {
+            // Giả sử GameManager.GAME_HEIGHT
+            final int GAME_HEIGHT = 690; 
+            final double BALL_HEIGHT = ball.getHeight(); // 30.0
+            
+            // Đặt bóng ngay trên mép tường dưới
+            // dy = speed * dirY = 10 * 0.5 = 5
+            ball.setY(660.0);
+            ball.setDirectionY(0.5); // Đảm bảo bay xuống
+            
+            assertFalse(ball.isDestroyed(), "Bóng chưa bị hủy ban đầu");
+
+            // Di chuyển
+            ball.update();
+
+            // Kiểm tra
+            assertTrue(ball.isDestroyed(), "Bóng phải bị hủy sau khi chạm đáy");
+        }
+
+        @Test
+        @DisplayName("Logic: update() nảy bóng khi chạm tường trên")
+        void testUpdate_BouncesOff_TopWall() {
+            // Thiết lập thông số
+            ball.setY(0.0); // Đặt ngay mép trên
+            ball.setDirectionY(-0.5); // Bay LÊN
+            
+            // Di chuyển
+            ball.update();
+            
+            // Kiểm tra
+            assertTrue(ball.getDirectionY() > 0, "Hướng Y phải đảo ngược (đi xuống)");
+            assertEquals(0.0, ball.getY(), 0.001, "Y phải được reset về 0 (chống kẹt)");
+        }
+
+        @Test
+        @DisplayName("Logic: update() nảy bóng khi chạm tường trái")
+        void testUpdate_BouncesOff_LeftWall() {
+            // Thiết lập thông số
+            ball.setX(0.0); // Đặt ngay mép trái
+            ball.setDirectionX(-0.5); // Bay trái
+            
+            // Di chuyển
+            ball.update();
+            
+            // Kiểm tra
+            assertTrue(ball.getDirectionX() > 0, "Hướng X phải đảo ngược (đi phải)");
+            assertEquals(0.0, ball.getX(), 0.001, "X phải được reset về 0 (chống kẹt)");
+        }
+
+        @Test
+        @DisplayName("Logic: update() nảy bóng khi chạm tường phải")
+        void testUpdate_BouncesOff_RightWall() {
+            // Giả sử GameManager.GAME_WIDTH = 920
+            final int GAME_WIDTH = 920; 
+            final double BALL_WIDTH = ball.getWidth(); // 30.0
+            
+            ball.setX(GAME_WIDTH - BALL_WIDTH); // Đặt ngay mép phải
+            ball.setDirectionX(0.5); // Bay phải
+            
+            // Di chuyển
+            ball.update();
+            
+            // Kiểm tra
+            assertTrue(ball.getDirectionX() < 0, "Hướng X phải đảo ngược (đi trái)");
+            assertEquals(GAME_WIDTH - BALL_WIDTH, ball.getX(), 0.001, "X phải được reset về mép (chống kẹt)");
+        }
+
+        @Test
         @DisplayName("Va chạm Tường/Gạch: Đảo ngược Y khi va chạm dọc (Vertical)")
         void testBounceOff_WallOrBrick_Vertical() {
             ball.setDirectionY(0.5); // Đang bay xuống
