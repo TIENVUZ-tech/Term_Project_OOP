@@ -1,7 +1,6 @@
 package com.DevChickens.Arkanoid.graphics;
 
 import com.DevChickens.Arkanoid.core.GameManager;
-
 import javax.swing.*;
 
 /**
@@ -20,15 +19,5 @@ public class GameWindow extends JFrame {
         pack(); // auto chỉnh kích thước theo panel
         setLocationRelativeTo(null); // đặt giữa màn hình
         setVisible(true);
-    }
-
-    /**
-     * Hàm main để chạy game
-     */
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            GameManager manager = new GameManager();
-            new GameWindow(manager);
-        });
     }
 }
