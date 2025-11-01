@@ -40,25 +40,42 @@ public class GamePanel extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        // Game loop với ~60 FPS
-        final int FPS = 60;
-        final long frameTime = 1000 / FPS;
+
+        //  Thiết lập timeline cố định cho logic game
+        final double TicksPerSecond = 60.0;
+
+        // Tính toán xem mỗi tick logic mất bao nhiêu nano giây.
+        final double nsPerTick = 1000000000.0 / TicksPerSecond;
+
+        long lastTime = System.nanoTime();
+        double delta = 0;
+
+        // Các biến để đếm FPS (khung hình/giây) và TPS (tick/giây) để debug
+        long timer = System.currentTimeMillis();
+        int frames = 0;
+        int updates = 0;
 
         while (running) {
-            long start = System.currentTimeMillis();
+            long now = System.nanoTime();
+            // delta: Biến đếm xem đã tích lũy đủ thời gian để chạy 1 tick logic chưa
+            delta += (now - lastTime) / nsPerTick;
+            lastTime = now;
 
-            manager.update();
-            repaint();
-
-            long elapsed = System.currentTimeMillis() - start;
-            long sleepTime = frameTime - elapsed;
-            if (sleepTime < 0) sleepTime = 2;
-
-            try {
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            // CẬP NHẬT LOGIC (Fixed-Step)
+            // Vòng lặp này đảm bảo logic luôn chạy 60 lần/giây.
+            // Nếu máy lag nặng (delta > 2), nó sẽ chạy update() 2 lần
+            // để "bắt kịp" thời gian, đảm bảo vật lý không bị chậm lại.
+            while (delta >= 1) {
+                manager.update();
+                updates++;
+                delta--;
             }
+
+            // VẼ (Variable-Step)
+            // Yêu cầu Swing vẽ lại (sẽ gọi hàm paintComponent)
+            // Hàm này chạy nhanh nhất có thể để không bị sleep
+            repaint();
+            frames++;
         }
     }
 
