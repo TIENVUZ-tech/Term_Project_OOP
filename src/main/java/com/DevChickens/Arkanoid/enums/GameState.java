@@ -13,7 +13,8 @@ public enum GameState {
     VICTORY,
     NEXT_ROUND,
     HIGH_SCORES,
-    SETTINGS
+    SETTINGS,
+    ROUND_CLEAR
 }
 
 

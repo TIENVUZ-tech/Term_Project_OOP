@@ -36,12 +36,15 @@
             private final int maxRounds = 5;
             private long nextRoundStartTime; // Thời điểm bắt đầu hiển thị "ROUND X"
             private final long ROUND_DISPLAY_DURATION = 2000; // 2 giây
-        
+
+            private long roundClearStartTime; // Thời điểm thắng màn
+            private final long ROUND_CLEAR_DISPLAY_DURATION = 1000; // Chờ 1 giây
+
             private List<PowerUp> powerUps; // Power-up đang rơi
             private List<PowerUp> activePowerUps; // Power-up đang có hiệu lực
             private Renderer renderer;
             private boolean isBallLaunched;
-        
+
             private boolean isMovingLeft = false;
             private boolean isMovingRight = false;
         
@@ -146,8 +149,7 @@
                 int backPadding = 20; // Khoảng cách từ lề
                 levelSelectBackRect = new Rectangle(backPadding, backPadding, backBtnWidth, backBtnHeight);
 
-                // --- KHỞI TẠO RECT CHO SETTINGS ---
-                // (Đây chỉ là ví dụ, bạn phải tự đặt tọa độ (x, y, w, h) cho hợp lý)
+                // KHỞI TẠO RECT CHO SETTINGS
                 int settingsBtnWidth = 300;
                 int settingsBtnHeight = 60;
                 int settingsCenterX = GAME_WIDTH / 2 - (settingsBtnWidth / 2);
@@ -227,6 +229,26 @@
                         gameState = GameState.PLAYING;
                     }
                     return; // Dừng update logic game trong lúc hiển thị round
+                }
+
+                // Game sẽ đứng hình trong 1 giây
+                if (gameState == GameState.ROUND_CLEAR) {
+                    long now = System.currentTimeMillis();
+
+                    if (now - roundClearStartTime >= ROUND_CLEAR_DISPLAY_DURATION) {
+
+                        // Logic chuyển màn
+                        if (currentRound < maxRounds) {
+                            currentRound++;
+                            initRound(currentRound); // Tải màn mới
+                            gameState = GameState.NEXT_ROUND; // Chuyển sang "ROUND X"
+                            nextRoundStartTime = System.currentTimeMillis();
+                        } else {
+                            addScore(this.score);
+                            gameState = GameState.VICTORY; // Thắng game
+                        }
+                    }
+                    return; // Dừng update mọi thứ khác trong lúc chờ
                 }
         
                 if (gameState == GameState.PAUSED) return;
@@ -352,15 +374,8 @@
                     }
         
                     if (allBreakableDestroyed) {
-                        if (currentRound < maxRounds) {
-                            currentRound++;
-                            initRound(currentRound);
-                            gameState = GameState.NEXT_ROUND;
-                            nextRoundStartTime = System.currentTimeMillis();
-                        } else {
-                            addScore(this.score);
-                            gameState = GameState.VICTORY;
-                        }
+                        gameState = GameState.ROUND_CLEAR; // Chuyển sang trạng thái đứng hình.
+                        roundClearStartTime = System.currentTimeMillis();
                     }
                 } else {
                     if (!balls.isEmpty()) {
@@ -408,7 +423,7 @@
              */
             private void checkCollisions() {
                 for (Ball ball : new ArrayList<>(balls)) {
-                    // --- Ball vs Paddle (Logic Chống Kẹt & Góc Bật Thông Minh) ---
+                    // Ball vs Paddle
 
                     if (ball.checkCollision(paddle)) {
 
@@ -425,7 +440,7 @@
                         }
                     }
         
-                    // --- Ball vs Bricks (Logic Chống Kẹt) ---
+                    // Ball vs Bricks
                     for (int i = 0; i < bricks.size(); i++) {
                         Brick b = bricks.get(i);
                         if (!b.isDestroyed() && ball.checkCollision(b)) {
@@ -440,7 +455,7 @@
                             ball.setX(ball.getX() - ball.getSpeed() * ball.getDirectionX());
                             ball.setY(ball.getY() - ball.getSpeed() * ball.getDirectionY());
         
-                            // Va chạm và Bật ngược (sử dụng logic bounceOff trong Ball.java)
+                            // Va chạm và Bật ngược
                             ball.bounceOff(b);
         
                             if (b.isDestroyed()) {
@@ -481,7 +496,7 @@
                     }
                 }
         
-                // Bullet vs Bricks (logic va chạm)
+                // Bullet vs Bricks
                 java.util.Iterator<Bullet> bulletIterator = bullets.iterator();
                 while (bulletIterator.hasNext()) {
                     Bullet currentBullet = bulletIterator.next();
@@ -530,7 +545,7 @@
                     }
                 }
         
-                // --- Paddle vs PowerUps ---
+                // Paddle vs PowerUps
                 for (int i = 0; i < powerUps.size(); i++) {
                     PowerUp p = powerUps.get(i);
                     // Loại bỏ PowerUp nếu nó rơi ra ngoài màn hình
@@ -543,16 +558,16 @@
                     // Khi Paddle va chạm PowerUp
                     if (p.checkCollision(paddle)) {
         
-                        // Loại 1: Power-up chỉ ảnh hưởng đến Paddle (chạy 1 lần)
+                        // Power-up chỉ ảnh hưởng đến Paddle (chạy 1 lần)
                         if (p instanceof ExpandPaddlePowerUp) {
                             // Ta truyền 'this' (manager) và 'null' (ball)
                             p.applyEffect(this, paddle, null);
                         } else if (p instanceof GunPaddlePowerUp) {
-                            // Loại 2: Gunpaddle.
+                            // Gunpaddle.
                             p.applyEffect(null, paddle, null);
                             onFire();
                         }
-                        // Loại 3: Power-up ảnh hưởng đến TẤT CẢ bóng
+                        // Power-up ảnh hưởng đến tất cả bóng
                         else if (p instanceof SuperBallPowerUp ||
                                 p instanceof FastBallPowerUp ||
                                 p instanceof MultiBallPowerUp) {
@@ -936,6 +951,27 @@
                             renderer.drawPause(g, GAME_WIDTH, GAME_HEIGHT, mouseX, mouseY,
                                     pauseContinueButton,  pauseRestartButton, pauseSettingsButtonRect, pauseExitButton);
                         }
+                        break;
+                    // Copy y hệt nội dung của case PLAYING/PAUSED ở trên
+                    case ROUND_CLEAR:
+                        renderer.drawGameBackground(g, GAME_WIDTH, GAME_HEIGHT, currentRound);
+                        renderer.drawPaddle(g, paddle);
+                        for (Ball b : balls) {
+                            renderer.drawBall(g, b);
+                        }
+                        for (Bullet b : bullets) {
+                            renderer.drawBullet(g, b);
+                        }
+                        for (Brick b : bricks) renderer.drawBrick(g, b);
+                        for (PowerUp p : powerUps) renderer.drawPowerUp(g, p);
+                        for (Explosion exp : explosions) {
+                            renderer.drawExplosion(g, exp);
+                        }
+                        g.setColor(Color.WHITE);
+                        g.drawString("Score: " + score, 10, 20);
+                        g.drawString("Lives: " + lives, 10, 40);
+                        g.drawString("Round: " + currentRound + "/" + maxRounds, 10, 60);
+                        renderer.drawPauseIcon(g, gameState, mouseX, mouseY, pauseButtonRect);
                         break;
                     case HIGH_SCORES:
                         renderer.drawHighScores(g, GAME_WIDTH, GAME_HEIGHT, mouseX, mouseY,
