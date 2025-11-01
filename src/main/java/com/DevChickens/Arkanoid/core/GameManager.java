@@ -291,7 +291,7 @@
         
                 if (isBallLaunched) {
                     for (Ball b : balls) {
-                        b.move();
+                        b.update();
                     }
         
                     for (PowerUp p : powerUps) {
@@ -299,31 +299,21 @@
                     }
         
                     for (Bullet bullet : bullets) {
-                        bullet.move();
+                        bullet.update();
                     }
-        
+
                     checkWallCollisions();
-        
+
                     checkCollisions();
-        
+
                     java.util.Iterator<Ball> ballIterator = balls.iterator();
                     while (ballIterator.hasNext()) {
                         Ball b = ballIterator.next();
-                        if (b.getY() > GAME_HEIGHT) {
-                            ballIterator.remove(); // Xóa quả bóng bị rơi
+                        // Kiếm tra update đã cho phép xóa bóng hay chưa.
+                        if (b.isDestroyed()) { 
+                            ballIterator.remove(); // Xóa bóng vì nó báo đã tự hủy
                         }
                     }
-        
-                    // Logic loại bỏ đạn ra khỏi màn hình.
-                    java.util.Iterator<Bullet> bulletIterator = bullets.iterator();
-                    while (bulletIterator.hasNext()) {
-                        Bullet b = bulletIterator.next();
-                        if (b.getY() + b.getHeight() < 0) {
-                            // xóa đạn nếu đạn đi khỏi cạnh trên.
-                            bulletIterator.remove();
-                        }
-                    }
-        
         
                     if (balls.isEmpty()) {
                         lives--;
@@ -470,7 +460,14 @@
                 // Bullet vs Bricks
                 java.util.Iterator<Bullet> bulletIterator = bullets.iterator();
                 while (bulletIterator.hasNext()) {
+
                     Bullet currentBullet = bulletIterator.next();
+
+                    // Kiểm tra xem update trước đó đã báo hủy đạn chưa
+                    if (currentBullet.isDestroyed()) {
+                        bulletIterator.remove();
+                        continue; // Chuyển qua viên đạn tiếp theo
+                    }
         
                     for (int i = 0; i < bricks.size(); i++) {
                         Brick b = bricks.get(i);

@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.graphics.AssetLoader;
 
 /**
@@ -22,6 +21,7 @@ public class Bullet extends MovableObject {
 
     private double speed; // Tốc độ di chuyển của đạn.
     private BufferedImage image; // Biến chứa ảnh của viên đạn.
+    private boolean isDestroyed = false;
 
     /**
      * Phương thức khởi tạo Bullet, giữ nguyên 9 tham số đầu vào.
@@ -73,6 +73,10 @@ public class Bullet extends MovableObject {
         return this.image;
     }
 
+    public boolean isDestroyed() {
+        return this.isDestroyed;
+    }
+
     @Override
     public void move() {
         // Cách thức di chuyển thẳng đứng của các viên đạn.
@@ -86,6 +90,10 @@ public class Bullet extends MovableObject {
     public void update() {
         // Cập nhật lại vị trí sau khi di chuyển.
         move();
+        // Xử lý va chạm với tường trên
+        if (this.getY() < 0) {
+            this.destroy();
+        }
     }
 
     @Override
@@ -107,5 +115,12 @@ public class Bullet extends MovableObject {
                (this.getX() + this.getWidth() > other.getX()) &&
                (this.getY() < other.getY() + other.getHeight()) &&
                (this.getY() + this.getHeight() > other.getY());
+    }
+
+    /**
+     * Phương thức destroy (xóa viên đạn khi viên đạn chạm vào bóng hoặc khung hình trên)
+     */
+    public void destroy() {
+        this.isDestroyed = true;
     }
 }
