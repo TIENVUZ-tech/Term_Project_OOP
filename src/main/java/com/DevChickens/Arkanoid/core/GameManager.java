@@ -27,6 +27,7 @@
             private List<Brick> bricks;
             private List<Bullet> bullets;
             private List<Explosion> explosions;
+            private static GameManager instance;
         
             private SoundManager soundManager;
             private int score;
@@ -99,7 +100,7 @@
             public static final int GAME_WIDTH = 920;
             public static final int GAME_HEIGHT = 690;
         
-            public GameManager() {
+            private GameManager() {
                 renderer = new Renderer();
                 playButtonRect = new Rectangle();
                 continueButtonRect = new Rectangle();
@@ -158,6 +159,13 @@
                 }
         
                 initGame();
+            }
+
+            public static GameManager getInstance() {
+                if (instance == null) {
+                    instance = new GameManager();
+                }
+                return instance;
             }
         
             public void addBall(Ball b) {

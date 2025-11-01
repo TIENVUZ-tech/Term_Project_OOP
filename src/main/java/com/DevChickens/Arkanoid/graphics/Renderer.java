@@ -23,7 +23,7 @@ public class Renderer {
         // Khởi tạo các font này một lần duy nhất.
         try {
             titleFont = new Font("Georgia", Font.BOLD, 72);
-            instructionFont = new Font("Georgia", Font.PLAIN, 32);
+            instructionFont = new Font("Georgia", Font.PLAIN, 30);
             smallFont = new Font("Georgia", Font.PLAIN, 20);
         } catch (Exception e) {
             titleFont = new Font("SansSerif", Font.BOLD, 72);
@@ -83,7 +83,7 @@ public class Renderer {
         g2d.setFont(instructionFont);
         FontMetrics fm = g2d.getFontMetrics();
 
-        int startY = h / 2 - 20;
+        int startY = h / 2 + 20;
         int spacing = 50;
 
         if (isGameInProgress) {

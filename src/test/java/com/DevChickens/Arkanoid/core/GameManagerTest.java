@@ -22,7 +22,7 @@ class GameManagerTest {
      */
     @BeforeEach
     void setUp() {
-        gameManager = new GameManager();
+        gameManager = GameManager.getInstance();
     }
 
     /**
