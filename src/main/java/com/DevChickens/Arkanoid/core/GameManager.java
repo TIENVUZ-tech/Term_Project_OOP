@@ -397,18 +397,12 @@
             private void checkCollisions() {
                 for (Ball ball : new ArrayList<>(balls)) {
                     // Ball vs Paddle
-
-                    if (ball.checkCollision(paddle)) {
-
-                        // Chỉ xử lý bật nếu bóng đang đi xuống
+                    if (CollisionManager.checkCollision(ball, paddle)) {
                         if (ball.getDirectionY() > 0) {
 
-                            ball.bounceOff(paddle);
+                            ball.bounceOff(paddle, null); // Truyền null
 
-                            // Đẩy bóng ra khỏi Paddle ngay lập tức để ngăn bị kẹt
                             ball.setY(paddle.getY() - ball.getHeight());
-
-                            //Âm thanh khi bóng va chạm với paddle
                             soundManager.playSound("paddle_hit", volumePaddle);
                         }
                     }
@@ -416,7 +410,7 @@
                     // Ball vs Bricks
                     for (int i = 0; i < bricks.size(); i++) {
                         Brick b = bricks.get(i);
-                        if (!b.isDestroyed() && ball.checkCollision(b)) {
+                        if (!b.isDestroyed() && CollisionManager.checkCollision(ball, b)) {
                             if (ball.isSuperBall()) {
                                 b.breakBrick();
                             } else {
@@ -427,10 +421,11 @@
                             // Lùi về vị trí trước khi va chạm
                             ball.setX(ball.getX() - ball.getSpeed() * ball.getDirectionX());
                             ball.setY(ball.getY() - ball.getSpeed() * ball.getDirectionY());
-        
-                            // Va chạm và Bật ngược
-                            ball.bounceOff(b);
-        
+
+                            // Lấy hướng va chạm từ Manager và truyền cho bóng.
+                            CollisionManager.CollisionSide side = CollisionManager.getCollisionDirection(ball, b);
+                            ball.bounceOff(b, side);
+
                             if (b.isDestroyed()) {
                                 int points = switch (b.getType().toLowerCase()) {
                                     case "strong" -> 300;

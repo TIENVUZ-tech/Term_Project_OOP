@@ -1,6 +1,7 @@
 package com.DevChickens.Arkanoid.entities;
 
 import com.DevChickens.Arkanoid.graphics.AssetLoader;
+import com.DevChickens.Arkanoid.core.CollisionManager;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -122,7 +123,7 @@ public class Ball extends MovableObject {
      * Phương thức bounceOff() đã được cập nhật.
      * Giờ đây nó xử lý logic nảy cho cả Paddle và Gạch/Tường.
      */
-    public void bounceOff(GameObject other) {
+    public void bounceOff(GameObject other, CollisionManager.CollisionSide side) {
         // VA CHẠM VỚI PADDLE
         if (other instanceof Paddle) {
             Paddle paddle = (Paddle) other;
@@ -147,35 +148,21 @@ public class Ball extends MovableObject {
         } else {
             // VA CHẠM VỚI GẠCH HOẶC TƯỜNG
 
-            // Logic AABB để tìm hướng va chạm (ngang hay dọc). Lấy tọa độ tâm của quả bóng và viên gạch.
-            double ballCentreX = this.getX() + this.getWidth() / 2;
-            double ballCentreY = this.getY() + this.getHeight() / 2;
-            double otherCentreX = other.getX() + other.getWidth() / 2;
-            double otherCentreY = other.getY() + other.getHeight() / 2;
-
-            // Tính khoảng cách giữa 2 tâm.
-            double dx = ballCentreX - otherCentreX;
-            double dy = ballCentreY - otherCentreY;
-
-            // Khoảng cách tối thiểu mà 2 tâm cách nhau trên trục để chúng vừa chạm nhau.
-            double combinedHalfWidth = this.getWidth() / 2 + other.getWidth() / 2;
-            double combinedHalfHeight = this.getHeight() / 2 + other.getHeight() / 2;
-
-            // Tính xem chúng đang lấn vào nhau bao nhiêu trên mỗi trục.
-            double overlapX = combinedHalfWidth - Math.abs(dx);
-            double overlapY = combinedHalfHeight - Math.abs(dy);
-
-            // Đảo ngược hướng.
-            if (overlapX < overlapY) {
-                // Va chạm theo phương ngang -> lật hướng X
-                this.directionX = -this.directionX;
-            } else if (overlapY < overlapX) {
-                // Va chạm theo phương dọc -> lật hướng Y
-                this.directionY = -this.directionY;
-            } else {
-                // Va chạm góc -> lật cả hai
-                this.directionX = -this.directionX;
-                this.directionY = -this.directionY;
+            // Chỉ cần xử lý hậu quả dựa trên 'side'
+            switch (side) {
+                case HORIZONTAL:
+                    // Va chạm theo phương ngang -> lật hướng X
+                    this.directionX = -this.directionX;
+                    break;
+                case VERTICAL:
+                    // Va chạm theo phương dọc -> lật hướng Y
+                    this.directionY = -this.directionY;
+                    break;
+                case CORNER:
+                    // Va chạm góc -> lật cả hai
+                    this.directionX = -this.directionX;
+                    this.directionY = -this.directionY;
+                    break;
             }
             // Gọi hàm này để đảm bảo giá trị tối thiểu của dirY.
             ensureMinimumVerticalSpeed();
