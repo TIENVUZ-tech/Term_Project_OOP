@@ -137,8 +137,8 @@ public class Ball extends MovableObject {
             // Kẹp giá trị
             normalizedIntersectX = Math.max(-1.0, Math.min(1.0, normalizedIntersectX));
 
-            // Tính góc bật (tối đa 60 độ)
-            double maxBounceAngle = Math.toRadians(69); // 0.358
+            // Tính góc bật (tối đa 69 độ)
+            double maxBounceAngle = Math.toRadians(69); //1.204
             double bounceAngle = normalizedIntersectX * maxBounceAngle;
 
             // Set hướng cho quả bóng.

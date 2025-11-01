@@ -36,6 +36,7 @@
             private final int maxRounds = 5;
             private long nextRoundStartTime; // Thời điểm bắt đầu hiển thị "ROUND X"
             private final long ROUND_DISPLAY_DURATION = 2000; // 2 giây
+            private boolean isGameInProgress = false;
 
             private long roundClearStartTime; // Thời điểm thắng màn
             private final long ROUND_CLEAR_DISPLAY_DURATION = 1000; // Chờ 1 giây
@@ -55,6 +56,7 @@
         
             private int mouseX, mouseY; // Tọa độ chuột
             private Rectangle playButtonRect;
+            private Rectangle continueButtonRect;
             private Rectangle highScoresButtonRect;
             private Rectangle exitButtonRect;
             private Rectangle backButtonRect;
@@ -100,6 +102,7 @@
             public GameManager() {
                 renderer = new Renderer();
                 playButtonRect = new Rectangle();
+                continueButtonRect = new Rectangle();
                 highScoresButtonRect = new Rectangle();
                 exitButtonRect = new Rectangle();
                 backButtonRect = new Rectangle();
@@ -172,6 +175,7 @@
                 activePowerUps = new ArrayList<>();
                 isMovingLeft = false;
                 isMovingRight = false;
+                isGameInProgress = false;
             }
         
             private void initRound(int round) {
@@ -222,6 +226,7 @@
                         } else {
                             addScore(this.score);
                             gameState = GameState.VICTORY; // Thắng game
+                            isGameInProgress = false;
                         }
                     }
                     return; // Dừng update mọi thứ khác trong lúc chờ
@@ -266,13 +271,16 @@
                         lastFireTime = now;
                     }
                 }
-        
+
                 java.util.Iterator<PowerUp> iterator = activePowerUps.iterator();
                 while (iterator.hasNext()) {
                     PowerUp p = iterator.next();
+
                     if (p.isExpired()) {
                         for (Ball b : balls) {
                             p.removeEffect(paddle, b);
+                        }
+                        if (p instanceof GunPaddlePowerUp) {
                             offFire();
                         }
                         iterator.remove();
@@ -330,6 +338,7 @@
                         if (lives <= 0) {
                             addScore(this.score);
                             gameState = GameState.GAME_OVER;
+                            isGameInProgress = false;
                         } else {
                             resetBallAndPaddle(); // Reset lại màn (tạo 1 bóng mới)
                         }
@@ -735,7 +744,7 @@
 
             public void onMouseClick(int x, int y) {
                 // Lọc sự kiện click dựa trên TRẠNG THÁI GAME
-        
+
                 if (gameState == GameState.PLAYING) {
                     if (pauseButtonRect.contains(x, y)) {
                         onPausePressed(); // Gọi hàm pause/resume có sẵn
@@ -747,36 +756,77 @@
                     } else if (pauseContinueButton.contains(x, y)) {
                         onPausePressed();
                     } else if (pauseRestartButton.contains(x, y)) {
-                        initRound(currentRound); // Tải lại round hiện tại
+                        initRound(currentRound);
                         gameState = GameState.NEXT_ROUND;
                         nextRoundStartTime = System.currentTimeMillis();
+                        isGameInProgress = true;
                     } else if (pauseSettingsButtonRect.contains(x, y)) {
                         previousGameState = GameState.PAUSED;
                         currentSettingsPage = SettingsPage.MAIN;
                         gameState = GameState.SETTINGS;
 
                     } else if (pauseExitButton.contains(x, y)) {
-                        initGame();
+                        gameState = GameState.MENU;
+                        soundManager.loopSound("bgm_menu", volumeBGM);
                     }
                 }
-                else if (gameState == GameState.MENU) {
-                    if (playButtonRect.contains(x, y)) {
-                        gameState = GameState.NEXT_ROUND;
-                        nextRoundStartTime = System.currentTimeMillis();
-                    } else if (highScoresButtonRect.contains(x, y)) {
-                        soundManager.stopSound("bgm_menu");
-                        this.highScores = loadScores();
-                        gameState = GameState.HIGH_SCORES;
-                    } else if (menuSettingsButtonRect.contains(x, y)) {
-                        soundManager.stopSound("bgm_menu");
-                        previousGameState = GameState.MENU;
-                        currentSettingsPage = SettingsPage.MAIN;
-                        gameState = GameState.SETTINGS;
 
-                    } else if (exitButtonRect.contains(x, y)) {
-                        System.exit(0);
+                else if (gameState == GameState.MENU) {
+
+                    if (isGameInProgress) {
+                        // TH1: Nếu đang có game chơi dở thì hiện cả continue và new game.
+
+                        if (continueButtonRect.contains(x, y)) {
+                            gameState = GameState.PAUSED;
+                            soundManager.stopSound("bgm_menu");
+                        }
+                        else if (playButtonRect.contains(x, y)) {
+                            initGame();
+
+                            gameState = GameState.NEXT_ROUND;
+                            nextRoundStartTime = System.currentTimeMillis();
+                            isGameInProgress = true; // Cần đặt lại cờ vì init game set về false.
+                        }
+                        else if (highScoresButtonRect.contains(x, y)) {
+                            soundManager.stopSound("bgm_menu");
+                            this.highScores = loadScores();
+                            gameState = GameState.HIGH_SCORES;
+                        }
+                        else if (menuSettingsButtonRect.contains(x, y)) {
+                            soundManager.stopSound("bgm_menu");
+                            previousGameState = GameState.MENU;
+                            currentSettingsPage = SettingsPage.MAIN;
+                            gameState = GameState.SETTINGS;
+                        }
+                        else if (exitButtonRect.contains(x, y)) {
+                            System.exit(0);
+                        }
+
+                    } else {
+                        // Trường hợp 2: Chơi mới nên chỉ hiện Play.
+
+                        if (playButtonRect.contains(x, y)) {
+                            gameState = GameState.NEXT_ROUND;
+                            nextRoundStartTime = System.currentTimeMillis();
+                            isGameInProgress = true;
+                        }
+                        else if (highScoresButtonRect.contains(x, y)) {
+                            soundManager.stopSound("bgm_menu");
+                            this.highScores = loadScores();
+                            gameState = GameState.HIGH_SCORES;
+                        }
+                        else if (menuSettingsButtonRect.contains(x, y)) {
+                            soundManager.stopSound("bgm_menu");
+                            previousGameState = GameState.MENU;
+                            currentSettingsPage = SettingsPage.MAIN;
+                            gameState = GameState.SETTINGS;
+                        }
+                        else if (exitButtonRect.contains(x, y)) {
+                            System.exit(0);
+                        }
                     }
                 }
+
                 else if (gameState == GameState.HIGH_SCORES) {
                     if (backButtonRect.contains(x, y)) {
                         gameState = GameState.MENU;
@@ -784,6 +834,7 @@
                     }
                 }
                 else if (gameState == GameState.GAME_OVER || gameState == GameState.VICTORY) {
+                    // Click bất kỳ để quay về Menu
                     initGame();
                 }
                 else if (gameState == GameState.SETTINGS) {
@@ -792,9 +843,8 @@
                             if (settingsSoundButtonRect.contains(x, y)) {
                                 currentSettingsPage = SettingsPage.SOUND;
                             } else if (settingsBackRect.contains(x, y)) {
-                                gameState = previousGameState; // Quay lại (PAUSED hoặc MENU)
+                                gameState = previousGameState;
 
-                                // Phát lại nhạc khi thoát lại menu
                                 if (gameState == GameState.MENU) {
                                     soundManager.loopSound("bgm_menu", volumeBGM);
                                 }
@@ -876,7 +926,9 @@
                     case MENU:
                         renderer.drawMenu(g, GAME_WIDTH, GAME_HEIGHT, mouseX, mouseY,
                                 playButtonRect, highScoresButtonRect,
-                                menuSettingsButtonRect, exitButtonRect);
+                                menuSettingsButtonRect, exitButtonRect,
+                                isGameInProgress,
+                                continueButtonRect);
                         break;
                     case PLAYING:
                     case PAUSED:

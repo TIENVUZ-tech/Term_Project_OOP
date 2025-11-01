@@ -64,9 +64,10 @@ public class Renderer {
 
     public void drawMenu(Graphics g, int w, int h, int mouseX, int mouseY,
                          Rectangle playRect, Rectangle highScoresRect,
-                         Rectangle settingsRect, Rectangle exitRect) {
+                         Rectangle settingsRect, Rectangle exitRect,
+                         boolean isGameInProgress, Rectangle continueRect) {
 
-        // 1. Vẽ nền
+        // Vẽ nền
         if (AssetLoader.MENU_BACKGROUND != null) {
             g.drawImage(AssetLoader.MENU_BACKGROUND, 0, 0, w, h, null);
         } else {
@@ -74,66 +75,112 @@ public class Renderer {
             g.fillRect(0, 0, w, h);
         }
 
-        // 2. Dùng Graphics2D
+        // Dùng Graphics2D
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        // 3. Vẽ Tiêu đề (đẩy lên cao một chút)
+        // Vẽ Tiêu đề
         g2d.setFont(titleFont);
         g2d.setColor(Color.WHITE);
         String title = "ARKANOID";
         FontMetrics fmTitle = g2d.getFontMetrics();
         int titleX = (w - fmTitle.stringWidth(title)) / 2;
-        int titleY = h / 2 - 70;
+        int titleY = h / 2 - 120;
         g2d.drawString(title, titleX, titleY);
 
-        // 4. VẼ CÁC NÚT BẤM
+        // VẼ CÁC NÚT BẤM
         g2d.setFont(instructionFont);
         FontMetrics fm = g2d.getFontMetrics();
 
-        // Tọa độ "PLAY" (Nút 1)
-        String textPlay = "PLAY";
-        int playX = (w - fm.stringWidth(textPlay)) / 2;
-        int playY = h / 2 + 20;
+        int startY = h / 2 - 20;
+        int spacing = 45;
 
-        // Tọa độ "HIGH SCORES" (Nút 2)
-        String textScores = "HIGH SCORES";
-        int scoresX = (w - fm.stringWidth(textScores)) / 2;
-        int scoresY = playY + 50;
+        if (isGameInProgress) {
+            // TH1: Có game đang chơi dở.
+            // Nút 1: "CONTINUE"
+            String textContinue = "CONTINUE";
+            int continueX = (w - fm.stringWidth(textContinue)) / 2;
+            int continueY = startY;
+            continueRect.setBounds(continueX, continueY - fm.getAscent(), fm.stringWidth(textContinue), fm.getHeight());
+            if (continueRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+            else g2d.setColor(Color.WHITE);
+            g2d.drawString(textContinue, continueX, continueY);
 
-        // Tọa độ "SETTINGS" ( Nút 3)
-        String textSettings = "SETTINGS";
-        int settingsX = (w - fm.stringWidth(textSettings)) / 2;
-        int settingsY = scoresY + 50;
+            // Nút 2: "NEW GAME"
+            String textPlay = "NEW GAME";
+            int playX = (w - fm.stringWidth(textPlay)) / 2;
+            int playY = continueY + spacing;
+            playRect.setBounds(playX, playY - fm.getAscent(), fm.stringWidth(textPlay), fm.getHeight());
+            if (playRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+            else g2d.setColor(Color.WHITE);
+            g2d.drawString(textPlay, playX, playY);
 
-        // Tọa độ "EXIT" (Nút 3)
-        String textExit = "EXIT";
-        int exitX = (w - fm.stringWidth(textExit)) / 2;
-        int exitY = settingsY + 50;
+            // Nút 3: "HIGH SCORES"
+            String textScores = "HIGH SCORES";
+            int scoresX = (w - fm.stringWidth(textScores)) / 2;
+            int scoresY = playY + spacing;
+            highScoresRect.setBounds(scoresX, scoresY - fm.getAscent(), fm.stringWidth(textScores), fm.getHeight());
+            if (highScoresRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+            else g2d.setColor(Color.WHITE);
+            g2d.drawString(textScores, scoresX, scoresY);
 
-        // Vẽ PLAY
-        playRect.setBounds(playX, playY - fm.getAscent(), fm.stringWidth(textPlay), fm.getHeight());
-        if (playRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW); // Highlight
-        else g2d.setColor(Color.WHITE);
-        g2d.drawString(textPlay, playX, playY);
+            // Nút 4: "SETTINGS"
+            String textSettings = "SETTINGS";
+            int settingsX = (w - fm.stringWidth(textSettings)) / 2;
+            int settingsY = scoresY + spacing;
+            settingsRect.setBounds(settingsX, settingsY - fm.getAscent(), fm.stringWidth(textSettings), fm.getHeight());
+            if (settingsRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+            else g2d.setColor(Color.WHITE);
+            g2d.drawString(textSettings, settingsX, settingsY);
 
-        // Vẽ HIGH SCORES
-        highScoresRect.setBounds(scoresX, scoresY - fm.getAscent(), fm.stringWidth(textScores), fm.getHeight());
-        if (highScoresRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW); // Highlight
-        else g2d.setColor(Color.WHITE);
-        g2d.drawString(textScores, scoresX, scoresY);
+            // Nút 5: "EXIT"
+            String textExit = "EXIT";
+            int exitX = (w - fm.stringWidth(textExit)) / 2;
+            int exitY = settingsY + spacing;
+            exitRect.setBounds(exitX, exitY - fm.getAscent(), fm.stringWidth(textExit), fm.getHeight());
+            if (exitRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+            else g2d.setColor(Color.WHITE);
+            g2d.drawString(textExit, exitX, exitY);
 
-        // Vẽ SETTINGS
-        settingsRect.setBounds(settingsX, settingsY - fm.getAscent(), fm.stringWidth(textSettings), fm.getHeight());
-        if (settingsRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
-        else g2d.setColor(Color.WHITE);
-        g2d.drawString(textSettings, settingsX, settingsY);
+        } else {
+            // TH2: Game mới.
 
-        // Vẽ EXIT
-        exitRect.setBounds(exitX, exitY - fm.getAscent(), fm.stringWidth(textExit), fm.getHeight());
-        if (exitRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW); // Highlight
-        else g2d.setColor(Color.WHITE);
-        g2d.drawString(textExit, exitX, exitY);
+            // Nút 1: "PLAY"
+            String textPlay = "PLAY";
+            int playX = (w - fm.stringWidth(textPlay)) / 2;
+            int playY = startY;
+            playRect.setBounds(playX, playY - fm.getAscent(), fm.stringWidth(textPlay), fm.getHeight());
+            if (playRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW); // Highlight
+            else g2d.setColor(Color.WHITE);
+            g2d.drawString(textPlay, playX, playY);
+
+            // Nút 2: "HIGH SCORES"
+            String textScores = "HIGH SCORES";
+            int scoresX = (w - fm.stringWidth(textScores)) / 2;
+            int scoresY = playY + spacing;
+            highScoresRect.setBounds(scoresX, scoresY - fm.getAscent(), fm.stringWidth(textScores), fm.getHeight());
+            if (highScoresRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW); // Highlight
+            else g2d.setColor(Color.WHITE);
+            g2d.drawString(textScores, scoresX, scoresY);
+
+            // Nút 3: "SETTINGS"
+            String textSettings = "SETTINGS";
+            int settingsX = (w - fm.stringWidth(textSettings)) / 2;
+            int settingsY = scoresY + spacing;
+            settingsRect.setBounds(settingsX, settingsY - fm.getAscent(), fm.stringWidth(textSettings), fm.getHeight());
+            if (settingsRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW);
+            else g2d.setColor(Color.WHITE);
+            g2d.drawString(textSettings, settingsX, settingsY);
+
+            // Nút 4: "EXIT"
+            String textExit = "EXIT";
+            int exitX = (w - fm.stringWidth(textExit)) / 2;
+            int exitY = settingsY + spacing;
+            exitRect.setBounds(exitX, exitY - fm.getAscent(), fm.stringWidth(textExit), fm.getHeight());
+            if (exitRect.contains(mouseX, mouseY)) g2d.setColor(Color.YELLOW); // Highlight
+            else g2d.setColor(Color.WHITE);
+            g2d.drawString(textExit, exitX, exitY);
+        }
     }
 
     public void drawGameBackground(Graphics g, int w, int h, int round) {
@@ -169,7 +216,7 @@ public class Renderer {
         g2d.setFont(instructionFont);
         FontMetrics fm = g2d.getFontMetrics();
 
-        // --- Vẽ Nút "Continue" ---
+        // Vẽ Nút Continue
         String textContinue = "Continue";
         // Căn giữa text bên trong Rectangle
         int continueX = continueBtn.x + (continueBtn.width - fm.stringWidth(textContinue)) / 2;
@@ -355,14 +402,14 @@ public class Renderer {
     public void drawHighScores(Graphics g, int w, int h, int mouseX, int mouseY,
                                Rectangle backRect, List<Integer> scores) {
 
-        // 1. Vẽ nền (dùng chung nền round 1)
-        drawGameBackground(g, w, h, 1);
+        //  Vẽ nền
+        drawGameBackground(g, w, h, 5);
 
-        // 2. Dùng Graphics2D
+        //  Dùng Graphics2D
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        // 3. Vẽ Tiêu đề
+        //  Vẽ Tiêu đề
         g2d.setFont(titleFont);
         g2d.setColor(Color.YELLOW);
         String title = "HIGH SCORES";
@@ -371,7 +418,7 @@ public class Renderer {
         int titleY = 100;
         g2d.drawString(title, titleX, titleY);
 
-        // 4. Vẽ danh sách điểm
+        //  Vẽ danh sách điểm
         g2d.setFont(instructionFont);
         g2d.setColor(Color.WHITE);
         FontMetrics fm = g2d.getFontMetrics();
@@ -392,12 +439,12 @@ public class Renderer {
             }
         }
 
-        // 5. --- Vẽ nút "BACK" (dùng chuột) ---
+        // Vẽ nút BACK
         String textBack = "BACK";
         int backX = (w - fm.stringWidth(textBack)) / 2;
         int backY = h - 70; // Đặt ở gần đáy
 
-        // Cập nhật "nút"
+        // Cập nhật nút
         backRect.setBounds(backX, backY - fm.getAscent(), fm.stringWidth(textBack), fm.getHeight());
 
         // Vẽ highlight
