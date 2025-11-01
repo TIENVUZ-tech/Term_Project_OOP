@@ -6,6 +6,7 @@
         import com.DevChickens.Arkanoid.enums.GameState;
         import com.DevChickens.Arkanoid.graphics.Renderer;
         import com.DevChickens.Arkanoid.entities.effects.Explosion;
+        import com.DevChickens.Arkanoid.core.CollisionManager;
         import java.util.Queue;
         import java.util.LinkedList;
         import java.util.Set;
@@ -1037,5 +1038,46 @@
                 } catch (IOException e) {
                     System.err.println("Lỗi khi lưu điểm: " + e.getMessage());
                 }
+            }
+
+            // Các hàm getter/setter để test.
+            public GameState getGameState() {
+                return this.gameState;
+            }
+
+            public void setGameState(GameState gameState) {
+                this.gameState = gameState;
+            }
+
+            public int getLives() {
+                return this.lives;
+            }
+
+            public void setLives(int lives) {
+                this.lives = lives;
+            }
+
+            public int getScore() {
+                return this.score;
+            }
+
+            public int getCurrentRound() {
+                return this.currentRound;
+            }
+
+            public List<Ball> getBalls() {
+                return this.balls;
+            }
+
+            public List<Brick> getBricks() {
+                return this.bricks;
+            }
+
+            public boolean isBallLaunched() {
+                return this.isBallLaunched;
+            }
+
+            public void setIsBallLaunched(boolean isBallLaunched) {
+                this.isBallLaunched = isBallLaunched;
             }
         }
