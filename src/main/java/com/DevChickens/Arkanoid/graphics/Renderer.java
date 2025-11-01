@@ -22,9 +22,9 @@ public class Renderer {
     public Renderer() {
         // Khởi tạo các font này một lần duy nhất.
         try {
-            titleFont = new Font("Arial", Font.BOLD, 72);
-            instructionFont = new Font("Arial", Font.PLAIN, 28);
-            smallFont = new Font("Arial", Font.PLAIN, 20);
+            titleFont = new Font("Georgia", Font.BOLD, 72);
+            instructionFont = new Font("Georgia", Font.PLAIN, 32);
+            smallFont = new Font("Georgia", Font.PLAIN, 20);
         } catch (Exception e) {
             titleFont = new Font("SansSerif", Font.BOLD, 72);
             instructionFont = new Font("SansSerif", Font.PLAIN, 28);
@@ -79,21 +79,12 @@ public class Renderer {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        // Vẽ Tiêu đề
-        g2d.setFont(titleFont);
-        g2d.setColor(Color.WHITE);
-        String title = "ARKANOID";
-        FontMetrics fmTitle = g2d.getFontMetrics();
-        int titleX = (w - fmTitle.stringWidth(title)) / 2;
-        int titleY = h / 2 - 120;
-        g2d.drawString(title, titleX, titleY);
-
         // VẼ CÁC NÚT BẤM
         g2d.setFont(instructionFont);
         FontMetrics fm = g2d.getFontMetrics();
 
         int startY = h / 2 - 20;
-        int spacing = 45;
+        int spacing = 50;
 
         if (isGameInProgress) {
             // TH1: Có game đang chơi dở.
