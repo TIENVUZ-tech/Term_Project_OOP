@@ -4,16 +4,16 @@ import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.entities.Paddle;
 import com.DevChickens.Arkanoid.entities.Ball;
 
-/*
+/**
  * PowerUp này giúp cho paddle đổi hình dạng, trở thành hình dạng mới
  * kèm theo hai chiếc súng, khi đạn gặp gạch thì sẽ làm cho gạch bị vỡ.
  */
 public class GunPaddlePowerUp extends PowerUp {
 
-    /* Tham số chiều cao và chiều rộng của vật thể. */
+    // Tham số chiều cao và chiều rộng của vật thể.
     private static final int GUNPADDLEPOWERUP_WIDTH = 60;
     private static final int GUNPADDLEPOWERUP_HEIGHT = 40;
-    /* Đường dẫn tới file ảnh. */
+    // Đường dẫn tới file ảnh.
     private static final String FILEPATH = "/images/GunPaddlePowerUp.png";
 
     /**
@@ -24,8 +24,8 @@ public class GunPaddlePowerUp extends PowerUp {
      * @param duration (thời gian tồn tại).
      */
     public GunPaddlePowerUp(double x, double y, String type, long duration) {
-        super(x, y, type, duration, FILEPATH, 
-        GUNPADDLEPOWERUP_WIDTH, GUNPADDLEPOWERUP_HEIGHT);
+        super(x, y, type, duration, FILEPATH,
+                GUNPADDLEPOWERUP_WIDTH, GUNPADDLEPOWERUP_HEIGHT);
     }
 
     @Override
