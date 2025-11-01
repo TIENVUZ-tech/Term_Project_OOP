@@ -2,6 +2,7 @@ package com.DevChickens.Arkanoid.entities;
 
 import com.DevChickens.Arkanoid.graphics.AssetLoader;
 import com.DevChickens.Arkanoid.core.CollisionManager;
+import com.DevChickens.Arkanoid.core.GameManager;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -17,11 +18,12 @@ public class Ball extends MovableObject {
     private double speed;           // Tốc độ của bóng (pixel/frame)
     private double directionX;
     private double directionY;
+    private boolean isSuperBall = false;
+    private boolean isDestroyed = false;
 
     private BufferedImage normalBall;
     private BufferedImage superBall;
     private BufferedImage image;
-    private boolean isSuperBall = false;
 
     /**
      * Phương thức khởi tạo Ball.
@@ -86,6 +88,10 @@ public class Ball extends MovableObject {
         return this.isSuperBall;
     }
 
+    public boolean isDestroyed() {
+        return this.isDestroyed;
+    }
+
     public BufferedImage getImage() {
         return this.image;
     }
@@ -100,7 +106,12 @@ public class Ball extends MovableObject {
 
     @Override
     public void update() {
+        // Cập nhật vị trí của Ball
         move();
+        // Kiểm tra va chạm với tường trên
+        if (this.getY() > GameManager.GAME_HEIGHT) {
+            this.destroy();
+        }
     }
 
     @Override
@@ -189,15 +200,31 @@ public class Ball extends MovableObject {
         }
     }
 
+    /**
+     * Phương thức destroy để phá hủy bóng.
+     */
+    public void destroy() {
+        this.isDestroyed = true;
+    }
+    /**
+     * Phương thức multiplySpeed để tăng tốc cho bóng.
+     * @param factor (hệ số tăng tốc).
+     */
     public void multiplySpeed(double factor) {
         this.speed *= factor;
     }
 
+    /**
+     * Phương thức kích hoạt SuperBall.
+     */
     public void activateSuperBall() {
         this.isSuperBall = true;
         this.image = this.superBall;
     }
 
+    /**
+     * Phương thức hủy kích hoạt SuperBall.
+     */
     public void deactivateSuperBall() {
         this.isSuperBall = false;
         this.image = this.normalBall;
