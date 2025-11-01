@@ -6,7 +6,6 @@ package com.DevChickens.Arkanoid.enums;
  */
 public enum GameState {
     MENU,
-    LEVEL_SELECT,
     PLAYING,
     PAUSED,
     GAME_OVER,

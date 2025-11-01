@@ -63,9 +63,6 @@
             private Rectangle pauseSettingsButtonRect;
             private Rectangle menuSettingsButtonRect;
         
-            private Rectangle[] levelButtonRects;
-            private Rectangle levelSelectBackRect;
-        
             private Rectangle pauseContinueButton;
             private Rectangle pauseRestartButton;
             private Rectangle pauseExitButton;
@@ -76,12 +73,12 @@
             private float volumeBrick = 0.7f;     // Mặc định 70%
             private float volumeWall = 0.6f;      // Mặc định 60%
             private float volumeExplosion = 0.9f; // Mặc định 90%
-            // --- BIẾN TRẠNG THÁI UI SETTINGS ---
+            // BIẾN TRẠNG THÁI UI SETTINGS
             private GameState previousGameState; // Để biết quay lại màn hình nào
             private enum SettingsPage { MAIN, SOUND, CONTROLS } // Phân cấp menu
             private SettingsPage currentSettingsPage = SettingsPage.MAIN;
 
-            // --- BIẾN RECTANGLE CHO UI ---
+            // BIẾN RECTANGLE CHO UI
             private Rectangle settingsSoundButtonRect;
             private Rectangle settingsControlsButtonRect;
             private Rectangle settingsBackRect;
@@ -123,31 +120,6 @@
                 pauseRestartButton = new Rectangle(centerX, startY_Pause + (buttonHeight + gap), buttonWidth, buttonHeight);
                 pauseSettingsButtonRect = new Rectangle(centerX, startY_Pause + (buttonHeight + gap) * 2, buttonWidth, buttonHeight);
                 pauseExitButton = new Rectangle(centerX, startY_Pause + (buttonHeight + gap) * 3, buttonWidth, buttonHeight);
-        
-                // --- KHỞI TẠO NÚT CHỌN LEVEL ---
-                levelSelectBackRect = new Rectangle();
-                levelButtonRects = new Rectangle[maxRounds];
-
-                int thumbWidth = 160;
-                int thumbHeight = 240;
-                int lvlgap = 15;
-
-                // Tính toán khoảng cách (padding)
-                int totalImagesWidth = (thumbWidth * maxRounds) + (lvlgap * (maxRounds - 1));
-                int startX = (GAME_WIDTH - totalImagesWidth) / 2;
-
-                // Căn giữa 1 hàng theo chiều dọc
-                int rowY = (GAME_HEIGHT / 2) - (thumbHeight / 2) + 40;
-
-                for (int i = 0; i < maxRounds; i++) {
-                    // Vị trí X = (vị trí padding trước nó) + (vị trí ảnh trước nó)
-                    int x = startX + i * (thumbWidth + gap);
-                    levelButtonRects[i] = new Rectangle(x, rowY, thumbWidth, thumbHeight);
-                }
-                int backBtnWidth = 100;
-                int backBtnHeight = 40;
-                int backPadding = 20; // Khoảng cách từ lề
-                levelSelectBackRect = new Rectangle(backPadding, backPadding, backBtnWidth, backBtnHeight);
 
                 // KHỞI TẠO RECT CHO SETTINGS
                 int settingsBtnWidth = 300;
@@ -788,9 +760,8 @@
                 }
                 else if (gameState == GameState.MENU) {
                     if (playButtonRect.contains(x, y)) {
-                        gameState = GameState.LEVEL_SELECT;
-                        // gameState = GameState.NEXT_ROUND;
-                        // nextRoundStartTime = System.currentTimeMillis();
+                        gameState = GameState.NEXT_ROUND;
+                        nextRoundStartTime = System.currentTimeMillis();
                     } else if (highScoresButtonRect.contains(x, y)) {
                         this.highScores = loadScores();
                         gameState = GameState.HIGH_SCORES;
@@ -801,23 +772,6 @@
 
                     } else if (exitButtonRect.contains(x, y)) {
                         System.exit(0);
-                    }
-                }
-                else if (gameState == GameState.LEVEL_SELECT) {
-                    // Kiểm tra xem có click nút "Back" không
-                    if (levelSelectBackRect.contains(x, y)) {
-                        gameState = GameState.MENU;
-                    }
-        
-                    // Kiểm tra 5 nút chọn level
-                    for (int i = 0; i < levelButtonRects.length; i++) {
-                        if (levelButtonRects[i].contains(x, y)) {
-                            currentRound = i + 1; // Nút 0 -> Round 1, Nút 1 -> Round 2, ...
-                            initRound(currentRound);
-                            gameState = GameState.NEXT_ROUND;
-                            nextRoundStartTime = System.currentTimeMillis();
-                            break; // Đã tìm thấy, thoát vòng lặp
-                        }
                     }
                 }
                 else if (gameState == GameState.HIGH_SCORES) {
@@ -913,10 +867,6 @@
                         renderer.drawMenu(g, GAME_WIDTH, GAME_HEIGHT, mouseX, mouseY,
                                 playButtonRect, highScoresButtonRect,
                                 menuSettingsButtonRect, exitButtonRect);
-                        break;
-                    case LEVEL_SELECT:
-                        renderer.drawLevelSelect(g, GAME_WIDTH, GAME_HEIGHT, mouseX, mouseY,
-                                levelButtonRects, levelSelectBackRect, maxRounds);
                         break;
                     case PLAYING:
                     case PAUSED:
