@@ -137,7 +137,7 @@ public class Ball extends MovableObject {
             normalizedIntersectX = Math.max(-1.0, Math.min(1.0, normalizedIntersectX));
 
             // Tính góc bật (tối đa 60 độ)
-            double maxBounceAngle = Math.toRadians(60); // 1.047 radians
+            double maxBounceAngle = Math.toRadians(69); // 0.358
             double bounceAngle = normalizedIntersectX * maxBounceAngle;
 
             // Set hướng cho quả bóng.
@@ -176,6 +176,28 @@ public class Ball extends MovableObject {
                 // Va chạm góc -> lật cả hai
                 this.directionX = -this.directionX;
                 this.directionY = -this.directionY;
+            }
+            // Gọi hàm này để đảm bảo giá trị tối thiểu của dirY.
+            ensureMinimumVerticalSpeed();
+        }
+    }
+
+    /**
+     * Hàm để ngăn directionY bị kẹt ở 0 .
+     * Đảm bảo bóng luôn có một vận tốc dọc tối thiểu.
+     */
+    public void ensureMinimumVerticalSpeed() {
+
+        final double MIN_VERTICAL_DIRECTION = 0.3; // Tương đương 17,5 độ
+
+        if (Math.abs(this.getDirectionY()) < MIN_VERTICAL_DIRECTION) {
+            // Nếu nó gần bằng 0, ép nó theo một giá trị tối thiểu
+            if (this.getDirectionY() >= 0) {
+                // Nếu đang đi xuống, ép nó đi xuống
+                this.setDirectionY(MIN_VERTICAL_DIRECTION);
+            } else {
+                // Nếu đang đi lên, ép nó đi lên
+                this.setDirectionY(-MIN_VERTICAL_DIRECTION);
             }
         }
     }

@@ -396,6 +396,9 @@
                     if (ball.getY() < 0) {
                         ball.setY(0); // Đẩy bóng về sát lề
                         ball.setDirectionY(Math.abs(ball.getDirectionY()));
+
+                        // Hàm đảm bảo cho dirY luôn có giá trị tối thiểu là 17.5 độ.
+                        ball.ensureMinimumVerticalSpeed();
                     }
                 }
             }
