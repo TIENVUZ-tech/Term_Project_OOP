@@ -71,7 +71,7 @@
             private Rectangle pauseExitButton;
 
             // BIẾN LƯU ÂM LƯỢNG
-            private float volumeBGM = 0.5f;
+            private float volumeBGM = 0.2f;
             private float volumePaddle = 0.5f;
             private float volumeBrick = 0.5f;
             private float volumeWall = 0.5f;

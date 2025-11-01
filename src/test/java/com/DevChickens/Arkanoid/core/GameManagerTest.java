@@ -23,6 +23,7 @@ class GameManagerTest {
     @BeforeEach
     void setUp() {
         gameManager = GameManager.getInstance();
+        gameManager.initGame();
     }
 
     /**
