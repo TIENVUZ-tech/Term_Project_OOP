@@ -108,10 +108,32 @@ public class Ball extends MovableObject {
     public void update() {
         // Cập nhật vị trí của Ball
         move();
-        // Kiểm tra va chạm với tường trên
-        if (this.getY() > GameManager.GAME_HEIGHT) {
+
+        // Kiểm tra va chạm với tường dưới
+        if (this.getY() + this.getHeight() > GameManager.GAME_HEIGHT) {
             this.destroy();
         }
+
+        // Va chạm tường trên
+        if (this.getY() < 0) {
+            this.setY(0); // Đặt lại vị trí để bóng không bị kẹt
+            this.bounceOff(null, CollisionManager.CollisionSide.VERTICAL); 
+        }
+
+        // Va chạm tường trái
+        if (this.getX() < 0) {
+            this.setX(0); // Đặt lại vị trí
+            this.bounceOff(null, CollisionManager.CollisionSide.HORIZONTAL);
+        }
+        
+        // Va chạm tường phải
+        if (this.getX() + this.getWidth() > GameManager.GAME_WIDTH) {
+            this.setX(GameManager.GAME_WIDTH - this.getWidth()); // Đặt lại vị trí
+            this.bounceOff(null, CollisionManager.CollisionSide.HORIZONTAL);
+        }
+
+        // Thiết lập góc nảy tối thiểu
+        this.ensureMinimumVerticalSpeed();
     }
 
     @Override

@@ -318,8 +318,6 @@
                         bullet.update();
                     }
 
-                    checkWallCollisions();
-
                     checkCollisions();
 
                     java.util.Iterator<Ball> ballIterator = balls.iterator();
@@ -370,33 +368,6 @@
         
                         mainBall.setX(ballNewX);
                         mainBall.setY(ballNewY);
-                    }
-                }
-            }
-            /**
-             * Xử lý va chạm giữa bóng và các cạnh của khung trò chơi (Tường).
-             */
-            private void checkWallCollisions() {
-                for (Ball ball : balls) {
-                    // Va chạm Cạnh Trái
-                    if (ball.getX() < 0) {
-                        ball.setX(0); // Đẩy bóng về sát lề
-                        ball.setDirectionX(Math.abs(ball.getDirectionX())); // Đảo hướng bóng.
-                    }
-        
-                    // Va chạm Cạnh Phải
-                    if (ball.getX() + ball.getWidth() > GAME_WIDTH) {
-                        ball.setX(GAME_WIDTH - ball.getWidth()); // Đẩy bóng về sát lề
-                        ball.setDirectionX(-Math.abs(ball.getDirectionX()));
-                    }
-        
-                    // Va chạm Cạnh Trên
-                    if (ball.getY() < 0) {
-                        ball.setY(0); // Đẩy bóng về sát lề
-                        ball.setDirectionY(Math.abs(ball.getDirectionY()));
-
-                        // Hàm đảm bảo cho dirY luôn có giá trị tối thiểu là 17.5 độ.
-                        ball.ensureMinimumVerticalSpeed();
                     }
                 }
             }
