@@ -194,7 +194,7 @@ public class PaddleTest {
             }, "Constructor phải ném RuntimeException nếu tải ảnh lỗi");
 
             // Kiểm tra thông báo
-            assertTrue(exception.getMessage().contains("Không thể tải ảnh cho Padlle"));
+            assertTrue(exception.getMessage().contains("Không thể tải ảnh cho Paddle"));
         }
     }
 }
