@@ -101,7 +101,7 @@ public class Renderer {
         int scoresX = (w - fm.stringWidth(textScores)) / 2;
         int scoresY = playY + 50;
 
-        // Tọa độ "SETTINGS"
+        // Tọa độ "SETTINGS" ( Nút 3)
         String textSettings = "SETTINGS";
         int settingsX = (w - fm.stringWidth(textSettings)) / 2;
         int settingsY = scoresY + 50;
@@ -109,10 +109,7 @@ public class Renderer {
         // Tọa độ "EXIT" (Nút 3)
         String textExit = "EXIT";
         int exitX = (w - fm.stringWidth(textExit)) / 2;
-        int exitY = scoresY + 50;
-
-        // --- Cập nhật "nút" (Rect) và vẽ ---
-        // (Tính toán vị trí chính xác của chữ để bắt click)
+        int exitY = settingsY + 50;
 
         // Vẽ PLAY
         playRect.setBounds(playX, playY - fm.getAscent(), fm.stringWidth(textPlay), fm.getHeight());
