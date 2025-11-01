@@ -78,7 +78,7 @@ public class Paddle extends MovableObject {
             // In ra lỗi gốc.
             e.printStackTrace();
             // Ném ra lỗi để dừng game.
-            throw new RuntimeException("Không thể tải ảnh cho Padlle", e);
+            throw new RuntimeException("Không thể tải ảnh cho Paddle", e);
         }
         this.baseWidth = targetWidth; // lưu lại kích thước gốc.
         this.expandEffectCount = 0; 

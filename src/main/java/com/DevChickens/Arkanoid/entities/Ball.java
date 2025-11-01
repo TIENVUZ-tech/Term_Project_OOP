@@ -148,7 +148,7 @@ public class Ball extends MovableObject {
         } else {
             // VA CHẠM VỚI GẠCH HOẶC TƯỜNG
 
-            // Chỉ cần xử lý hậu quả dựa trên 'side'
+            // Chỉ cần xử lý hậu quả dựa trên side
             switch (side) {
                 case HORIZONTAL:
                     // Va chạm theo phương ngang -> lật hướng X
