@@ -1,6 +1,5 @@
 package com.DevChickens.Arkanoid.entities.powerups;
 
-import java.awt.Graphics;
 import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.entities.Paddle;
 import com.DevChickens.Arkanoid.entities.Ball;

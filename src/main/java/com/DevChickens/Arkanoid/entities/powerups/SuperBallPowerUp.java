@@ -4,8 +4,6 @@ import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.entities.Ball;
 import com.DevChickens.Arkanoid.entities.Paddle;
 
-import java.awt.Graphics;
-
 /**
  * Loại PowerUp này sẽ làm cho bóng mạnh hơn.
  * Bất kỳ loạt gạch nào chạm vào bóng sẽ bị vỡ

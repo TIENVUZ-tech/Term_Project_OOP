@@ -3,7 +3,6 @@ package com.DevChickens.Arkanoid.entities.powerups;
 import com.DevChickens.Arkanoid.core.GameManager;
 import com.DevChickens.Arkanoid.entities.Ball;
 import com.DevChickens.Arkanoid.entities.Paddle;
-import java.awt.Graphics;
 
 public class MultiBallPowerUp extends PowerUp {
 

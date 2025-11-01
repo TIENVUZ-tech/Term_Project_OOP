@@ -83,7 +83,6 @@
 
             // BIẾN RECTANGLE CHO UI
             private Rectangle settingsSoundButtonRect;
-            private Rectangle settingsControlsButtonRect;
             private Rectangle settingsBackRect;
 
             private Rectangle sliderBgmRect;

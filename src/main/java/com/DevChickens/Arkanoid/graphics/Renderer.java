@@ -7,9 +7,6 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.awt.Rectangle;
 
-import java.awt.image.BufferedImage;
-import java.awt.BasicStroke;
-
 /**
  * Renderer vẽ toàn bộ đối tượng và màn hình của Arkanoid.
  */
