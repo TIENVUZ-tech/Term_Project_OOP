@@ -6,7 +6,6 @@
         import com.DevChickens.Arkanoid.enums.GameState;
         import com.DevChickens.Arkanoid.graphics.Renderer;
         import com.DevChickens.Arkanoid.entities.effects.Explosion;
-        import com.DevChickens.Arkanoid.core.CollisionManager;
         import java.util.Queue;
         import java.util.LinkedList;
         import java.util.Set;
@@ -69,11 +68,11 @@
             private Rectangle pauseExitButton;
 
             // BIẾN LƯU ÂM LƯỢNG
-            private float volumeBGM = 0.5f;       // Mặc định 50%
-            private float volumePaddle = 0.8f;    // Mặc định 80%
-            private float volumeBrick = 0.7f;     // Mặc định 70%
-            private float volumeWall = 0.6f;      // Mặc định 60%
-            private float volumeExplosion = 0.9f; // Mặc định 90%
+            private float volumeBGM = 0.5f;
+            private float volumePaddle = 0.5f;
+            private float volumeBrick = 0.5f;
+            private float volumeWall = 0.5f;
+            private float volumeExplosion = 0.5f;
             // BIẾN TRẠNG THÁI UI SETTINGS
             private GameState previousGameState; // Để biết quay lại màn hình nào
             private enum SettingsPage { MAIN, SOUND, CONTROLS } // Phân cấp menu
@@ -148,6 +147,7 @@
                     // Tải các âm thanh va chạm
                     soundManager.loadSound("paddle_hit", "sounds/paddle_hit.wav");
                     soundManager.loadSound("brick_explode", "sounds/brick_explode.wav");
+                    soundManager.loadSound("bgm_menu", "sounds/ChillMenu.wav");
         
                 } catch (Exception e) {
                     System.err.println("Không thể khởi tạo SoundManager!");
@@ -187,6 +187,9 @@
                 bricks = LevelLoader.createLevel(round, GAME_WIDTH);
                 isMovingLeft = false;
                 isMovingRight = false;
+
+                //Nhạc chờ menu
+                soundManager.loopSound("bgm_menu", volumeBGM);
             }
         
             public void update() {
@@ -761,12 +764,15 @@
                 }
                 else if (gameState == GameState.MENU) {
                     if (playButtonRect.contains(x, y)) {
+                        soundManager.stopSound("bgm_menu"); // dừng nhạc
                         gameState = GameState.NEXT_ROUND;
                         nextRoundStartTime = System.currentTimeMillis();
                     } else if (highScoresButtonRect.contains(x, y)) {
+                        soundManager.stopSound("bgm_menu");
                         this.highScores = loadScores();
                         gameState = GameState.HIGH_SCORES;
                     } else if (menuSettingsButtonRect.contains(x, y)) {
+                        soundManager.stopSound("bgm_menu");
                         previousGameState = GameState.MENU;
                         currentSettingsPage = SettingsPage.MAIN;
                         gameState = GameState.SETTINGS;
@@ -778,6 +784,7 @@
                 else if (gameState == GameState.HIGH_SCORES) {
                     if (backButtonRect.contains(x, y)) {
                         gameState = GameState.MENU;
+                        soundManager.loopSound("bgm_menu", volumeBGM); // phát lại nhạc
                     }
                 }
                 else if (gameState == GameState.GAME_OVER || gameState == GameState.VICTORY) {
@@ -790,6 +797,11 @@
                                 currentSettingsPage = SettingsPage.SOUND;
                             } else if (settingsBackRect.contains(x, y)) {
                                 gameState = previousGameState; // Quay lại (PAUSED hoặc MENU)
+
+                                // Phát lại nhạc khi thoát lại menu
+                                if (gameState == GameState.MENU) {
+                                    soundManager.loopSound("bgm_menu", volumeBGM);
+                                }
                             }
                             break;
 
@@ -800,7 +812,7 @@
                             // Cho phép click để set volume
                             else if (sliderBgmRect.contains(x, y)) {
                                 volumeBGM = calculateVolumeFromSlider(x, sliderBgmRect);
-                                // soundManager.updateVolume("bgm_menu", volumeBGM);
+                                soundManager.updateVolume("bgm_menu", volumeBGM);
                             } else if (sliderPaddleRect.contains(x, y)) {
                                 volumePaddle = calculateVolumeFromSlider(x, sliderPaddleRect);
                             } else if (sliderBrickRect.contains(x, y)) {
@@ -838,6 +850,7 @@
                 // Kiểm tra từng thanh trượt
                 if (sliderBgmRect.contains(x, y)) {
                     volumeBGM = calculateVolumeFromSlider(x, sliderBgmRect);
+                    soundManager.updateVolume("bgm_menu", volumeBGM);
 
                 } else if (sliderPaddleRect.contains(x, y)) {
                     volumePaddle = calculateVolumeFromSlider(x, sliderPaddleRect);
