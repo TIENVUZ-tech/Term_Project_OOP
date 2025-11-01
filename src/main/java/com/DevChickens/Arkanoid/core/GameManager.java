@@ -681,8 +681,10 @@
             public void onPausePressed() {
                 if (gameState == GameState.PLAYING) {
                     gameState = GameState.PAUSED;
+                    soundManager.stopSound("bgm_menu"); // Dừng nhạc
                 } else if (gameState == GameState.PAUSED) {
                     gameState = GameState.PLAYING;
+                    soundManager.loopSound("bgm_menu", volumeBGM); // Phát lại nhạc
                 }
             }
         
@@ -759,7 +761,6 @@
                 }
                 else if (gameState == GameState.MENU) {
                     if (playButtonRect.contains(x, y)) {
-                        soundManager.stopSound("bgm_menu"); // dừng nhạc
                         gameState = GameState.NEXT_ROUND;
                         nextRoundStartTime = System.currentTimeMillis();
                     } else if (highScoresButtonRect.contains(x, y)) {
