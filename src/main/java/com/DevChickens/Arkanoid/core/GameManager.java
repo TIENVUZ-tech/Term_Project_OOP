@@ -165,7 +165,6 @@
                     soundManager.loadSound("powerup_collect", "sounds/powerup_collect.wav");
                     soundManager.loadSound("pause_in", "sounds/pause_in.wav");
                     soundManager.loadSound("pause_out", "sounds/pause_out.wav");
-        
                 } catch (Exception e) {
                     System.err.println("Không thể khởi tạo SoundManager!");
                     e.printStackTrace();

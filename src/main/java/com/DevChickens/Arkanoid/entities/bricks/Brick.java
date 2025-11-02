@@ -59,7 +59,7 @@ public abstract class Brick extends GameObject {
         // Gạch sẽ vỡ luôn khi va chạm với Super Ball
         this.destroyed = true;
     }
-    
+
     /**
      * Kiểm tra xem viên gạch đã bị phá hủy hoàn toàn hay chưa.
      * @return true nếu gạch đã bị phá hủy, ngược lại false.
@@ -90,7 +90,7 @@ public abstract class Brick extends GameObject {
      */
     @Override
     public void update() {
-        // Gạch tĩnh không cần cập nhật logic.
+
     }
 
     /**
