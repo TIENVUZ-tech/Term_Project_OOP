@@ -7,7 +7,6 @@ import com.DevChickens.Arkanoid.graphics.AssetLoader;
 import org.junit.jupiter.api.*;
 import org.mockito.MockedStatic;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException; // Dùng để ném lỗi giả
 
 import static org.junit.jupiter.api.Assertions.*;
