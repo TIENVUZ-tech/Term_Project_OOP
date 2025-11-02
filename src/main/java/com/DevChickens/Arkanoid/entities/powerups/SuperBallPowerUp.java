@@ -10,10 +10,10 @@ import com.DevChickens.Arkanoid.entities.Paddle;
  */
 public class SuperBallPowerUp extends PowerUp {
 
-     /* Tham số chiều cao và chiều rộng của vật thể. */
+    // Tham số chiều cao và chiều rộng của vật thể.
     private static final int SUPERBALLPOWERUP_WIDTH = 50;
     private static final int SUPERBALLPOWERUP_HEIGHT = 60;
-    /* Đường dẫn tới file ảnh. */
+    // Đường dẫn tới file ảnh.
     private static final String FILEPATH = "/images/SuperBallPowerUp.png";
 
     /**
@@ -24,8 +24,8 @@ public class SuperBallPowerUp extends PowerUp {
      * @param duration (thời gian tồn tại).
      */
     public SuperBallPowerUp(double x, double y, String type, long duration) {
-        super(x, y, type, duration, FILEPATH, 
-        SUPERBALLPOWERUP_WIDTH, SUPERBALLPOWERUP_HEIGHT);
+        super(x, y, type, duration, FILEPATH,
+                SUPERBALLPOWERUP_WIDTH, SUPERBALLPOWERUP_HEIGHT);
     }
 
     @Override
@@ -37,5 +37,4 @@ public class SuperBallPowerUp extends PowerUp {
     public void removeEffect(Paddle paddle, Ball ball) {
         ball.deactivateSuperBall();
     }
-
 }
