@@ -76,6 +76,11 @@
             private float volumeBrick = 0.5f;
             private float volumeWall = 0.5f;
             private float volumeExplosion = 0.5f;
+            private float volumeGun = 0.5f;
+            private float volumeClick = 0.5f;
+            private float volumePowerUp = 0.5f;
+            private float volumePause = 0.5f;
+
             // BIẾN TRẠNG THÁI UI SETTINGS
             private GameState previousGameState; // Để biết quay lại màn hình nào
             private enum SettingsPage { MAIN, SOUND, CONTROLS } // Phân cấp menu
@@ -150,7 +155,16 @@
                     // Tải các âm thanh va chạm
                     soundManager.loadSound("paddle_hit", "sounds/paddle_hit.wav");
                     soundManager.loadSound("brick_explode", "sounds/brick_explode.wav");
+                    soundManager.loadSound("wall_hit", "sounds/wall.wav");
                     soundManager.loadSound("bgm_menu", "sounds/ChillMenu.wav");
+                    soundManager.loadSound("brick_hit", "sounds/brick.wav");
+                    soundManager.loadSound("brick_crack", "sounds/brick_crack.wav");
+                    soundManager.loadSound("gun_fire", "sounds/gun.wav");
+                    soundManager.loadSound("ui_click", "sounds/click.wav");
+                    soundManager.loadSound("powerup_apply", "sounds/powerup.wav");
+                    soundManager.loadSound("powerup_collect", "sounds/powerup_collect.wav");
+                    soundManager.loadSound("pause_in", "sounds/pause_in.wav");
+                    soundManager.loadSound("pause_out", "sounds/pause_out.wav");
         
                 } catch (Exception e) {
                     System.err.println("Không thể khởi tạo SoundManager!");
@@ -166,7 +180,18 @@
                 }
                 return instance;
             }
-        
+
+            public SoundManager getSoundManager() {
+                return this.soundManager;
+            }
+
+            /**
+             * Getter để các đối tượng khác như Ball có thể truy cập volumeWall
+             */
+            public float getVolumeWall() {
+                return this.volumeWall;
+            }
+
             public void addBall(Ball b) {
                 if (this.balls != null) {
                     this.balls.add(b);
@@ -273,6 +298,7 @@
         
                         bullets.add(b1);
                         bullets.add(b2);
+                        soundManager.playSound("gun_fire", volumeGun);
         
                         // cập nhật lại thời gian bắn lần cuối.
                         lastFireTime = now;
@@ -422,6 +448,9 @@
                                     explosions.add(new Explosion(explosionX, explosionY, b.getWidth() * 2, b.getHeight() * 2));
                                     processExplosion(b);
                                     soundManager.playSound("brick_explode", volumeExplosion);
+                                } else {
+                                    // Gạch  thường
+                                    soundManager.playSound("brick_hit", volumeBrick);
                                 }
         
                                 // Có thể rơi PowerUp ngẫu nhiên
@@ -438,6 +467,9 @@
                                 } else if (rand < 0.25) { // 5% cơ hội (tổng 25%)
                                     powerUps.add(new FastBallPowerUp(b.getX(), b.getY(), "FAST_BALL", 5000));
                                 }
+                            } else {
+                                // Gạch crack
+                                soundManager.playSound("brick_crack", volumeBrick);
                             }
                             break;
                         }
@@ -477,6 +509,9 @@
                                     double explosionY = b.getY() + b.getHeight() / 2.0;
                                     explosions.add(new Explosion(explosionX, explosionY, b.getWidth() * 2, b.getHeight() * 2));
                                     processExplosion(b);
+                                } else {
+                                    // Gạch thường
+                                    soundManager.playSound("brick_hit", volumeBrick);
                                 }
                                 // Có thể rơi PowerUp ngẫu nhiên
                                 double rand = Math.random(); // Lấy 1 số ngẫu nhiên
@@ -492,6 +527,9 @@
                                 } else if (rand < 0.25) { // 5% cơ hội (tổng 25%)
                                     powerUps.add(new FastBallPowerUp(b.getX(), b.getY(), "FAST_BALL", 5000));
                                 }
+                            } else {
+                                // Gạch crack
+                                soundManager.playSound("brick_crack", volumeBrick);
                             }
                             // loại bỏ đạn khi va chạm với gạch
                             bulletIterator.remove();
@@ -512,7 +550,11 @@
         
                     // Khi Paddle va chạm PowerUp
                     if (p.checkCollision(paddle)) {
-        
+                        // Ăn powerup
+                        soundManager.playSound("powerup_collect", volumePowerUp);
+                        // Áp dụng powerup
+                        soundManager.playSound("powerup_apply", volumePowerUp);
+
                         // Power-up chỉ ảnh hưởng đến Paddle (chạy 1 lần)
                         if (p instanceof ExpandPaddlePowerUp) {
                             // Ta truyền 'this' (manager) và 'null' (ball)
@@ -664,9 +706,11 @@
         
             public void onPausePressed() {
                 if (gameState == GameState.PLAYING) {
+                    soundManager.playSound("pause_in", volumePause);
                     gameState = GameState.PAUSED;
                     soundManager.stopSound("bgm_menu"); // Dừng nhạc
                 } else if (gameState == GameState.PAUSED) {
+                    soundManager.playSound("pause_out", volumePause);
                     gameState = GameState.PLAYING;
                     soundManager.loopSound("bgm_menu", volumeBGM); // Phát lại nhạc
                 }
@@ -731,16 +775,19 @@
                     } else if (pauseContinueButton.contains(x, y)) {
                         onPausePressed();
                     } else if (pauseRestartButton.contains(x, y)) {
+                        soundManager.playSound("ui_click", volumeClick);
                         initRound(currentRound);
                         gameState = GameState.NEXT_ROUND;
                         nextRoundStartTime = System.currentTimeMillis();
                         isGameInProgress = true;
                     } else if (pauseSettingsButtonRect.contains(x, y)) {
+                        soundManager.playSound("ui_click", volumeClick);
                         previousGameState = GameState.PAUSED;
                         currentSettingsPage = SettingsPage.MAIN;
                         gameState = GameState.SETTINGS;
 
                     } else if (pauseExitButton.contains(x, y)) {
+                        soundManager.playSound("ui_click", volumeClick);
                         gameState = GameState.MENU;
                         soundManager.loopSound("bgm_menu", volumeBGM);
                     }
@@ -752,28 +799,32 @@
                         // TH1: Nếu đang có game chơi dở thì hiện cả continue và new game.
 
                         if (continueButtonRect.contains(x, y)) {
+                            soundManager.playSound("ui_click", volumeClick);
                             gameState = GameState.PAUSED;
                             soundManager.stopSound("bgm_menu");
                         }
                         else if (playButtonRect.contains(x, y)) {
+                            soundManager.playSound("ui_click", volumeClick);
                             initGame();
-
                             gameState = GameState.NEXT_ROUND;
                             nextRoundStartTime = System.currentTimeMillis();
                             isGameInProgress = true; // Cần đặt lại cờ vì init game set về false.
                         }
                         else if (highScoresButtonRect.contains(x, y)) {
+                            soundManager.playSound("ui_click", volumeClick);
                             soundManager.stopSound("bgm_menu");
                             this.highScores = loadScores();
                             gameState = GameState.HIGH_SCORES;
                         }
                         else if (menuSettingsButtonRect.contains(x, y)) {
+                            soundManager.playSound("ui_click", volumeClick);
                             soundManager.stopSound("bgm_menu");
                             previousGameState = GameState.MENU;
                             currentSettingsPage = SettingsPage.MAIN;
                             gameState = GameState.SETTINGS;
                         }
                         else if (exitButtonRect.contains(x, y)) {
+                            soundManager.playSound("ui_click", volumeClick);
                             System.exit(0);
                         }
 
@@ -781,22 +832,26 @@
                         // Trường hợp 2: Chơi mới nên chỉ hiện Play.
 
                         if (playButtonRect.contains(x, y)) {
+                            soundManager.playSound("ui_click", volumeClick);
                             gameState = GameState.NEXT_ROUND;
                             nextRoundStartTime = System.currentTimeMillis();
                             isGameInProgress = true;
                         }
                         else if (highScoresButtonRect.contains(x, y)) {
+                            soundManager.playSound("ui_click", volumeClick);
                             soundManager.stopSound("bgm_menu");
                             this.highScores = loadScores();
                             gameState = GameState.HIGH_SCORES;
                         }
                         else if (menuSettingsButtonRect.contains(x, y)) {
+                            soundManager.playSound("ui_click", volumeClick);
                             soundManager.stopSound("bgm_menu");
                             previousGameState = GameState.MENU;
                             currentSettingsPage = SettingsPage.MAIN;
                             gameState = GameState.SETTINGS;
                         }
                         else if (exitButtonRect.contains(x, y)) {
+                            soundManager.playSound("ui_click", volumeClick);
                             System.exit(0);
                         }
                     }
@@ -804,11 +859,13 @@
 
                 else if (gameState == GameState.HIGH_SCORES) {
                     if (backButtonRect.contains(x, y)) {
+                        soundManager.playSound("ui_click", volumeClick);
                         gameState = GameState.MENU;
                         soundManager.loopSound("bgm_menu", volumeBGM); // phát lại nhạc
                     }
                 }
                 else if (gameState == GameState.GAME_OVER || gameState == GameState.VICTORY) {
+                    soundManager.playSound("ui_click", volumeClick);
                     // Click bất kỳ để quay về Menu
                     initGame();
                 }
@@ -816,8 +873,10 @@
                     switch (currentSettingsPage) {
                         case MAIN:
                             if (settingsSoundButtonRect.contains(x, y)) {
+                                soundManager.playSound("ui_click", volumeClick);
                                 currentSettingsPage = SettingsPage.SOUND;
                             } else if (settingsBackRect.contains(x, y)) {
+                                soundManager.playSound("ui_click", volumeClick);
                                 gameState = previousGameState;
 
                                 if (gameState == GameState.MENU) {
@@ -828,19 +887,25 @@
 
                         case SOUND:
                             if (soundBackRect.contains(x, y)) {
+                                soundManager.playSound("ui_click", volumeClick);
                                 currentSettingsPage = SettingsPage.MAIN;
                             }
                             // Cho phép click để set volume
                             else if (sliderBgmRect.contains(x, y)) {
+                                soundManager.playSound("ui_click", volumeClick);
                                 volumeBGM = calculateVolumeFromSlider(x, sliderBgmRect);
                                 soundManager.updateVolume("bgm_menu", volumeBGM);
                             } else if (sliderPaddleRect.contains(x, y)) {
+                                soundManager.playSound("ui_click", volumeClick);
                                 volumePaddle = calculateVolumeFromSlider(x, sliderPaddleRect);
                             } else if (sliderBrickRect.contains(x, y)) {
+                                soundManager.playSound("ui_click", volumeClick);
                                 volumeBrick = calculateVolumeFromSlider(x, sliderBrickRect);
                             } else if (sliderWallRect.contains(x, y)) {
+                                soundManager.playSound("ui_click", volumeClick);
                                 volumeWall = calculateVolumeFromSlider(x, sliderWallRect);
                             } else if (sliderExplosionRect.contains(x, y)) {
+                                soundManager.playSound("ui_click", volumeClick);
                                 volumeExplosion = calculateVolumeFromSlider(x, sliderExplosionRect);
                             }
                             break;
