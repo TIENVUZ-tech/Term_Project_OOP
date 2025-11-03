@@ -10,10 +10,11 @@ import com.DevChickens.Arkanoid.entities.Ball;
  */
 public class GunPaddlePowerUp extends PowerUp {
 
-    // Tham số chiều cao và chiều rộng của vật thể.
+    /** Tham số chiều rộng của vật thể. */
     private static final int GUNPADDLEPOWERUP_WIDTH = 60;
+    /** Tham số chiều cao của vật thể. */
     private static final int GUNPADDLEPOWERUP_HEIGHT = 40;
-    // Đường dẫn tới file ảnh.
+    /** Đường dẫn tới file ảnh. */
     private static final String FILEPATH = "/images/GunPaddlePowerUp.png";
 
     /**
@@ -28,11 +29,22 @@ public class GunPaddlePowerUp extends PowerUp {
                 GUNPADDLEPOWERUP_WIDTH, GUNPADDLEPOWERUP_HEIGHT);
     }
 
+    /**
+     * Áp dụng hiệu ứng GunPaddle lên thanh đỡ.
+     * @param manager (GameManager, không dùng trong hiệu ứng này)
+     * @param paddle (Thanh đỡ để áp dụng hiệu ứng)
+     * @param ball (Bóng, không dùng trong hiệu ứng này)
+     */
     @Override
     public void applyEffect(GameManager manager, Paddle paddle, Ball ball) {
         paddle.activateGunPaddle();
     }
 
+    /**
+     * Xóa hiệu ứng GunPaddle khỏi thanh đỡ.
+     * @param paddle (Thanh đỡ để xóa hiệu ứng)
+     * @param ball (Bóng, không dùng trong hiệu ứng này)
+     */
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
         paddle.deactivateGunPaddle();

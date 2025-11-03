@@ -13,20 +13,25 @@ import java.io.IOException;
  * Paddle (Kế thừa từ MovableObject): Thanh đỡ mà người chơi điều khiển.
  * Thuộc tính: speed, currentPowerUp.
  * Phương thức: moveLeft(), moveRight(), applyPowerUp().
- * @author Vũ Văn Tiến.
  */
 public class Paddle extends MovableObject {
 
-    // Tốc độ di chuyển của Paddle theo phương ngang.
-    // với mỗi lần cập nhật thì vị trí của paddle thay đổi speed (pixel).
+    /** Tốc độ di chuyển của Paddle theo phương ngang (pixel/frame). */
     private double speed;
-    private PowerUp currentPowerUp;      // Tham chiếu đến PowerUp mà hiện tại paddle đang áp dụng.
-    private BufferedImage image;         // Biến lưu ảnh của Paddle.
-    private BufferedImage normalPaddle;  // Biến lưu ảnh của paddle bình thường.
-    private BufferedImage gunPaddle;     // Biến lưu ảnh của LaserPadlee.
-    private final double baseWidth;      // Biến để lưu kích thước gốc của paddle.
-    private boolean isGunPaddle = false; // Biến lưu tình trạng của paddle (laserPaddle hoặc thường).
-    private int expandEffectCount;       // Biến để đếm số lượng hiệu ứng "Expand" đang có hiệu lực.
+    /** Tham chiếu đến PowerUp mà hiện tại paddle đang áp dụng. */
+    private PowerUp currentPowerUp;
+    /** Biến lưu ảnh của Paddle. */
+    private BufferedImage image;
+    /** Biến lưu ảnh của paddle bình thường. */
+    private BufferedImage normalPaddle;
+    /** Biến lưu ảnh của LaserPaddle. */
+    private BufferedImage gunPaddle;
+    /** Biến để lưu kích thước gốc của paddle. */
+    private final double baseWidth;
+    /** Biến lưu tình trạng của paddle (true nếu là laserPaddle). */
+    private boolean isGunPaddle = false;
+    /** Biến để đếm số lượng hiệu ứng "Expand" đang có hiệu lực. */
+    private int expandEffectCount;
 
     /**
      * Phương thức khởi tạo Paddle.
@@ -81,43 +86,79 @@ public class Paddle extends MovableObject {
             throw new RuntimeException("Không thể tải ảnh cho Paddle", e);
         }
         this.baseWidth = targetWidth; // lưu lại kích thước gốc.
-        this.expandEffectCount = 0; 
+        this.expandEffectCount = 0;
     }
 
+    /**
+     * Thiết lập tốc độ di chuyển của Paddle.
+     * @param speed Tốc độ mới
+     */
     public void setSpeed(double speed) {
         this.speed = speed;
     }
 
+    /**
+     * Lấy tốc độ di chuyển hiện tại của Paddle.
+     * @return Tốc độ (pixel/frame)
+     */
     public double getSpeed() {
         return this.speed;
     }
 
+    /**
+     * Kiểm tra xem Paddle có đang ở trạng thái GunPaddle không.
+     * @return true nếu là GunPaddle, ngược lại false
+     */
     public boolean isGunPaddle() {
         return this.isGunPaddle;
     }
 
+    /**
+     * Thiết lập PowerUp hiện tại đang có hiệu lực trên Paddle.
+     * @param currentPowerUp PowerUp đang áp dụng
+     */
     public void setCurrentPowerUp(PowerUp currentPowerUp) {
         this.currentPowerUp = currentPowerUp;
     }
 
+    /**
+     * Lấy PowerUp hiện tại đang có hiệu lực trên Paddle.
+     * @return PowerUp đang áp dụng (có thể là null)
+     */
     public PowerUp getCurrentPowerUp() {
         return this.currentPowerUp;
     }
 
+    /**
+     * Lấy chiều rộng cơ sở (gốc) của Paddle.
+     * @return Chiều rộng gốc
+     */
     public double getBaseWidth() {
         return this.baseWidth;
     }
 
+    /**
+     * Lấy số lượng hiệu ứng "Expand" đang được xếp chồng.
+     * @return Số lượng hiệu ứng "Expand"
+     */
     public int getExpandEffectCount() {
         return this.expandEffectCount;
     }
 
+    /**
+     * Thiết lập số lượng hiệu ứng "Expand" đang có hiệu lực.
+     * @param count Số lượng mới (phải >= 0)
+     */
     public void setExpandEffectCount(int count) {
         if (count >= 0) {
             this.expandEffectCount = count;
         }
     }
 
+    /**
+     * Lấy ảnh (BufferedImage) hiện tại của Paddle để vẽ.
+     * @return Ảnh (thường hoặc GunPaddle)
+     */
     public BufferedImage getImage() {
         if (isGunPaddle) {
             return this.gunPaddle;
@@ -126,12 +167,19 @@ public class Paddle extends MovableObject {
         }
     }
 
+    /**
+     * Cập nhật logic của Paddle mỗi khung hình (gọi phương thức move).
+     */
     @Override
     public void update() {
         // cập nhật lại vị trí.
         move();
     }
 
+    /**
+     * Di chuyển Paddle dựa trên vận tốc dx và kiểm tra va chạm tường.
+     * Tự động reset vận tốc dx về 0 sau khi di chuyển.
+     */
     @Override
     public void move() {
         double newX = super.getX() + super.getDx();
@@ -148,6 +196,11 @@ public class Paddle extends MovableObject {
         // đặt tốc độ về 0 sau khi di chuyển.
         super.setDx(0);
     }
+
+    /**
+     * Vẽ Paddle lên màn hình.
+     * @param g Đối tượng Graphics để vẽ
+     */
     @Override
     public void render(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -160,6 +213,9 @@ public class Paddle extends MovableObject {
         }
     }
 
+    /**
+     * Thiết lập vận tốc (dx) cho Paddle để di chuyển sang trái.
+     */
     public void moveLeft() {
         // cập nhật tốc độ.
         super.setDx(-this.getSpeed());
@@ -167,6 +223,7 @@ public class Paddle extends MovableObject {
 
     /**
      * Phương thức moveRight() (di chuyển sang phải speed đơn vị).
+     * Thiết lập vận tốc (dx) cho Paddle.
      */
     public void moveRight() {
         // cập nhật tốc độ.
@@ -175,7 +232,7 @@ public class Paddle extends MovableObject {
 
     /**
      * Phương thức applyPowerUp. Cập nhật trạng thái PowerUp hiện tại.
-     * @param p
+     * @param p PowerUp mới
      */
     public void applyPowerUp(PowerUp p) {
         this.currentPowerUp = p;
@@ -183,6 +240,7 @@ public class Paddle extends MovableObject {
 
     /**
      * Phương thức activateGunPaddle.
+     * Kích hoạt trạng thái GunPaddle và thay đổi ảnh.
      */
     public void activateGunPaddle() {
         this.isGunPaddle = true;
@@ -190,7 +248,8 @@ public class Paddle extends MovableObject {
     }
 
     /**
-     * Phương thức deactivateLaserPaddle.
+     * Phương thức deactivateGunPaddle.
+     * Hủy kích hoạt trạng thái GunPaddle và trả về ảnh bình thường.
      */
     public void deactivateGunPaddle() {
         this.isGunPaddle = false;
