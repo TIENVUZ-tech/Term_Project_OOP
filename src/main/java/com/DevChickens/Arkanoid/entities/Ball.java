@@ -118,21 +118,21 @@ public class Ball extends MovableObject {
         if (this.getY() < 0) {
             this.setY(0); // Đặt lại vị trí để bóng không bị kẹt
             this.bounceOff(null, CollisionManager.CollisionSide.VERTICAL);
-            GameManager.getInstance().getSoundManager().playSound("wall_hit", GameManager.getInstance().getVolumeWall());
+            GameManager.getInstance().getSoundManager().playSound("paddle_hit", GameManager.getInstance().getVolumeWall());
         }
 
         // Va chạm tường trái
         if (this.getX() < 0) {
             this.setX(0); // Đặt lại vị trí
             this.bounceOff(null, CollisionManager.CollisionSide.HORIZONTAL);
-            GameManager.getInstance().getSoundManager().playSound("wall_hit", GameManager.getInstance().getVolumeWall());
+            GameManager.getInstance().getSoundManager().playSound("paddle_hit", GameManager.getInstance().getVolumeWall());
         }
         
         // Va chạm tường phải
         if (this.getX() + this.getWidth() > GameManager.GAME_WIDTH) {
             this.setX(GameManager.GAME_WIDTH - this.getWidth()); // Đặt lại vị trí
             this.bounceOff(null, CollisionManager.CollisionSide.HORIZONTAL);
-            GameManager.getInstance().getSoundManager().playSound("wall_hit", GameManager.getInstance().getVolumeWall());
+            GameManager.getInstance().getSoundManager().playSound("paddle_hit", GameManager.getInstance().getVolumeWall());
         }
 
         // Thiết lập góc nảy tối thiểu
