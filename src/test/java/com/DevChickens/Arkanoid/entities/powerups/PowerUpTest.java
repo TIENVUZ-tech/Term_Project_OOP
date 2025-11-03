@@ -28,27 +28,29 @@ class PowerUpTest {
         }
 
         @Override
-        public void applyEffect(GameManager manager, Paddle paddle, Ball ball) {}
+        public void applyEffect(GameManager manager, Paddle paddle, Ball ball) {
+        }
 
         @Override
-        public void removeEffect(Paddle paddle, Ball ball) {}
+        public void removeEffect(Paddle paddle, Ball ball) {
+        }
     }
 
     // Biến lưu trữ đối tượng mock
-    private MockedStatic<AssetLoader> assetLoaderMock;
+    //private MockedStatic<AssetLoader> assetLoaderMock;
     private final long TEST_DURATION = 100;
 
-    @BeforeEach
-    void setUpOuter() {
-        // Bắt đầu giả lập AssetLoader trước mỗi test
-        assetLoaderMock = mockStatic(AssetLoader.class);
-    }
+    //@BeforeEach
+    //void setUpOuter() {
+    // Bắt đầu giả lập AssetLoader trước mỗi test
+    //  assetLoaderMock = mockStatic(AssetLoader.class);
+    //}
 
-    @AfterEach
-    void tearDownOuter() {
-        // Dọn dẹp, trả AssetLoader về trạng thái thật
-        assetLoaderMock.close();
-    }
+    //@AfterEach
+    //void tearDownOuter() {
+    // Dọn dẹp, trả AssetLoader về trạng thái thật
+    //  assetLoaderMock.close();
+    //}
 
     // Các test cần để contructor chạy thành công
     @Nested
@@ -56,9 +58,11 @@ class PowerUpTest {
     class WhenConstructorSucceeds {
 
         private TestPowerUp powerUp;
+        private MockedStatic<AssetLoader> assetLoaderMock;
 
         @BeforeEach
         void setUpHappyPath() {
+            assetLoaderMock = mockStatic(AssetLoader.class);
             // Dạy cho Mockito Khi ai đó gọi loadImage... thì trả về null
             // khối try chạy xong mà không ném lỗi
             assetLoaderMock.when(() -> AssetLoader.loadImage(anyString()))
@@ -68,8 +72,13 @@ class PowerUpTest {
             powerUp = new TestPowerUp(50, 50, TEST_DURATION);
         }
 
-        // Các test logic của PowerUp
+        @AfterEach
+        void tearDownHappyPath() {
+            // Đóng mock
+            assetLoaderMock.close();
+        }
 
+        // Các test logic của PowerUp
         @Test
         @DisplayName("Trạng thái ban đầu: Vị trí Y và chưa hết hạn")
         void testInitialState() {
@@ -121,18 +130,20 @@ class PowerUpTest {
         @Test
         @DisplayName("Ném RuntimeException nếu AssetLoader.loadImage ném lỗi")
         void testConstructorThrowsExceptionOnLoadFailure() {
-            // Dạy cho Mockito Khi ai đó gọi loadImage... hãy ném lõi
-            // Kích hoạt khối catch trong constructor của PowerUp
-            assetLoaderMock.when(() -> AssetLoader.loadImage(anyString()))
-                    .thenThrow(new IOException("Test: Giả lập lỗi không tìm thấy file"));
 
-            // Kiểm tra xem constructor của PowerUp có ném ra RuntimeException như mong đợi không
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-                new TestPowerUp(50, 50, TEST_DURATION);
-            }, "Constructor phải ném RuntimeException nếu tải ảnh lỗi");
+            // Dùng try-with-resources để mock tự động đóng
+            try (MockedStatic<AssetLoader> assetLoaderMock = mockStatic(AssetLoader.class)) {
 
-            // Đảm bảo là đúng lỗi đó
-            assertTrue(exception.getMessage().contains("Lỗi tải ảnh tại đường dẫn"));
+                // Dạy cho Mockito
+                assetLoaderMock.when(() -> AssetLoader.loadImage(anyString()))
+                        .thenThrow(new RuntimeException("Test: Giả lập lỗi không tìm thấy file"));
+
+                // Kiểm tra
+                RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+                    new TestPowerUp(50, 50, TEST_DURATION);
+                }, "Constructor phải ném RuntimeException nếu tải ảnh lỗi");
+                assertTrue(exception.getMessage().contains("Lỗi tải ảnh tại đường dẫn"));
+            }
         }
     }
 }
