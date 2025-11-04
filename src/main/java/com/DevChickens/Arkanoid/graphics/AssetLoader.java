@@ -38,7 +38,7 @@ public class AssetLoader {
         for (int i = 1; i <= numberOfFrames; i++) {
             // Sẽ tạo ra đường dẫn "/images/boom1.png", "/images/boom2.png", ...
             String path = basePath + prefix + i + ".png";
-            BufferedImage frame = loadImage(path); // Dùng lại hàm loadImage() của bạn
+            BufferedImage frame = loadImage(path);
             if (frame != null) {
                 frames.add(frame);
             }

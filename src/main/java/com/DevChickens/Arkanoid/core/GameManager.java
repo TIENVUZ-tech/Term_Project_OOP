@@ -31,6 +31,7 @@ public class GameManager {
     private static GameManager instance;
     private InputHandler inputHandler;
     private UIManager uiManager;
+    private CollisionManager collisionManager;
 
     private SoundManager soundManager;
     private int score;
@@ -75,6 +76,7 @@ public class GameManager {
 
     private GameManager() {
         renderer = new Renderer();
+        this.collisionManager = new CollisionManager(this);
         soundManager = new SoundManager();
         try {
             // Tải âm thanh
@@ -273,7 +275,7 @@ public class GameManager {
                 bullet.update();
             }
 
-            checkCollisions();
+            collisionManager.checkAndResolveCollisions();
 
             java.util.Iterator<Ball> ballIterator = balls.iterator();
             while (ballIterator.hasNext()) {
@@ -316,196 +318,6 @@ public class GameManager {
                 double ballNewY = paddle.getY() - mainBall.getHeight();
                 mainBall.setX(ballNewX);
                 mainBall.setY(ballNewY);
-            }
-        }
-    }
-
-    private void checkCollisions() {
-        for (Ball ball : new ArrayList<>(balls)) {
-            // Ball vs Paddle
-            if (CollisionManager.checkCollision(ball, paddle)) {
-                if (ball.getDirectionY() > 0) {
-                    ball.bounceOff(paddle, null);
-                    ball.setY(paddle.getY() - ball.getHeight());
-                    soundManager.playSound("paddle_hit", volumePaddle);
-                }
-            }
-
-            // Ball vs Bricks
-            for (int i = 0; i < bricks.size(); i++) {
-                Brick b = bricks.get(i);
-                if (!b.isDestroyed() && CollisionManager.checkCollision(ball, b)) {
-                    if (ball.isSuperBall()) {
-                        b.breakBrick();
-                    } else {
-                        b.takeHit();
-                    }
-
-                    ball.setX(ball.getX() - ball.getSpeed() * ball.getDirectionX());
-                    ball.setY(ball.getY() - ball.getSpeed() * ball.getDirectionY());
-
-                    CollisionManager.CollisionSide side = CollisionManager.getCollisionDirection(ball, b);
-                    ball.bounceOff(b, side);
-
-                    if (b.isDestroyed()) {
-                        int points = switch (b.getType().toLowerCase()) {
-                            case "strong" -> 300;
-                            case "explosive" -> 200;
-                            case "quite" -> 150;
-                            default -> 100;
-                        };
-                        score += points;
-
-                        if (b instanceof ExplosiveBrick) {
-                            double explosionX = b.getX() + b.getWidth() / 2.0;
-                            double explosionY = b.getY() + b.getHeight() / 2.0;
-                            explosions.add(new Explosion(explosionX, explosionY, b.getWidth() * 2, b.getHeight() * 2));
-                            processExplosion(b);
-                            soundManager.playSound("brick_explode", volumeExplosion);
-                        } else {
-                            soundManager.playSound("brick_hit", volumeBrick);
-                        }
-
-                        PowerUp newPowerUp = PowerUpFactory.createRandomPowerUp(b.getX(), b.getY());
-                        if (newPowerUp != null) {
-                            powerUps.add(newPowerUp);
-                        }
-                    } else {
-                        soundManager.playSound("brick_crack", volumeBrick);
-                    }
-                    break;
-                }
-            }
-        }
-
-        // Bullet vs Bricks
-        java.util.Iterator<Bullet> bulletIterator = bullets.iterator();
-        while (bulletIterator.hasNext()) {
-            Bullet currentBullet = bulletIterator.next();
-            if (currentBullet.isDestroyed()) {
-                bulletIterator.remove();
-                continue;
-            }
-            for (int i = 0; i < bricks.size(); i++) {
-                Brick b = bricks.get(i);
-                if (!b.isDestroyed() && currentBullet.checkCollision(b)) {
-                    b.takeHit();
-                    if (b.isDestroyed()) {
-                        int points = switch (b.getType().toLowerCase()) {
-                            case "strong" -> 300;
-                            case "explosive" -> 200;
-                            case "quite" -> 150;
-                            default -> 100;
-                        };
-                        score += points;
-
-                        if (b instanceof ExplosiveBrick) {
-                            double explosionX = b.getX() + b.getWidth() / 2.0;
-                            double explosionY = b.getY() + b.getHeight() / 2.0;
-                            explosions.add(new Explosion(explosionX, explosionY, b.getWidth() * 2, b.getHeight() * 2));
-                            processExplosion(b);
-                        } else {
-                            soundManager.playSound("brick_hit", volumeBrick);
-                        }
-                        PowerUp newPowerUp = PowerUpFactory.createRandomPowerUp(b.getX(), b.getY());
-                        if (newPowerUp != null) {
-                            powerUps.add(newPowerUp);
-                        }
-                    } else {
-                        soundManager.playSound("brick_crack", volumeBrick);
-                    }
-                    bulletIterator.remove();
-                    break;
-                }
-            }
-        }
-
-        // Paddle vs PowerUps
-        for (int i = 0; i < powerUps.size(); i++) {
-            PowerUp p = powerUps.get(i);
-            if (p.getY() > GAME_HEIGHT) {
-                powerUps.remove(i);
-                i--;
-                continue;
-            }
-
-            if (p.checkCollision(paddle)) {
-                soundManager.playSound("powerup_collect", volumePowerUp);
-                soundManager.playSound("powerup_apply", volumePowerUp);
-
-                if (p instanceof ExpandPaddlePowerUp) {
-                    p.applyEffect(this, paddle, null);
-                } else if (p instanceof GunPaddlePowerUp) {
-                    p.applyEffect(null, paddle, null);
-                    isFiring = true;
-                }
-                else if (p instanceof SuperBallPowerUp ||
-                        p instanceof FastBallPowerUp ||
-                        p instanceof MultiBallPowerUp) {
-                    for (Ball b : new ArrayList<>(balls)) {
-                        p.applyEffect(this, paddle, b);
-                    }
-                }
-
-                p.activate();
-                activePowerUps.add(p);
-                powerUps.remove(i);
-                i--;
-            }
-        }
-    }
-
-    private void processExplosion(Brick initialBrick) {
-        Queue<Brick> explosionQueue = new LinkedList<>();
-        Set<Brick> alreadyExploded = new HashSet<>();
-        explosionQueue.add(initialBrick);
-        alreadyExploded.add(initialBrick);
-
-        while (!explosionQueue.isEmpty()) {
-            Brick currentExplosion = explosionQueue.poll();
-            double brickWidth = currentExplosion.getWidth();
-            double brickHeight = currentExplosion.getHeight();
-            double centerX = currentExplosion.getX() + brickWidth / 2.0;
-            double centerY = currentExplosion.getY() + brickHeight / 2.0;
-            double radiusX = brickWidth * 1.5;
-            double radiusY = brickHeight * 1.5;
-            double explosionLeft = centerX - radiusX;
-            double explosionRight = centerX + radiusX;
-            double explosionTop = centerY - radiusY;
-            double explosionBottom = centerY + radiusY;
-
-            for (Brick neighbor : bricks) {
-                if (neighbor.isDestroyed() || neighbor == currentExplosion) {
-                    continue;
-                }
-                double otherLeft = neighbor.getX();
-                double otherRight = neighbor.getX() + neighbor.getWidth();
-                double otherTop = neighbor.getY();
-                double otherBottom = neighbor.getY() + neighbor.getHeight();
-
-                boolean overlaps = (otherLeft < explosionRight &&
-                        otherRight > explosionLeft &&
-                        otherTop < explosionBottom &&
-                        otherBottom > explosionTop);
-
-                if (overlaps) {
-                    neighbor.takeHit();
-                    if (neighbor.isDestroyed()) {
-                        int points = switch (neighbor.getType().toLowerCase()) {
-                            case "strong" -> 300;
-                            case "explosive" -> 200;
-                            case "quite" -> 150;
-                            default -> 100;
-                        };
-                        score += points;
-
-                        if (neighbor instanceof ExplosiveBrick &&
-                                !alreadyExploded.contains(neighbor)) {
-                            explosionQueue.add(neighbor);
-                            alreadyExploded.add(neighbor);
-                        }
-                    }
-                }
             }
         }
     }
@@ -628,11 +440,7 @@ public class GameManager {
 
     public void draw(Graphics g) {
         // Guard clause: Đảm bảo UIManager đã sẵn sàng
-        if (uiManager == null) return;
-
-        // Ủy quyền toàn bộ việc vẽ cho Renderer.
-        // Renderer sẽ tự "hỏi" GameManager và UIManager
-        // xem cần vẽ cái gì, ở đâu.
+        if (uiManager == null) { return; }
         renderer.drawCurrentState(g, this, uiManager);
     }
 
@@ -651,7 +459,7 @@ public class GameManager {
         }
     }
 
-    private void addScore(int newScore) {
+    public void addScore(int newScore) {
         if (newScore <= 0) return;
         try {
             Files.write(Paths.get(SCORE_FILE),
@@ -662,6 +470,43 @@ public class GameManager {
             System.err.println("Lỗi khi lưu điểm: " + e.getMessage());
         }
     }
+
+    // Các hàm API cho hệ thống va chạm.
+
+    /**
+     * Thêm một hiệu ứng nổ vào danh sách (để Renderer vẽ).
+     */
+    public void addExplosion(Explosion e) {
+        if (e != null) {
+            this.explosions.add(e);
+        }
+    }
+
+    /**
+     * Thêm một Power-Up đang rơi vào danh sách.
+     */
+    public void addPowerUp(PowerUp p) {
+        if (p != null) {
+            this.powerUps.add(p);
+        }
+    }
+
+    /**
+     * Kích hoạt một Power-Up (chuyển nó vào danh sách "active").
+     */
+    public void activatePowerUp(PowerUp p) {
+        if (p != null) {
+            this.activePowerUps.add(p);
+        }
+    }
+
+    /**
+     * Bật cờ tự động bắn (cho GunPaddle).
+     */
+    public void setFiring(boolean firing) {
+        this.isFiring = firing;
+    }
+
 
     // Getter/setter cho game logic.
     public boolean isGameInProgress() { return isGameInProgress; }
@@ -689,4 +534,5 @@ public class GameManager {
     public float getVolumeBrick() { return this.volumeBrick; }
     public float getVolumeWall() { return this.volumeWall; }
     public float getVolumeExplosion() { return this.volumeExplosion; }
+    public float getVolumePowerUp() { return this.volumePowerUp; }
 }
