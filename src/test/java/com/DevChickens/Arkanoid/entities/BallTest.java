@@ -7,7 +7,6 @@ import org.junit.jupiter.api.*;
 import org.mockito.MockedStatic;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
