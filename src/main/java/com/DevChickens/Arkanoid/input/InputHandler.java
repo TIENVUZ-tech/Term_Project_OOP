@@ -70,7 +70,6 @@ public class InputHandler extends KeyAdapter implements MouseListener, MouseMoti
 
 
     // Các hàm listener được ghi đè từ AWT - Abstract Window Toolkit.
-
     /**
      * Được gọi khi một phím được nhấn.
      * Cập nhật trạng thái cho các cờ tương ứng.

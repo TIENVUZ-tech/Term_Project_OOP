@@ -342,7 +342,7 @@ public class GameManager {
         isFiring = false;
     }
 
-    // --- CÁC HÀM API SẠCH (ĐÃ CÓ SẴN) ---
+    // Các hàm API đã có sẵn
     public void pauseGame() {
         if (gameState == GameState.PLAYING) {
             soundManager.playSound("pause_in", volumePause);
@@ -472,7 +472,6 @@ public class GameManager {
     }
 
     // Các hàm API cho hệ thống va chạm.
-
     /**
      * Thêm một hiệu ứng nổ vào danh sách (để Renderer vẽ).
      */

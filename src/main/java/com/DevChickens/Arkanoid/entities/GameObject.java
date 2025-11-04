@@ -34,7 +34,7 @@ public abstract class GameObject {
 
     /**
      * Thiết lập vị trí X (hoành độ) của vật thể.
-     * @param x Vị trí X mới
+     * @param x Vị trí X mới.
      */
     public void setX(double x) {
         this.x = x;

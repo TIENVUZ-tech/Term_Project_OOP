@@ -134,7 +134,7 @@ public class CollisionManager {
                             double explosionX = b.getX() + b.getWidth() / 2.0;
                             double explosionY = b.getY() + b.getHeight() / 2.0;
                             gm.addExplosion(new Explosion(explosionX, explosionY, b.getWidth() * 2, b.getHeight() * 2)); // <-- Gọi API
-                            this.processExplosion(b); // <-- Gọi hàm nội bộ
+                            this.processExplosion(b); // Gọi hàm nội bộ
                             gm.getSoundManager().playSound("brick_explode", gm.getVolumeExplosion());
                         } else {
                             gm.getSoundManager().playSound("brick_hit", gm.getVolumeBrick());
@@ -228,58 +228,94 @@ public class CollisionManager {
     }
 
     /**
-     * Hàm xử lý một vụ nổ lan (BFS).
+     * Hàm xử lý một vụ nổ (BFS).
      * @param initialBrick Viên gạch nổ ban đầu.
      */
     private void processExplosion(Brick initialBrick) {
-        List<Brick> bricks = gm.getBricks(); // Lấy danh sách gạch
+        // Lấy danh sách tất cả gạch hiện có trong màn chơi
+        List<Brick> bricks = gm.getBricks();
 
+        // Sử dụng Queue để xử lý nổ (BFS)
         Queue<Brick> explosionQueue = new LinkedList<>();
+
+        // Sử dụng Set để lưu lại những viên gạch đã nổ hoặc đang chờ nổ
+        // Để ránh một viên gạch bị thêm vào hàng đợi nhiều lần gây lặp vô hạn
         Set<Brick> alreadyExploded = new HashSet<>();
+
+        // Bắt đầu chuỗi nổ từ viên gạch ban đầu
         explosionQueue.add(initialBrick);
         alreadyExploded.add(initialBrick);
 
+        // Vòng lặp tiếp tục khi hàng đợi nổ vẫn còn
         while (!explosionQueue.isEmpty()) {
+            // Lấy viên gạch đang nổ hiện tại ra khỏi hàng đợi để xử lý
             Brick currentExplosion = explosionQueue.poll();
+
+            // Tính toán vùng ảnh hưởng của vụ nổ
             double brickWidth = currentExplosion.getWidth();
             double brickHeight = currentExplosion.getHeight();
+
+            // Tìm tâm của viên gạch đang nổ
             double centerX = currentExplosion.getX() + brickWidth / 2.0;
             double centerY = currentExplosion.getY() + brickHeight / 2.0;
+
+            // Vùng nổ được là 1.5 lần kích thước của viên gạch
             double radiusX = brickWidth * 1.5;
             double radiusY = brickHeight * 1.5;
+
+            // Xác định 4 cạnh của hình chữ nhật đại diện cho vùng nổ
             double explosionLeft = centerX - radiusX;
             double explosionRight = centerX + radiusX;
             double explosionTop = centerY - radiusY;
             double explosionBottom = centerY + radiusY;
 
+            // Duyệt qua tất cả các viên gạch trong màn chơi
             for (Brick neighbor : bricks) {
+
+                // Bỏ qua nếu viên gạch bên cạnh này đã bị phá hủy,
+                // hoặc chính là viên gạch đang nổ
                 if (neighbor.isDestroyed() || neighbor == currentExplosion) {
                     continue;
                 }
+
+                // Lấy tọa độ 4 cạnh của viên gạch bên cạnh
                 double otherLeft = neighbor.getX();
                 double otherRight = neighbor.getX() + neighbor.getWidth();
                 double otherTop = neighbor.getY();
                 double otherBottom = neighbor.getY() + neighbor.getHeight();
 
+                // Kiểm tra va chạm AABB
+                // xem gạch "hàng xóm" có giao với vùng nổ không
                 boolean overlaps = (otherLeft < explosionRight &&
                         otherRight > explosionLeft &&
                         otherTop < explosionBottom &&
                         otherBottom > explosionTop);
 
+                // Nếu gạch "hàng xóm" nằm trong vùng nổ
                 if (overlaps) {
-                    neighbor.takeHit();
+                    neighbor.takeHit(); // Cho viên gạch này nhận sát thương
+
+                    // Nếu viên gạch bị phá hủy sau khi nhận sát thương
                     if (neighbor.isDestroyed()) {
+
+                        // Tính điểm dựa trên loại gạch
                         int points = switch (neighbor.getType().toLowerCase()) {
                             case "strong" -> 300;
                             case "explosive" -> 200;
                             case "quite" -> 150;
                             default -> 100;
                         };
-                        gm.addScore(points);
+                        gm.addScore(points); // Cộng điểm cho người chơi
 
+                        // Nổ lan
+                        // Nếu viên gạch vừa bị phá hủy cũng là gạch nổ
+                        // VÀ chưa từng được thêm vào hàng đợi nổ trước đây
                         if (neighbor instanceof ExplosiveBrick &&
                                 !alreadyExploded.contains(neighbor)) {
+
+                            // Thêm vào hàng đợi để nó cũng phát nổ ở các lượt lặp sau
                             explosionQueue.add(neighbor);
+                            // Đánh dấu nó là đã xử lý để tránh thêm lại
                             alreadyExploded.add(neighbor);
                         }
                     }

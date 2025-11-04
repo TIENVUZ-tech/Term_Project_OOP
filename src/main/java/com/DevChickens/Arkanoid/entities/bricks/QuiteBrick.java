@@ -38,7 +38,7 @@ public class QuiteBrick extends Brick {
          */
         @Override
         public void takeHit() {
-            super.takeHit(); // Gọi phương thức của lớp cha để trừ máu (hitPoints--)
+            super.takeHit(); // Gọi phương thức của lớp cha để trừ máu
 
             // Sau khi trừ máu, kiểm tra xem có cần đổi ảnh không
             if (this.hitPoints == 1) {
