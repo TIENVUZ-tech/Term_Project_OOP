@@ -155,7 +155,7 @@
                     // Tải các âm thanh va chạm
                     soundManager.loadSound("paddle_hit", "sounds/paddle_hit.wav");
                     soundManager.loadSound("brick_explode", "sounds/brick_explode.wav");
-                    soundManager.loadSound("wall_hit", "sounds/wall.wav");
+                    soundManager.loadSound("wall_hit", "sounds/paddle_hit.wav");
                     soundManager.loadSound("bgm_menu", "sounds/ChillMenu.wav");
                     soundManager.loadSound("brick_hit", "sounds/brick.wav");
                     soundManager.loadSound("brick_crack", "sounds/brick_crack.wav");
