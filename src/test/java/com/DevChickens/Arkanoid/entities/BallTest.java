@@ -112,11 +112,7 @@ public class BallTest {
         @Test
         @DisplayName("Logic: update() tự hủy (isDestroyed) khi chạm tường dưới")
         void testUpdate_DestroysBall_When_HittingBottomWall() {
-            // Giả sử GameManager.GAME_HEIGHT
-            final int GAME_HEIGHT = 690; 
-            final double BALL_HEIGHT = ball.getHeight(); // 30.0
-            
-            // Đặt bóng ngay trên mép tường dưới
+            // Đặt bóng ngay trên mép tường dưới (tường dưới 690)
             // dy = speed * dirY = 10 * 0.5 = 5
             ball.setY(660.0);
             ball.setDirectionY(0.5); // Đảm bảo bay xuống
