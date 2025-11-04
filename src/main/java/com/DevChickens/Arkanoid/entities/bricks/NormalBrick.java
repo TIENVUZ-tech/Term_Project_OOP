@@ -4,7 +4,7 @@ import com.DevChickens.Arkanoid.graphics.AssetLoader;
 import java.awt.Graphics;
 
 /**
- * Đại diện cho một viên gạch bình thường, bị phá hủy sau một lần va chạm.
+ * Gạch bình thường, bị phá hủy sau một lần va chạm.
  */
 public class NormalBrick extends Brick {
     /**

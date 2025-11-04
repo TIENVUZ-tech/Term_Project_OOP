@@ -19,10 +19,10 @@ public class GunPaddlePowerUp extends PowerUp {
 
     /**
      * Constructor.
-     * @param x (tọa độ x).
-     * @param y (tọa độ y).
-     * @param type (kiểu powerUp)
-     * @param duration (thời gian tồn tại).
+     * @param x tọa độ x.
+     * @param y tọa độ y.
+     * @param type kiểu powerUp.
+     * @param duration thời gian tồn tại.
      */
     public GunPaddlePowerUp(double x, double y, String type, long duration) {
         super(x, y, type, duration, FILEPATH,
@@ -31,9 +31,9 @@ public class GunPaddlePowerUp extends PowerUp {
 
     /**
      * Áp dụng hiệu ứng GunPaddle lên thanh đỡ.
-     * @param manager (GameManager, không dùng trong hiệu ứng này)
-     * @param paddle (Thanh đỡ để áp dụng hiệu ứng)
-     * @param ball (Bóng, không dùng trong hiệu ứng này)
+     * @param manager GameManager, không dùng trong hiệu ứng này.
+     * @param paddle Thanh đỡ để áp dụng hiệu ứng.
+     * @param ball Bóng, không dùng trong hiệu ứng này.
      */
     @Override
     public void applyEffect(GameManager manager, Paddle paddle, Ball ball) {
@@ -42,8 +42,8 @@ public class GunPaddlePowerUp extends PowerUp {
 
     /**
      * Xóa hiệu ứng GunPaddle khỏi thanh đỡ.
-     * @param paddle (Thanh đỡ để xóa hiệu ứng)
-     * @param ball (Bóng, không dùng trong hiệu ứng này)
+     * @param paddle Thanh đỡ để xóa hiệu ứng.
+     * @param ball Bóng, không dùng trong hiệu ứng này.
      */
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {

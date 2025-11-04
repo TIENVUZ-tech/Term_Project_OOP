@@ -13,18 +13,18 @@ import java.util.Map;
 
 /**
  * Lớp SoundManager quản lý việc tải và phát các file âm thanh.
- * Nó tải trước (pre-load) các âm thanh vào bộ nhớ để phát ngay lập tức.
- * Hoạt động tốt nhất với các file định dạng .wav.
  */
 public class SoundManager {
 
-    // Một Map để lưu trữ tất cả các Clip âm thanh đã được tải
-    // Key (String): Tên định danh (ví dụ: "paddle_hit")
-    // Value (Clip): Đối tượng âm thanh đã được nạp
+    /**
+     * Một Map để lưu trữ tất cả các Clip âm thanh đã được tải.
+     * Key (String): Tên âm thanh định danh.
+     * Value (Clip): Đối tượng âm thanh đã được nạp.
+     */
     private Map<String, Clip> soundClips;
 
     /**
-     * Hàm khởi tạo (Constructor)
+     * Hàm khởi tạo.
      * Khởi tạo HashMap để lưu trữ các âm thanh.
      */
     public SoundManager() {
@@ -32,11 +32,9 @@ public class SoundManager {
     }
 
     /**
-     * Tải một file âm thanh từ thư mục resources (classpath) vào bộ nhớ.
-     *
-     * @param name         Tên định danh bạn muốn đặt cho âm thanh (ví dụ: "paddle_hit").
-     * @param resourcePath Đường dẫn tương đối BÊN TRONG thư mục resources
-     * (ví dụ: "sounds/paddle_hit.wav").
+     * Tải một file âm thanh từ thư mục resources vào bộ nhớ.
+     * @param name Tên định danh đặt cho âm thanh.
+     * @param resourcePath Đường dẫn tương đối trong thư mục resources
      */
     public void loadSound(String name, String resourcePath) {
         try {
@@ -51,19 +49,14 @@ public class SoundManager {
 
             // Mở luồng âm thanh
             AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundUrl);
-
             // Lấy một đối tượng Clip
             Clip clip = AudioSystem.getClip();
-
             // Mở clip với luồng âm thanh (tải dữ liệu vào bộ nhớ)
             clip.open(audioIn);
-
             // Đóng luồng sau khi đã tải xong
             audioIn.close();
-
             // Lưu clip vào Map để sử dụng sau
             soundClips.put(name, clip);
-
             System.out.println("Tải âm thanh thành công: " + resourcePath);
 
         } catch (UnsupportedAudioFileException e) {
@@ -92,11 +85,9 @@ public class SoundManager {
 
         // Đảm bảo giá trị nằm trong khoảng [0.0, 1.0]
         float volume = Math.max(0.0f, Math.min(1.0f, linearVolume));
-
         try {
             // Lấy bộ điều khiển âm lượng
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-
             // Xử lý trường hợp tắt tiếng
             if (volume == 0.0f) {
                 gainControl.setValue(gainControl.getMinimum()); // Tắt tiếng hoàn toàn
@@ -106,7 +97,6 @@ public class SoundManager {
 
                 // Giới hạn giá trị dB trong khoảng min/max mà clip cho phép
                 dB = Math.max(gainControl.getMinimum(), Math.min(dB, gainControl.getMaximum()));
-
                 gainControl.setValue(dB);
             }
         } catch (IllegalArgumentException e) {
@@ -119,16 +109,16 @@ public class SoundManager {
     }
 
     /**
-     * Phát một âm thanh (SFX) đã được tải.
+     * Phát một âm thanh đã được tải.
      * Âm thanh sẽ được phát một lần từ đầu.
-     * @param name Tên định danh của âm thanh (đã dùng khi loadSound).
+     * @param name Tên định danh của âm thanh.
      */
     public void playSound(String name, float linearVolume) {
         Clip clip = soundClips.get(name);
 
         if (clip != null) {
             setClipVolume(clip, linearVolume);
-            // Dừng clip nếu nó đang chạy (để có thể phát lại ngay)
+            // Dừng clip nếu nó đang chạy
             if (clip.isRunning()) {
                 clip.stop();
             }
@@ -142,8 +132,7 @@ public class SoundManager {
     }
 
     /**
-     * Phát lặp lại một âm thanh (dùng cho nhạc nền - BGM).
-     *
+     * Phát lặp lại một âm thanh: nhạc nền.
      * @param name Tên định danh của âm thanh.
      */
     public void loopSound(String name, float linearVolume) {
@@ -157,7 +146,7 @@ public class SoundManager {
             }
             // Tua về đầu
             clip.setFramePosition(0);
-            // Bắt đầu lặp lại vô tận
+            // Bắt đầu lặp vô tận
             clip.loop(Clip.LOOP_CONTINUOUSLY);
         } else {
             System.err.println("Cảnh báo: Không thể lặp âm thanh. Không tìm thấy tên: " + name);
@@ -165,7 +154,7 @@ public class SoundManager {
     }
 
     /**
-     * Cập nhật âm lượng của một clip đang phát (dùng cho BGM).
+     * Cập nhật âm lượng của một clip đang phát.
      * @param name Tên định danh của âm thanh.
      * @param linearVolume Âm lượng mới.
      */
@@ -177,8 +166,7 @@ public class SoundManager {
     }
 
     /**
-     * Dừng một âm thanh đang phát (thường dùng để dừng nhạc nền).
-     *
+     * Dừng một âm thanh đang phát .
      * @param name Tên định danh của âm thanh.
      */
     public void stopSound(String name) {

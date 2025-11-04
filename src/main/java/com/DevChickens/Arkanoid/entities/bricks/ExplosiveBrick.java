@@ -5,7 +5,7 @@ import java.awt.Graphics;
 
 /**
  * Đại diện cho một viên gạch nổ. Bị phá hủy sau một lần va chạm.
- * Lưu ý: Logic gây nổ lan truyền được xử lý ở lớp cấp cao hơn (GameManager).
+ * Logic gây nổ xử lý ở lớp GameManager.
  */
 public class ExplosiveBrick extends Brick {
     /**

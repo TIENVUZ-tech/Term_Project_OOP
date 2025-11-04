@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 /**
- * Lớp trừu tượng cơ sở cho tất cả các khối gạch cần phá hủy.
+ * Lớp trừu tượng cơ sở cho tất cả các khối gạch.
  * Kế thừa từ GameObject và định nghĩa các thuộc tính, phương thức chung cho gạch.
  */
 public abstract class Brick extends GameObject {
@@ -69,7 +69,7 @@ public abstract class Brick extends GameObject {
     }
 
     /**
-     * Kiểm tra xem gạch có nên sinh ra một Power-up hay không.
+     * Kiểm tra xem gạch có nên sinh ra một Powerup hay không.
      * @return true nếu gạch đã bị phá hủy và có khả năng sinh Power-up.
      */
     public boolean shouldSpawnPowerUp() {

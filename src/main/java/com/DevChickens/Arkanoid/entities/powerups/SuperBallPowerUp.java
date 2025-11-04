@@ -6,7 +6,7 @@ import com.DevChickens.Arkanoid.entities.Paddle;
 
 /**
  * Loại PowerUp này sẽ làm cho bóng mạnh hơn.
- * Bất kỳ loạt gạch nào chạm vào bóng sẽ bị vỡ
+ * Bất kỳ loạt gạch nào chạm vào bóng sẽ bị vỡ.
  */
 public class SuperBallPowerUp extends PowerUp {
 
@@ -18,10 +18,10 @@ public class SuperBallPowerUp extends PowerUp {
 
     /**
      * Constructor.
-     * @param x (tọa độ x).
-     * @param y (tọa độ y).
-     * @param type (kiểu powerUp)
-     * @param duration (thời gian tồn tại).
+     * @param x tọa độ x.
+     * @param y tọa độ y.
+     * @param type kiểu powerUp.
+     * @param duration thời gian tồn tại.
      */
     public SuperBallPowerUp(double x, double y, String type, long duration) {
         super(x, y, type, duration, FILEPATH,

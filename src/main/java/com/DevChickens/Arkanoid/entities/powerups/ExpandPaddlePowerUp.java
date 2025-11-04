@@ -10,7 +10,7 @@ import com.DevChickens.Arkanoid.entities.Ball;
  */
 public class ExpandPaddlePowerUp extends PowerUp {
 
-    /* Các tham số cho chiều rộng và chiều cao của PowerUp. */
+    /* Chiều rộng và chiều cao của PowerUp. */
     private static final int EXPANDPADDLEPOWERUP_WIDTH = 40;
     private static final int EXPANDPADDLEPOWERUP_HEIGHT = 30;
     /* Đường dẫn tới ảnh. */
@@ -27,7 +27,7 @@ public class ExpandPaddlePowerUp extends PowerUp {
     }
 
     /**
-     * Áp dụng hiệu ứng: Lấy thông tin từ Paddle, tính toán và cập nhật lại Paddle.
+     * Áp dụng hiệu ứng Lấy thông tin từ Paddle, tính toán và cập nhật lại Paddle.
      */
     @Override
     public void applyEffect(GameManager manager, Paddle paddle, Ball ball) {
@@ -40,7 +40,7 @@ public class ExpandPaddlePowerUp extends PowerUp {
     }
 
     /**
-     * Gỡ bỏ hiệu ứng: Lấy thông tin từ Paddle, tính toán và cập nhật lại Paddle.
+     * Gỡ bỏ hiệu ứng Lấy thông tin từ Paddle, tính toán và cập nhật lại Paddle.
      */
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {

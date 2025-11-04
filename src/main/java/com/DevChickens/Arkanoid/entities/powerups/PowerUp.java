@@ -50,7 +50,6 @@ public abstract class PowerUp extends GameObject {
         }   
     }
 
-    /* Getter cho image. */
     public Image getImage() {
         return this.image;
     }

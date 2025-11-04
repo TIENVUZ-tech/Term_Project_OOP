@@ -29,7 +29,6 @@ public class FastBallPowerUp extends PowerUp {
         
     }
 
-    /* Getter cho image. */
     public BufferedImage getImage() {
         return this.image;
     }

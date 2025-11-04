@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Lớp quản lý hiệu ứng nổ (animation).
- * Nó tự cập nhật frame và tự đánh dấu là "đã kết thúc" khi chạy xong.
+ * Tự cập nhật frame và tự đánh dấu là đã kết thúc khi chạy xong.
  */
 public class Explosion {
     private double x, y; // Tọa độ tâm của vụ nổ

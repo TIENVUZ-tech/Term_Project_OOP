@@ -1,6 +1,6 @@
 package com.DevChickens.Arkanoid.entities.powerups;
 /**
- * Lớp Factory chịu trách nhiệm tạo ra các đối tượng PowerUp.
+ * Lớp tạo ra các đối tượng PowerUp.
  */
 public class PowerUpFactory {
 
@@ -16,7 +16,7 @@ public class PowerUpFactory {
     private static final double FASTBALL_CHANCE = 0.25;    // 5% (tổng 25%)
 
     /**
-     * Thử tạo một PowerUp ngẫu nhiên tại vị trí (x, y).
+     * Tạo một PowerUp ngẫu nhiên tại vị trí (x, y).
      */
     public static PowerUp createRandomPowerUp(double x, double y) {
         double rand = Math.random();

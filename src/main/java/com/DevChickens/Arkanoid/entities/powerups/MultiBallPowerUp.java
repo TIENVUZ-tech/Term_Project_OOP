@@ -18,7 +18,7 @@ public class MultiBallPowerUp extends PowerUp {
     }
 
     /**
-     * Áp dụng hiệu ứng: Tạo 2 bóng mới tách ra 2 bên so với bóng gốc.
+     * Áp dụng hiệu ứng Tạo 2 bóng mới tách ra 2 bên so với bóng gốc.
      * @param manager GameManager chính (để gọi addBall).
      * @param originalBall Quả bóng gốc ăn item.
      */
@@ -70,6 +70,6 @@ public class MultiBallPowerUp extends PowerUp {
 
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
-        // Không cần làm gì khi hết hạn
+
     }
 }

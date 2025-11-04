@@ -4,7 +4,7 @@ import com.DevChickens.Arkanoid.graphics.AssetLoader;
 import java.awt.Graphics;
 
 /**
- * Đại diện cho một viên gạch bất tử, không thể bị phá hủy.
+ * Gạch bất tử, không thể bị phá hủy.
  */
 public class StrongBrick extends Brick {
 

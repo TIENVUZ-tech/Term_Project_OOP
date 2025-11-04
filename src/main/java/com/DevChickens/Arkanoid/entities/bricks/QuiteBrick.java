@@ -5,8 +5,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 /**
- * Đại diện cho một viên gạch cứng, cần hai lần va chạm để phá hủy.
- * Viên gạch sẽ thay đổi hình dạng (bị nứt) sau lần va chạm đầu tiên.
+ * Viên gạch cần 2 lần va chạm để phá hủy.
+ * Viên gạch sẽ thay đổi hình dạng bị nứt sau lần va chạm đầu tiên.
  */
 public class QuiteBrick extends Brick {
     private final BufferedImage imageNormal;
@@ -34,7 +34,7 @@ public class QuiteBrick extends Brick {
     }
 
         /**
-         *Ghi đè (override) phương thức takeHit() để cập nhật ảnh
+         * override takeHit() để cập nhật ảnh
          */
         @Override
         public void takeHit() {
