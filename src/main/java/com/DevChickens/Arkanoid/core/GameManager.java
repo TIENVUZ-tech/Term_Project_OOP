@@ -119,10 +119,6 @@ public class GameManager {
         return this.soundManager;
     }
 
-    public float getVolumeWall() {
-        return this.volumeWall;
-    }
-
     public void addBall(Ball b) {
         if (this.balls != null) {
             this.balls.add(b);
@@ -630,108 +626,14 @@ public class GameManager {
         }
     }
 
-    /**
-     * Vẽ các đối tượng lên màn hình
-     */
     public void draw(Graphics g) {
+        // Guard clause: Đảm bảo UIManager đã sẵn sàng
         if (uiManager == null) return;
 
-        switch (gameState) {
-            case MENU:
-                renderer.drawMenu(g, GAME_WIDTH, GAME_HEIGHT,
-                        uiManager.getMouseX(), uiManager.getMouseY(),
-                        uiManager.getPlayButtonRect(),
-                        uiManager.getHighScoresButtonRect(),
-                        uiManager.getMenuSettingsButtonRect(),
-                        uiManager.getExitButtonRect(),
-                        isGameInProgress, // Biến này vẫn ở GameManager
-                        uiManager.getContinueButtonRect());
-                break;
-            case PLAYING:
-            case PAUSED:
-                renderer.drawGameBackground(g, GAME_WIDTH, GAME_HEIGHT, currentRound);
-
-                // VẼ GAME OBJECTS.
-                renderer.drawPaddle(g, paddle);
-                for (Ball b : new ArrayList<>(balls)) renderer.drawBall(g, b);
-                for (Bullet b : new ArrayList<>(bullets)) renderer.drawBullet(g, b);
-                for (Brick b : new ArrayList<>(bricks)) renderer.drawBrick(g, b);
-                for (PowerUp p : new ArrayList<>(powerUps)) renderer.drawPowerUp(g, p);
-                for (Explosion exp : new ArrayList<>(explosions)) renderer.drawExplosion(g, exp);
-
-                // VẼ UI.
-                g.setColor(Color.WHITE);
-                g.drawString("Score: " + score, 10, 20);
-                g.drawString("Lives: " + lives, 10, 40);
-                g.drawString("Round: " + currentRound + "/" + maxRounds, 10, 60);
-
-                renderer.drawPauseIcon(g, gameState,
-                        uiManager.getMouseX(), uiManager.getMouseY(),
-                        uiManager.getPauseButtonRect());
-
-                if (gameState == GameState.PAUSED) {
-                    renderer.drawPause(g, GAME_WIDTH, GAME_HEIGHT,
-                            uiManager.getMouseX(), uiManager.getMouseY(),
-                            uiManager.getPauseContinueButton(),
-                            uiManager.getPauseRestartButton(),
-                            uiManager.getPauseSettingsButtonRect(),
-                            uiManager.getPauseExitButton());
-                }
-                break;
-            case ROUND_CLEAR:
-                renderer.drawGameBackground(g, GAME_WIDTH, GAME_HEIGHT, currentRound);
-                renderer.drawPaddle(g, paddle);
-                for (Ball b : new ArrayList<>(balls)) renderer.drawBall(g, b);
-                for (Bullet b : new ArrayList<>(bullets)) renderer.drawBullet(g, b);
-                for (Brick b : new ArrayList<>(bricks)) renderer.drawBrick(g, b);
-                for (PowerUp p : new ArrayList<>(powerUps)) renderer.drawPowerUp(g, p);
-                for (Explosion exp : new ArrayList<>(explosions)) renderer.drawExplosion(g, exp);
-                g.setColor(Color.WHITE);
-                g.drawString("Score: " + score, 10, 20);
-                g.drawString("Lives: " + lives, 10, 40);
-                g.drawString("Round: " + currentRound + "/" + maxRounds, 10, 60);
-
-                renderer.drawPauseIcon(g, gameState,
-                        uiManager.getMouseX(), uiManager.getMouseY(),
-                        uiManager.getPauseButtonRect());
-                break;
-            case HIGH_SCORES:
-                renderer.drawHighScores(g, GAME_WIDTH, GAME_HEIGHT,
-                        uiManager.getMouseX(), uiManager.getMouseY(),
-                        uiManager.getBackButtonRect(),
-                        highScores);
-                break;
-            case NEXT_ROUND:
-                renderer.drawNextRound(g, GAME_WIDTH, GAME_HEIGHT, currentRound);
-                break;
-            case GAME_OVER:
-                renderer.drawGameOver(g, GAME_WIDTH, GAME_HEIGHT, score);
-                break;
-            case VICTORY:
-                renderer.drawVictory(g, GAME_WIDTH, GAME_HEIGHT, score);
-                break;
-            case SETTINGS:
-                switch (uiManager.getCurrentSettingsPage()) {
-                    case MAIN:
-                        renderer.drawSettingsMain(g, GAME_WIDTH, GAME_HEIGHT,
-                                uiManager.getMouseX(), uiManager.getMouseY(),
-                                uiManager.getSettingsSoundButtonRect(),
-                                uiManager.getSettingsBackRect());
-                        break;
-                    case SOUND:
-                        renderer.drawSettingsSound(g, GAME_WIDTH, GAME_HEIGHT,
-                                uiManager.getMouseX(), uiManager.getMouseY(),
-                                uiManager.getSliderBgmRect(), volumeBGM,
-                                uiManager.getSliderPaddleRect(), volumePaddle,
-                                uiManager.getSliderBrickRect(), volumeBrick,
-                                uiManager.getSliderWallRect(), volumeWall,
-                                uiManager.getSliderExplosionRect(), volumeExplosion,
-                                uiManager.getSoundBackRect());
-                        break;
-                    // (case CONTROLS: chưa có)
-                }
-                break;
-        }
+        // Ủy quyền toàn bộ việc vẽ cho Renderer.
+        // Renderer sẽ tự "hỏi" GameManager và UIManager
+        // xem cần vẽ cái gì, ở đâu.
+        renderer.drawCurrentState(g, this, uiManager);
     }
 
     private List<Integer> loadScores() {
@@ -769,9 +671,22 @@ public class GameManager {
     public void setLives(int lives) { this.lives = lives; }
     public int getScore() { return this.score; }
     public int getCurrentRound() { return this.currentRound; }
+    public int getMaxRounds() {
+        return this.maxRounds;
+    }
     public List<Ball> getBalls() { return this.balls; }
     public List<Brick> getBricks() { return this.bricks; }
     public boolean isBallLaunched() { return this.isBallLaunched; }
     public void setIsBallLaunched(boolean isBallLaunched) { this.isBallLaunched = isBallLaunched; }
     public Paddle getPaddle() { return this.paddle; }
+    public List<Bullet> getBullets() { return this.bullets; }
+    public List<PowerUp> getPowerUps() { return this.powerUps; }
+    public List<Explosion> getExplosions() { return this.explosions; }
+    public List<Integer> getHighScores() { return this.highScores; }
+
+    public float getVolumeBGM() { return this.volumeBGM; }
+    public float getVolumePaddle() { return this.volumePaddle; }
+    public float getVolumeBrick() { return this.volumeBrick; }
+    public float getVolumeWall() { return this.volumeWall; }
+    public float getVolumeExplosion() { return this.volumeExplosion; }
 }
