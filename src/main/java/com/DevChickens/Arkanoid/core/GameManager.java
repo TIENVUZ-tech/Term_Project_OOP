@@ -331,7 +331,21 @@
         
                 if (isBallLaunched) {
                     for (Ball b : balls) {
+                        // Lấy hướng cũ của bóng
+                        double oldDirX = b.getDirectionX();
+                        double oldDirY = b.getDirectionY();
+
+                        // Cập nhật vị trí
                         b.update();
+
+                        // Lấy hướng mới của bóng
+                        double newDirX = b.getDirectionX();
+                        double newDirY = b.getDirectionY();
+
+                        // Kiểm tra và phát âm thanh
+                        if (oldDirX != newDirX || oldDirY != newDirY) {
+                            soundManager.playSound("wall_hit", volumeWall);
+                        }
                     }
         
                     for (PowerUp p : powerUps) {
