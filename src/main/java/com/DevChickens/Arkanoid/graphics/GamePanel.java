@@ -1,88 +1,120 @@
 package com.DevChickens.Arkanoid.graphics;
 
 import com.DevChickens.Arkanoid.core.GameManager;
-import com.DevChickens.Arkanoid.input.InputHandler; // <-- 1. THÊM IMPORT
+import com.DevChickens.Arkanoid.core.UIManager;
+import com.DevChickens.Arkanoid.input.InputHandler;
 
 import javax.swing.*;
 import java.awt.*;
 
 /**
- * GamePanel là nơi hiển thị game và chứa vòng lặp game (game loop).
+ * GamePanel là "trái tim" của toàn bộ trò chơi.
+ * <p>
+ * Kế thừa từ {@link JPanel}, nó chịu trách nhiệm:
+ * 1. Khởi tạo và "kết nối" các hệ thống cốt lõi (GameManager, UIManager, InputHandler).
+ * 2. Chạy vòng lặp game (game loop) trên một luồng (Thread) riêng biệt.
+ * 3. Nhận lệnh vẽ (draw) từ GameManager và hiển thị chúng lên màn hình.
+ *
+ * @author Tuấn (DKCTuan)
  */
 public class GamePanel extends JPanel implements Runnable {
 
-    private GameManager manager;
-    private Thread gameThread;
-    private boolean running;
+    private final GameManager gameManager;
+    private final UIManager uiManager;
+    private final InputHandler inputHandler;
+    private volatile boolean running;
 
-    public GamePanel(GameManager manager) {
-        this.manager = manager;
+    /**
+     * Hàm khởi tạo của GamePanel.
+     */
+    public GamePanel() {
+        // Khởi tạo các hệ thống.
+        this.gameManager = GameManager.getInstance();
+        this.inputHandler = new InputHandler();
+        this.uiManager = new UIManager(this.gameManager, this.inputHandler);
 
+        // Đăng ký hander với gameManager.
+        this.gameManager.registerInputHandler(this.inputHandler);
+        this.gameManager.registerUIManager(this.uiManager);
+
+        // Cài đặt Panel lập kích thước mong muốn, GameWindow sẽ dùng
+        // hàm pack() để tự động điều chỉnh cửa sổ theo kích thước này.
         setPreferredSize(new Dimension(GameManager.GAME_WIDTH, GameManager.GAME_HEIGHT));
         setBackground(Color.BLACK);
-        setOpaque(false);
+
+        // Đánh dấu panel này có thể nhận sự chú ý, là bắt buộc.
         setFocusable(true);
-        requestFocus();
 
-        InputHandler inputHandler = new InputHandler(this.manager);
+        // Thêm listener vào Panel để nói với nó là InputHandler sẽ chịu trách nhiệm
+        // xử lý tất cả các sự kiện đầu vào của nó.
         addKeyListener(inputHandler);
-
         addMouseListener(inputHandler);
         addMouseMotionListener(inputHandler);
 
         startGameLoop();
     }
+
+    /**
+     * Khởi tạo và bắt đầu luồng (Thread) chính của game.
+     */
     private void startGameLoop() {
         running = true;
-        gameThread = new Thread(this);
+        Thread gameThread = new Thread(this);
         gameThread.start();
     }
 
+    /**
+     * Phương thức {@link Runnable#run()}, đây là "trái tim" của vòng lặp game (Game Loop).
+     * <p>
+     * Vòng lặp này sử dụng kiến trúc Fixed-Step Update (Cập nhật logic theo bước cố định)
+     * và Variable-Step Draw (Vẽ theo tốc độ thay đổi).
+     * <p>
+     */
     @Override
     public void run() {
-
-        //  Thiết lập timeline cố định cho logic game
+        // Thiết lập mục tiêu là 60 Tick (cập nhật logic) mỗi giây.
         final double TicksPerSecond = 60.0;
 
-        // Tính toán xem mỗi tick logic mất bao nhiêu nano giây.
+        // Tính toán xem mỗi tick logic cần bao nhiêu nano giây.
         final double nsPerTick = 1000000000.0 / TicksPerSecond;
 
         long lastTime = System.nanoTime();
-        double delta = 0;
 
-        // Các biến để đếm FPS (khung hình/giây) và TPS (tick/giây) để debug
-        long timer = System.currentTimeMillis();
-        int frames = 0;
-        int updates = 0;
+        // delta là một bộ đếm, tích lũy thời gian trôi qua.
+        // Khi delta >= 1.0, nghĩa là đã đủ thời gian để chạy 1 tick logic.
+        double delta = 0;
 
         while (running) {
             long now = System.nanoTime();
-            // delta: Biến đếm xem đã tích lũy đủ thời gian để chạy 1 tick logic chưa
+            // Cộng dồn thời gian đã trôi qua vào delta
             delta += (now - lastTime) / nsPerTick;
             lastTime = now;
 
-            // CẬP NHẬT LOGIC (Fixed-Step)
-            // Vòng lặp này đảm bảo logic luôn chạy 60 lần/giây.
-            // Nếu máy lag nặng (delta > 2), nó sẽ chạy update() 2 lần
-            // để "bắt kịp" thời gian, đảm bảo vật lý không bị chậm lại.
+            // Cập nhật logic Fixed-Step
+            // Vòng lặp này đảm bảo logic update luôn chạy 60 lần / giây.
+            // Nếu bị chậm có thể gọi 2 lần update liên tục.
             while (delta >= 1) {
-                manager.update();
-                updates++;
+                gameManager.update();
                 delta--;
             }
 
-            // VẼ (Variable-Step)
-            // Yêu cầu Swing vẽ lại (sẽ gọi hàm paintComponent)
-            // Hàm này chạy nhanh nhất có thể để không bị sleep
+            // Vẽ Variable-Step
+            // Yêu cầu Swing vẽ lại = cách gọi hàm paintComponent.
             repaint();
-            frames++;
         }
     }
 
+    /**
+     * Ghi đè phương thức vẽ cốt lõi của {@link JPanel}.
+     * Được gọi bởi hệ thống Swing (thông qua `repaint()`).
+     *
+     * @param g Đối tượng Graphics do Swing cung cấp để vẽ lên.
+     */
     @Override
     protected void paintComponent(Graphics g) {
+        // Luôn gọi đầu tiên để Jpanel ưu tiên dọn dẹp background.
         super.paintComponent(g);
-        manager.draw(g);
+        // Anh Manager sẽ lo phần vẽ.
+        gameManager.draw(g);
     }
-
 }
