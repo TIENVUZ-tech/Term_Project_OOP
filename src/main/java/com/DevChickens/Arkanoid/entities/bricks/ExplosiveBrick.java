@@ -2,7 +2,6 @@ package com.DevChickens.Arkanoid.entities.bricks;
 
 import com.DevChickens.Arkanoid.graphics.AssetLoader;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 
 /**
  * Đại diện cho một viên gạch nổ. Bị phá hủy sau một lần va chạm.

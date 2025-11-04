@@ -1,9 +1,7 @@
 package com.DevChickens.Arkanoid.entities.bricks;
 
-import com.DevChickens.Arkanoid.entities.GameObject;
 import com.DevChickens.Arkanoid.graphics.AssetLoader;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 
 /**
  * Đại diện cho một viên gạch bất tử, không thể bị phá hủy.

@@ -235,6 +235,7 @@ public class Ball extends MovableObject {
             double relativeIntersectX = (this.getX() + (this.getWidth() / 2.0)) - (paddle.getX() + (paddle.getWidth() / 2.0));
 
             // Chuẩn hóa vị trí va chạm [-1.0, 1.0]
+            // Tuy nhiên có thể giá trị vẫn vượt quá [-1.0, 1.0]
             double normalizedIntersectX = relativeIntersectX / (paddle.getWidth() / 2.0);
 
             // Kẹp giá trị
@@ -246,8 +247,7 @@ public class Ball extends MovableObject {
 
             // Set hướng cho quả bóng.
             this.setDirectionX(Math.sin(bounceAngle));
-            this.setDirectionY(-Math.cos(bounceAngle));
-
+            this.setDirectionY(- Math.cos(bounceAngle));
         } else {
             // VA CHẠM VỚI GẠCH HOẶC TƯỜNG
 
